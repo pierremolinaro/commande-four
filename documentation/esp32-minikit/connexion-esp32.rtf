@@ -1,0 +1,54 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww15180\viewh9600\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs22 \cf0 Connexion :\
+\
+ESP32     TFT\
+IO19 <--- MISO\
+IO18 ---> SCK\
+IO23 ---> MOSI\
+ IO5 ---> CS\
+IO0  ---> DC/RS\
+IO33 ---> RESET\
+ GND ---- GND\
+3,3V ---- Vcc\
+3,3V ---- 47\uc0\u937  --- LED\
+\
+ESP32 ---- Horloge I2C : ZS042 DS3231 Module\
+IO21  ---- SDA\
+IO22  ---- SCL\
+\
+ESP32 ---- Ampli MAX31855\
+IO4   ---> CS\
+IO17  <--- MISO \
+IO16  ---> CLK\
+\
+ESP32 ---- SDCARD\
+IO13  ---> MOSI\
+IO12  <--- MISO\
+IO14  ---> CLK\
+IO15  ---> CS\
+\
+Entr\'e9es logiques : IO34, IO35, IO36 (SVP), IO39 (SVP) : encodeur, 1 poussoir\
+\
+Restent : IO26, IO27, IO25, IO32 : 2 leds, 1 poussoir, + relais\
+\
+Sortie logique : relais\
+\
+Type de carte ESP32 : "MH ET LIVE ESP32MiniKit"\
+\
+Librairie TFT : TFT_eSPI\
+\
+Attention, il faut modifier le fichier User_Setup.h, en ne laissant que les d\'e9finitions suivantes :\
+\
+#define ILI9341_DRIVER\
+#define TFT_MISO 19\
+#define TFT_MOSI 23\
+#define TFT_SCLK 18\
+#define TFT_CS    5  // Chip select control pin\
+#define TFT_DC    2  // Data Command control pin\
+#define TFT_RST  33  // Reset pin (could connect to RST pin)\
+}

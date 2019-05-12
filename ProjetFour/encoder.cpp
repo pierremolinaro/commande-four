@@ -1,5 +1,6 @@
 // ----------Include the header----------
 #include "encoder.h"
+#include "TFT.h"
 
 // ----------Static variables in the file----------
 static int16_t encoderPos = 0; // This variable stores our current value of encoder position.
@@ -49,9 +50,9 @@ void IRAM_ATTR encoderISR(void) {
  * this value varies between minValue and maxValue.
  */
 uint16_t useRotaryEncoder(uint16_t minValue, uint16_t maxValue) {
-    if (encoderPos > maxValue) setEncoderPosition(minValue);
-    else if (encoderPos < minValue) setEncoderPosition(maxValue);
-    return(encoderPos);
+  if (encoderPos > maxValue) setEncoderPosition(minValue);
+  else if (encoderPos < minValue) setEncoderPosition(maxValue);
+  return(encoderPos);
 }
 
 /*====================================================================================*
@@ -61,8 +62,15 @@ uint16_t useRotaryEncoder(uint16_t minValue, uint16_t maxValue) {
  * It returns the position of the encoder,
  * this value varies between 0 and nbMenus-1.
  */
+static uint16_t gPreviousEncoderPosition = 0 ;
+
 uint16_t encoderPosition(uint16_t nbMenus) {
-    return(useRotaryEncoder(0, nbMenus-1));
+  const uint16_t encoderPosition = useRotaryEncoder (0, nbMenus-1) ;
+  if (gPreviousEncoderPosition != encoderPosition) {
+    gPreviousEncoderPosition = encoderPosition ;
+    prolongerRetroEclairage () ;
+  }
+  return encoderPosition ;
 }
 
 /*====================================================================================*

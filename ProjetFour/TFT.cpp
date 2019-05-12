@@ -1179,12 +1179,26 @@ void printEndCycleMenu(void) {
 //   GERER ECONOMISEUR ECRAN
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-//static uint32_t gDateExtinction = 1000 ; // 20s après le démarrage
+static uint32_t gDateExtinction = 60 * 1000 ; // 20s après le démarrage
+
+//······················································································································
+
+void prolongerRetroEclairage (void) {
+  const uint32_t nouvelleDateExtinction = millis () + 60 * 1000 ;
+  if (gDateExtinction < nouvelleDateExtinction) {
+    gDateExtinction = nouvelleDateExtinction ;
+  }
+}
 
 //······················································································································
 
 void gererEconomiseurEcran (void) {
-
+// Appuyer sur le bouton prolonge la durée de retro-éclairage
+  if (!digitalRead (BOUTON_BTN)) {
+    prolongerRetroEclairage () ;
+  }
+// Le retro-éclairage est activé par un niveau haut sur RETRO_ECLAIRAGE
+  digitalWrite (RETRO_ECLAIRAGE, gDateExtinction >= millis ()) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

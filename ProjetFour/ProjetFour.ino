@@ -76,14 +76,15 @@ void setup() {
     // ----------LEDs section of setup----------
     pinMode(LED1, OUTPUT); // setup the LED 1 pin
     pinMode(LED2, OUTPUT); // setup the LED 2 pin
-    pinMode(LED_BUILTIN, OUTPUT); // setup the builtin LED on the microcontroller
+    pinMode (RETRO_ECLAIRAGE, OUTPUT); // Au niveau bas, active le retro-éclairage
+    pinMode (BOUTON_BTN, INPUT) ;
     // ----------Buzzer section of setup----------
     // attach the channel to the buzzer to be controlled
     ledcAttachPin (buzzer, PWMchannelBuzz);
     // configure PWM functionalitites
     ledcSetup (PWMchannelBuzz, PWMfrequency, PWMresolution);
     // ----------Relay section of setup----------
-    pinMode(ovenRelay, OUTPUT);
+    pinMode (ovenRelay, OUTPUT);
   //--- Configurer le thermo-couple
     configurerThermoCouple () ;
     // ----------Rotary encoder section of setup----------
@@ -105,17 +106,17 @@ void setup() {
  *                                    LOOP                                            *
  *====================================================================================*/
 static uint32_t delayScreen = 2000;
-static uint32_t blinkLED    = 2000;
+// static uint32_t blinkLED    = 2000;
 static uint32_t delaySD     = 0;
 
 void loop() {
 //--- Economiseur d'ecran
   gererEconomiseurEcran () ;
-// ----------Blinking Led----------
-  if (millis() > blinkLED) {
-    blinkLED += 1500;
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-  }
+//---Blinking Led (supprimé, IO2 sert à contrôler le retro-éclairage)
+//  if (millis() > blinkLED) {
+//    blinkLED += 1500;
+//    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+//  }
     // ----------Updating the time----------
     updateTime();
     // ----------Updating the temperature----------

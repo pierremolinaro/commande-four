@@ -1,0 +1,14 @@
+Voici quelques pièges à éviter.
+
+
+Les signaux TXD et RXD ne sont pas utilisables (utilisés par la liaison USB).
+
+Les signaux CMD, CLK, SD0, SD1, SD2 et SD3 ne sont pas utilisables (liaison avec la flash interne).
+
+IO2 est le signal connecté à la led embarquée sur le MH ET LIVE ESP32 Minikit.
+
+Les GPIO34 à GPIO39 sont en entrée uniquement, sans pullup.
+
+Certaines broches n'ont pas de pullup en entrée (?) : IO13, IO25, IO26, IO27, IO32, IO33. il semble que c'est un bug du composant, https://www.esp32.com/viewtopic.php?t=439
+
+IO22 est une sortie à collecteur ouvert ???
