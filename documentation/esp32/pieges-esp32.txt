@@ -5,7 +5,7 @@ Les signaux TXD et RXD ne sont pas utilisables (utilisés par la liaison USB).
 
 Les signaux CMD, CLK, SD0, SD1, SD2 et SD3 ne sont pas utilisables (liaison avec la flash interne).
 
-IO2 est le signal connecté à la led embarquée sur le MH ET LIVE ESP32 Minikit.
+IO2 est le signal connecté à la led embarquée sur le MH ET LIVE ESP32 Minikit. Attention, il semble qu'un niveau HAUT pendant le RESET empêche le flashage de l'ESP32.
 
 Les GPIO34 à GPIO39 sont en entrée uniquement, sans pullup.
 
