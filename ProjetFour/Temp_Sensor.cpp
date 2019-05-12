@@ -1,9 +1,24 @@
-// ----------Include the header----------
 #include "Temp_Sensor.h"
+#include "Defines.h"
+#include "myAdafruit_MAX31855.h"
 
-// ----------Static variables in the file----------
-static Adafruit_MAX31855 thermocouple(MAXCLK, MAXCS, MAXDO); // Initialize the thermocouple
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  Variables statiques
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+static myAdafruit_MAX31855 thermocouple (MAX31855_CLK, MAX31855_CS, MAX31855_DO) ;
+
 static int32_t seqBin;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  Configurer le thermo-couple
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void configurerThermoCouple (void) {
+  thermocouple.begin () ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 // ----------Functions----------
 /*====================================================================================*
@@ -12,7 +27,7 @@ static int32_t seqBin;
  * This function stocks the data read by the thermocouple in a static variable seqBin.
  */
 void updateTemp(void) {
-    seqBin = thermocouple.spiread32();
+    seqBin = thermocouple.rawValue ();
 }
 
 /*====================================================================================*

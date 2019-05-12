@@ -57,71 +57,6 @@ void myAdafruit_MAX31855::begin(void) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-double myAdafruit_MAX31855::readInternal(void) {
-  uint32_t v;
-
-  v = rawValue();
-
-  // ignore bottom 4 bits - they're just thermocouple data
-  v >>= 4;
-
-  // pull the bottom 11 bits off
-  float internal = v & 0x7FF;
-  // check sign bit!
-  if (v & 0x800) {
-    // Convert to negative value by extending sign and casting to signed type.
-    int16_t tmp = 0xF800 | (v & 0x7FF);
-    internal = tmp;
-  }
-  internal *= 0.0625; // LSB = 0.0625 degrees
-  //Serial.print("\tInternal Temp: "); Serial.println(internal);
-  return internal;
-}
-
-double myAdafruit_MAX31855::readCelsius(void) {
-
-  int32_t v;
-
-  v = rawValue();
-
-  //Serial.print("0x"); Serial.println(v, HEX);
-
-  /*
-  float internal = (v >> 4) & 0x7FF;
-  internal *= 0.0625;
-  if ((v >> 4) & 0x800)
-    internal *= -1;
-  Serial.print("\tInternal Temp: "); Serial.println(internal);
-  */
-
-  if (v & 0x7) {
-    // uh oh, a serious problem!
-    return NAN;
-  }
-
-  if (v & 0x80000000) {
-    // Negative value, drop the lower 18 bits and explicitly extend sign bits.
-    v = 0xFFFFC000 | ((v >> 18) & 0x00003FFFF);
-  }
-  else {
-    // Positive value, just drop the lower 18 bits.
-    v >>= 18;
-  }
-  //Serial.println(v, HEX);
-
-  double centigrade = v;
-
-  // LSB = 0.25 degrees C
-  centigrade *= 0.25;
-  return centigrade;
-}
-
-uint8_t myAdafruit_MAX31855::readError() {
-  return rawValue() & 0x7;
-}
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   Get raw value
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
@@ -134,11 +69,11 @@ uint32_t myAdafruit_MAX31855::rawValue(void) {
   digitalWrite (mSCLK, LOW) ;
   delay (1) ;
 
-  for (int i = 31 ; i >= 0 ; i--) {
+  for (int32_t i = 31 ; i >= 0 ; i--) {
     digitalWrite (mSCLK, LOW);
     delay (1) ;
     result <<= 1 ;
-    if (digitalRead(mMISO)) {
+    if (digitalRead (mMISO)) {
 	    result |= 1 ;
     }
 

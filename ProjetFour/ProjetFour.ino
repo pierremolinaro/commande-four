@@ -1,6 +1,6 @@
 /************************************************************************************
 Project by Antoine COLSON and Clément NADER
-directed by Pierre MOLINARO and Jean-Claude BARDIEUX
+directed by Pierre MOLINARO and Jean-Claude BARDIAUX
 
 This sketch is used to control an oven in order to follow a temperature graph 
 
@@ -84,8 +84,10 @@ void setup() {
     ledcSetup (PWMchannelBuzz, PWMfrequency, PWMresolution);
     // ----------Relay section of setup----------
     pinMode(ovenRelay, OUTPUT);
+  //--- Configurer le thermo-couple
+    configurerThermoCouple () ;
     // ----------Rotary encoder section of setup----------
-    initEncoder();
+    initEncoder () ;
     // ----------Buttons section of setup----------
     initButtons();
     // ----------Clock section of setup----------
@@ -107,11 +109,13 @@ static uint32_t blinkLED    = 2000;
 static uint32_t delaySD     = 0;
 
 void loop() {
-    // ----------Blinking Led----------
-    if (millis() > blinkLED) {
-        blinkLED += 1500;
-        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    }
+//--- Economiseur d'ecran
+  gererEconomiseurEcran () ;
+// ----------Blinking Led----------
+  if (millis() > blinkLED) {
+    blinkLED += 1500;
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  }
     // ----------Updating the time----------
     updateTime();
     // ----------Updating the temperature----------

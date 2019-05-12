@@ -1,6 +1,8 @@
 // ----------Always begin by this pragma----------
 #pragma once
 
+#include <Arduino.h>
+
 // ----------Constants declaration----------
 // Rotary encoder declaration
 const uint8_t pinA     = 35;
@@ -25,9 +27,9 @@ const uint32_t PWMfrequency   =  1;
 const uint8_t  PWMresolution  =  8; //Resolution 8, 10, 12, 15
 
 // Creating a thermocouple instance with software SPI on any three digital IO pins
-const uint8_t MAXDO  = 17;
-const uint8_t MAXCS  =  4;
-const uint8_t MAXCLK = 16;
+const uint8_t MAX31855_DO  = 17;
+const uint8_t MAX31855_CS  =  4;
+const uint8_t MAX31855_CLK = 16;
 
 // Reading on the SD card declaration
 const String curvesDir = "/Courbes";

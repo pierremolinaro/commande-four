@@ -17,7 +17,7 @@ const uint8_t nbColumn = 26; // with a text size of 2
 /*====================================================================================*
  *                                  initScreen                                        *
  *====================================================================================*
- * This function initialized the TFT screen and sets the rotation in landscape, 
+ * This function initialized the TFT screen and sets the rotation in landscape,
  * and draws the logo of Centrale Nantes.
  */
 void initScreen(void);
@@ -32,7 +32,7 @@ void drawBmp(String filename);
 /*====================================================================================*
  *                               read16 & read32                                      *
  *====================================================================================*
- * These functions read 16- and 32-bit types from the SD card file, 
+ * These functions read 16- and 32-bit types from the SD card file,
  * they are used for the drawBMP function.
  * BMP data is stored little-endian, Arduino is little-endian too.
  * May need to reverse subscript order if porting elsewhere.
@@ -43,7 +43,7 @@ uint32_t read32(fs::File &f);
 /*====================================================================================*
  *                                 clearScreen                                        *
  *====================================================================================*
- * This function clears all the screen except the bottom where are printed the 
+ * This function clears all the screen except the bottom where are printed the
  * permanent information.
  */
 void clearScreen(void);
@@ -51,7 +51,7 @@ void clearScreen(void);
 /*====================================================================================*
  *                                   setLign                                          *
  *====================================================================================*
- * This function sets the cursor at the given lign and at the first column in order 
+ * This function sets the cursor at the given lign and at the first column in order
  * to write text in the given text size.
  * The default text size is 2.
  */
@@ -60,53 +60,53 @@ void setLign(uint8_t lign, uint8_t textSize = 2);
 /*====================================================================================*
  *                                  setColumn                                         *
  *====================================================================================*
- * This function sets the cursor at the same lign and at the given column in order 
+ * This function sets the cursor at the same lign and at the given column in order
  * to write text in the given text size.
  * The default text size is 2.
  */
 void setColumn(uint8_t column, uint8_t textSize = 2);
 
-// -------------------------------printPermanent----------------------------------------------------------------------------------------------------------------------
+// -------------------------------printPermanent------------------------------------------------------------------------
 /*====================================================================================*
  *                                printPermanent                                      *
  *====================================================================================*
- * This function prints on the screen permanent information which are  date,  time, 
+ * This function prints on the screen permanent information which are  date,  time,
  * temperature, if the oven is running or a program is delayed,
  * and if so, the time left.
  */
-void printPermanent(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second, 
+void printPermanent(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second,
                       double temp, bool isRunning, uint16_t timeLeft, bool isDelayed, uint16_t timeBeforeStart);
 
 /*====================================================================================*
  *                             clearPrintPermanent                                    *
  *====================================================================================*
- * This function clears the bottom of the screen where are printed the permanent 
+ * This function clears the bottom of the screen where are printed the permanent
  * information.
  */
 void clearPrintPermanent(void);
 
-// --------------------------------printMainMenu----------------------------------------------------------------------------------------------------------------------
+// --------------------------------printMainMenu------------------------------------------------------------------------
 /*====================================================================================*
  *                                 printMainMenu                                      *
  *====================================================================================*
- * This function prints on the screen the Main Menu to select the next menu between 
+ * This function prints on the screen the Main Menu to select the next menu between
  * starting menu, showing information menu, setting time menu and curve managing menu.
- * If the oven has a delayed start, the starting menu turns into a menu to change the 
+ * If the oven has a delayed start, the starting menu turns into a menu to change the
  * value of the delay.
  * If the oven is running, the starting menu turns into a menu to stop the oven.
  */
 void printMainMenu(uint16_t encoderPos, bool isRunning, bool isDelayed);
 
-// ----------------------------printSelectCurveMenu-------------------------------------------------------------------------------------------------------------------
+// ----------------------------printSelectCurveMenu------------------------------------------------------------------------
 /*====================================================================================*
  *                             printSelectCurveMenu                                   *
  *====================================================================================*
- * This function prints on the screen the menu to select the curve between those on 
+ * This function prints on the screen the menu to select the curve between those on
  * the SD card.
  */
 void printSelectCurveMenu(uint16_t encoderPos, uint8_t nbCurves, String arrayDisplayNames[], uint8_t numPage);
 
-// -----------------------------printShowValuesMenu-------------------------------------------------------------------------------------------------------------------
+// -----------------------------printShowValuesMenu---------------------------------------------------------------------
 /*====================================================================================*
  *                                  setCursorTab                                      *
  *====================================================================================*
@@ -118,7 +118,7 @@ void setCursorTab(uint8_t numTime, bool TimeOrTemp);
 /*====================================================================================*
  *                                printTabTimeTemp                                    *
  *====================================================================================*
- * This function prints the values of a table of time and temperature 
+ * This function prints the values of a table of time and temperature
  * of 22 columns maximum.
  */
 void printTabTimeTemp(TimeTemp arrayTimeTemp[], uint8_t len);
@@ -144,7 +144,7 @@ void printShowValuesMenu(uint16_t encoderPos);
  */
 void printValues(String nameOfCurve);
 
-// ------------------------------printPlotGraphMenu-------------------------------------------------------------------------------------------------------------------
+// ------------------------------printPlotGraphMenu---------------------------------------------------------------------
 /*====================================================================================*
  *                                   printCurve                                       *
  *====================================================================================*
@@ -166,16 +166,16 @@ void printPlotGraphMenu(uint16_t encoderPos);
  */
 void printGraph(String nameOfCurve);
 
-// ----------------------------printStartOrDelayMenu------------------------------------------------------------------------------------------------------------------
+// ----------------------------printStartOrDelayMenu--------------------------------------------------------------------
 /*====================================================================================*
  *                             printStartOrDelayMenu                                  *
  *====================================================================================*
- * This function prints the menu to select whether we start directly the program or 
+ * This function prints the menu to select whether we start directly the program or
  * we delay it.
  */
 void printStartOrDelayMenu(uint16_t encoderPos, uint16_t tmax, uint8_t hour, uint8_t minute);
 
-// --------------------------------printDelayMenu---------------------------------------------------------------------------------------------------------------------
+// --------------------------------printDelayMenu-----------------------------------------------------------------------
 /*====================================================================================*
  *                                 printDelayMenu                                     *
  *====================================================================================*
@@ -183,7 +183,7 @@ void printStartOrDelayMenu(uint16_t encoderPos, uint16_t tmax, uint8_t hour, uin
  */
 void printDelayMenu(uint16_t launchDelay, uint16_t tmax, uint8_t hour, uint8_t minute);
 
-// --------------------------------printStopMenu----------------------------------------------------------------------------------------------------------------------
+// --------------------------------printStopMenu------------------------------------------------------------------------
 /*====================================================================================*
  *                                 printStopMenu                                      *
  *====================================================================================*
@@ -199,7 +199,7 @@ void printStopMenu(uint16_t encoderPos);
  */
 void printChangeDelayMenu(uint16_t launchDelay, uint16_t tmax, uint8_t hour, uint8_t minute);
 
-// --------------------------------printInfoMenu----------------------------------------------------------------------------------------------------------------------
+// --------------------------------printInfoMenu------------------------------------------------------------------------
 /*====================================================================================*
  *                                 printInfoMenu                                      *
  *====================================================================================*
@@ -223,11 +223,11 @@ void printSetTimeMenu(uint16_t encoderPos, uint16_t year, uint8_t month, uint8_t
  */
 void printSetTimeSubMenu(uint16_t Mode, uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute);
 
-// ----------------------------printManageCurvesMenu------------------------------------------------------------------------------------------------------------------
+// ----------------------------printManageCurvesMenu--------------------------------------------------------------------
 /*====================================================================================*
  *                             printManageCurvesMenu                                  *
  *====================================================================================*
- * This function prints the menu where we select what to do concerning the curves 
+ * This function prints the menu where we select what to do concerning the curves
  * stocked on the SD card: show onformation on them, create a new curve or delete one.
  */
 void printManageCurvesMenu(uint16_t encoderPos);
@@ -239,11 +239,11 @@ void printManageCurvesMenu(uint16_t encoderPos);
  * on the SD card, and we want to create a new one.
  */
 void printMaxNbCurvesErrorMenu(void);
-// -----------------------------printChooseNameMenu-------------------------------------------------------------------------------------------------------------------
+// -----------------------------printChooseNameMenu---------------------------------------------------------------------
 /*====================================================================================*
  *                              printChooseNameMenu                                   *
  *====================================================================================*
- * This function prints the menu where we select the name of the new curve we want 
+ * This function prints the menu where we select the name of the new curve we want
  * to create.
  */
 void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJminOth);
@@ -252,16 +252,16 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
  *                              printNameContinueMenu                                 *
  *====================================================================================*
  * The name of the curve is already given.
- * This function prints the menu where we choose between continue with this name 
+ * This function prints the menu where we choose between continue with this name
  * or return back to take another name.
  */
 void printNameContinueMenu(uint16_t encoderPos, String displayName);
 
-// ------------------------------printSelectValuesMenu----------------------------------------------------------------------------------------------------------------
+// ------------------------------printSelectValuesMenu------------------------------------------------------------------
 /*====================================================================================*
  *                            clearPrintSelectValuesMenu                              *
  *====================================================================================*
- * This function clears the top of the screen when we select values of time or 
+ * This function clears the top of the screen when we select values of time or
  * temperature.
  */
 void clearPrintSelectValuesMenu(void);
@@ -269,7 +269,7 @@ void clearPrintSelectValuesMenu(void);
 /*====================================================================================*
  *                               printSelectValuesMenu                                *
  *====================================================================================*
- * This function prints the menu where we select the values of the new curve, to 
+ * This function prints the menu where we select the values of the new curve, to
  * select whether we create a new entry, delete one, validate or cancel.
  */
 void printSelectValuesMenu(uint16_t encoderPos, TimeTemp arrayTimeTemp[], uint8_t len);
@@ -283,12 +283,12 @@ void printValues(TimeTemp arrayTimeTemp[], uint8_t len);
 /*====================================================================================*
  *                              printSelectTimeTempMenu                               *
  *====================================================================================*
- * This function prints the menu where we select the values of the new curve, to 
+ * This function prints the menu where we select the values of the new curve, to
  * show the value we are modifying (time or temperature).
  */
 void printSelectTimeTempMenu(TimeTemp arrayTimeTemp[], uint8_t len, uint16_t Mode);
 
-// -------------------------------printPlotGraphMenu------------------------------------------------------------------------------------------------------------------
+// -------------------------------printPlotGraphMenu--------------------------------------------------------------------
 /*====================================================================================*
  *                                printPlotGraphMenu                                  *
  *====================================================================================*
@@ -296,7 +296,7 @@ void printSelectTimeTempMenu(TimeTemp arrayTimeTemp[], uint8_t len, uint16_t Mod
  */
 void printPlotGraphMenu(uint16_t encoderPos, TimeTemp arrayTimeTemp[], uint8_t len);
 
-// -------------------------------printCreationMenu-------------------------------------------------------------------------------------------------------------------
+// -------------------------------printCreationMenu------------------------------------------------------------------------
 /*====================================================================================*
  *                                printCreationMenu                                   *
  *====================================================================================*
@@ -304,7 +304,7 @@ void printPlotGraphMenu(uint16_t encoderPos, TimeTemp arrayTimeTemp[], uint8_t l
  */
 void printCreationMenu(void);
 
-// -----------------------------printDeleteCurveMenu------------------------------------------------------------------------------------------------------------------
+// -----------------------------printDeleteCurveMenu--------------------------------------------------------------------
 /*====================================================================================*
  *                              printDeleteCurveMenu                                  *
  *====================================================================================*
@@ -315,16 +315,24 @@ void printDeleteCurveMenu(uint16_t encoderPos, String nameOfCurve);
 /*====================================================================================*
  *                               printNameErrorMenu                                   *
  *====================================================================================*
- * This function prints the menu when the chosen name of file to delete or create 
+ * This function prints the menu when the chosen name of file to delete or create
  * is the one which is running.
  */
 void printNameErrorMenu(String nameOfCurve, uint16_t Mode);
 
-// -------------------------------printEndCycleMenu-------------------------------------------------------------------------------------------------------------------
+// -------------------------------printEndCycleMenu---------------------------------------------------------------------
 /*====================================================================================*
  *                                printEndCycleMenu                                   *
  *====================================================================================*
- * This function prints the menu when the cycle has finished, when the buzzer is 
+ * This function prints the menu when the cycle has finished, when the buzzer is
  * running.
  */
 void printEndCycleMenu(void);
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   GERER ECONOMISEUR ECRAN
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void gererEconomiseurEcran (void) ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

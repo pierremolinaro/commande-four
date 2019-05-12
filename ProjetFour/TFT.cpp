@@ -8,7 +8,7 @@ static TFT_eSPI tft = TFT_eSPI();
 /*====================================================================================*
  *                                  initScreen                                        *
  *====================================================================================*
- * This function initialized the TFT screen and sets the rotation in landscape, 
+ * This function initialized the TFT screen and sets the rotation in landscape,
  * and draws the logo of Centrale Nantes.
  */
 void initScreen(void) {
@@ -45,7 +45,7 @@ void drawBmp(String filename) {
         read32(bmpFS);
         w = read32(bmpFS);
         h = read32(bmpFS);
-    
+
         if ((read16(bmpFS) == 1) && (read16(bmpFS) == 24) && (read32(bmpFS) == 0)) {
             y += h - 1;
             tft.setSwapBytes(true);
@@ -78,7 +78,7 @@ void drawBmp(String filename) {
 /*====================================================================================*
  *                               read16 & read32                                      *
  *====================================================================================*
- * These functions read 16- and 32-bit types from the SD card file, 
+ * These functions read 16- and 32-bit types from the SD card file,
  * they are used for the drawBMP function.
  * BMP data is stored little-endian, Arduino is little-endian too.
  * May need to reverse subscript order if porting elsewhere.
@@ -102,7 +102,7 @@ uint32_t read32(fs::File &f) {
 /*====================================================================================*
  *                                 clearScreen                                        *
  *====================================================================================*
- * This function clears all the screen except the bottom where are printed the 
+ * This function clears all the screen except the bottom where are printed the
  * permanent information.
  */
 void clearScreen(void) {
@@ -112,7 +112,7 @@ void clearScreen(void) {
 /*====================================================================================*
  *                                   setLign                                          *
  *====================================================================================*
- * This function sets the cursor at the given lign and at the first column in order 
+ * This function sets the cursor at the given lign and at the first column in order
  * to write text in the given text size.
  * The default text size is 2.
  */
@@ -123,7 +123,7 @@ void setLign(uint8_t lign, uint8_t textSize) {
 /*====================================================================================*
  *                                  setColumn                                         *
  *====================================================================================*
- * This function sets the cursor at the same lign and at the given column in order 
+ * This function sets the cursor at the same lign and at the given column in order
  * to write text in the given text size.
  * The default text size is 2.
  */
@@ -135,11 +135,11 @@ void setColumn(uint8_t column, uint8_t textSize) {
 /*====================================================================================*
  *                                printPermanent                                      *
  *====================================================================================*
- * This function prints on the screen permanent information which are  date,  time, 
+ * This function prints on the screen permanent information which are  date,  time,
  * temperature, if the oven is running or a program is delayed,
  * and if so, the time left.
  */
-void printPermanent(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second, 
+void printPermanent(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second,
                       double temp, bool isRunning, uint16_t timeLeft, bool isDelayed, uint16_t timeBeforeStart) {
     tft.setTextColor(TFT_WHITE, TFT_BLACK); tft.setTextSize(2);
     // ----------Printing the date----------
@@ -178,7 +178,7 @@ void printPermanent(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uin
         tft.printf("Diff%cr%c", 130, 130); // (char)130 -> é
     }
     tft.setTextColor(TFT_WHITE, TFT_BLACK); tft.setTextSize(2);
-    
+
     // ----------Printing time left if a program is running----------
     if (isRunning) {
         setLign(nbLign*2 - 5, 1); setColumn(nbColumn*2 - 12, 1); tft.setTextSize(1);
@@ -198,7 +198,7 @@ void printPermanent(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uin
 /*====================================================================================*
  *                             clearPrintPermanent                                    *
  *====================================================================================*
- * This function clears the bottom of the screen where are printed the permanent 
+ * This function clears the bottom of the screen where are printed the permanent
  * information.
  */
 void clearPrintPermanent(void) {
@@ -212,9 +212,9 @@ void clearPrintPermanent(void) {
 /*====================================================================================*
  *                                 printMainMenu                                      *
  *====================================================================================*
- * This function prints on the screen the Main Menu to select the next menu between 
+ * This function prints on the screen the Main Menu to select the next menu between
  * starting menu, showing information menu, setting time menu and curve managing menu.
- * If the oven has a delayed start, the starting menu turns into a menu to change the 
+ * If the oven has a delayed start, the starting menu turns into a menu to change the
  * value of the delay.
  * If the oven is running, the starting menu turns into a menu to stop the oven.
  */
@@ -229,23 +229,23 @@ void printMainMenu(uint16_t encoderPos, bool isRunning, bool isDelayed) {
         if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
         tft.printf(" Changer Prog. ");
     } else {
-        if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);            
+        if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
         tft.printf(" D%cmarrer Four ", 130); // (char)130 -> é
     }
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    
+
     // ----------Show Information----------
-    setLign(2, 3); 
+    setLign(2, 3);
     if (encoderPos == 1) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.print(" Afficher Infos ");
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    
+
     // ----------Set Time----------
     setLign(4, 3);
     if (encoderPos == 2) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-    tft.printf(" R%cgler Heure ", 130); // (char)130 -> é    
+    tft.printf(" R%cgler Heure ", 130); // (char)130 -> é
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    
+
     // ----------Manage Curves----------
     setLign(6, 3);
     if (encoderPos == 3) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
@@ -261,7 +261,7 @@ void printMainMenu(uint16_t encoderPos, bool isRunning, bool isDelayed) {
 /*====================================================================================*
  *                             printSelectCurveMenu                                   *
  *====================================================================================*
- * This function prints on the screen the menu to select the curve between those on 
+ * This function prints on the screen the menu to select the curve between those on
  * the SD card.
  */
 void printSelectCurveMenu(uint16_t encoderPos, uint8_t nbCurves, String arrayDisplayNames[], uint8_t numPage) {
@@ -283,7 +283,7 @@ void printSelectCurveMenu(uint16_t encoderPos, uint8_t nbCurves, String arrayDis
         tft.print(' ' + displayName + ' ');
     }
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    
+
     // ----------Next page----------
     if (nbCurves - 6*numPage > 6) {
         setLign(21, 1); setColumn(18); tft.setTextSize(2);
@@ -315,7 +315,7 @@ void setCursorTab(uint8_t numTime, bool TimeOrTemp) { // TimeOrTemp : 0 -> time,
 /*====================================================================================*
  *                                printTabTimeTemp                                    *
  *====================================================================================*
- * This function prints the values of a table of time and temperature 
+ * This function prints the values of a table of time and temperature
  * of 22 columns maximum.
  */
 void printTabTimeTemp(TimeTemp arrayTimeTemp[], uint8_t len) {
@@ -336,7 +336,7 @@ void drawTab(void) {
     tft.setTextSize(2); tft.setTextColor(TFT_WHITE);
     uint32_t smallTraitsColor = TFT_NAVY;
     uint32_t largeTraitsColor = TFT_LIGHTGREY;
-    
+
     // ----------Write the name of the table ligns----------
     setLign( 5, 1); setColumn( 1, 1); tft.print ("Temps(min)");
     setLign( 7, 1); setColumn( 1, 1); tft.printf("Temp%crature(%cC)", 130, 247); // (char) 130 -> é, (char) 247 -> °
@@ -363,7 +363,7 @@ void printShowValuesMenu(uint16_t encoderPos) {
     setLign(0); tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 1) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.print("Retour");
-    
+
     // ----------Next----------
     setLign(0); setColumn(7); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
@@ -382,7 +382,7 @@ void printValues(String nameOfCurve) {
     String pathValues = valuesDir + "/valeurs" + nameOfCurve + ".CSV";
     uint8_t len = extractValues(arrayTimeTemp, pathValues);
     printTabTimeTemp(arrayTimeTemp, len);
-    
+
     // ----------Print all the ligns of the table----------
     drawTab();
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -400,7 +400,7 @@ void printCurve(TimeTemp arrayTimeTemp[], uint8_t len) {
     uint16_t w = 298, h = 160;
     tft.setCursor(16, 32);
     tft.drawRect(tft.getCursorX(), tft.getCursorY(), w, h, TFT_WHITE);
-    
+
     uint16_t x0 = tft.getCursorX() + arrayTimeTemp[0].Time/tmax*w;
     uint16_t y0 = tft.getCursorY() + h - arrayTimeTemp[0].Temp/tempmax*h;
     for (uint8_t i = 1; i < len; i++) {
@@ -453,7 +453,7 @@ void printGraph(String nameOfCurve) {
 /*====================================================================================*
  *                             printStartOrDelayMenu                                  *
  *====================================================================================*
- * This function prints the menu to select whether we start directly the program or 
+ * This function prints the menu to select whether we start directly the program or
  * we delay it.
  */
 void printStartOrDelayMenu(uint16_t encoderPos, uint16_t tmax, uint8_t hour, uint8_t minute) {
@@ -466,12 +466,12 @@ void printStartOrDelayMenu(uint16_t encoderPos, uint16_t tmax, uint8_t hour, uin
     setLign(2, 3); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.print(" Lancer Cuisson ");
-    
+
     // ----------Delayed departure----------
     setLign(4, 3); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 1) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.printf(" D%cpart Diff%cr%c ", 130, 130, 130); // (char)130 -> é
-    
+
     // ----------Print end date----------
     uint16_t endM = minute + tmax;
     uint16_t endH = hour;
@@ -517,7 +517,7 @@ void printDelayMenu(uint16_t launchDelay, uint16_t tmax, uint8_t hour, uint8_t m
     // ----------Start Cooking----------
     setLign(2, 3); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.print(" Lancer Cuisson ");
-    
+
     // ----------Delayed Departure----------
     setLign(4, 3); tft.setTextSize(3); tft.setTextColor(TFT_BLACK, TFT_ORANGE);
     tft.printf(" D%cpart Diff%cr%c ", 130, 130, 130); // (char)130 -> é
@@ -530,7 +530,7 @@ void printDelayMenu(uint16_t launchDelay, uint16_t tmax, uint8_t hour, uint8_t m
     else { tft.setTextColor(TFT_WHITE, TFT_BLACK); tft.print("   "); }
     tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.printf("%02umn", m);
-    
+
     // ----------Print end date----------
     uint16_t endM = minute + m + tmax;
     uint16_t endH = hour + h;
@@ -578,7 +578,7 @@ void printStopMenu(uint16_t encoderPos) {
     setLign(3, 3); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.printf(" Arr%cter Cuisson ", 136); // (char)136 -> ê
-    
+
     tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
 }
 
@@ -601,7 +601,7 @@ void printChangeDelayMenu(uint16_t launchDelay, uint16_t tmax, uint8_t hour, uin
     else { tft.setTextColor(TFT_WHITE, TFT_BLACK); tft.print("   "); }
     tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.printf("%02umn", m);
-    
+
     // ----------Print end date----------
     uint16_t endM = minute + m + tmax;
     uint16_t endH = hour + h;
@@ -678,12 +678,12 @@ void printSetTimeMenu(uint16_t encoderPos, uint16_t year, uint8_t month, uint8_t
     setLign(0, 2); tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 2) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.print("Retour");
-    
+
     // ----------Time----------
     setLign(2, 3); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.printf(" %02u:%02u ", hour, minute);
-    
+
     // ----------Date----------
     setLign(4, 3); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 1) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
@@ -706,7 +706,7 @@ void printSetTimeSubMenu(uint16_t Mode, uint16_t year, uint8_t month, uint8_t da
     if (Mode == 30) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.printf("%02u", hour);
     tft.setTextColor(TFT_WHITE, TFT_BLACK); tft.print(':');
-    
+
     // ----------Minute----------
     if (Mode == 31) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.printf("%02u", minute);
@@ -722,7 +722,7 @@ void printSetTimeSubMenu(uint16_t Mode, uint16_t year, uint8_t month, uint8_t da
     if (Mode == 33) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.printf("%02u", month);
     tft.setTextColor(TFT_WHITE, TFT_BLACK); tft.print('/');
-    
+
     // ----------Year----------
     if (Mode == 32) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.printf("%04u", year);
@@ -733,7 +733,7 @@ void printSetTimeSubMenu(uint16_t Mode, uint16_t year, uint8_t month, uint8_t da
 /*====================================================================================*
  *                             printManageCurvesMenu                                  *
  *====================================================================================*
- * This function prints the menu where we select what to do concerning the curves 
+ * This function prints the menu where we select what to do concerning the curves
  * stocked on the SD card: show onformation on them, create a new curve or delete one.
  */
 void printManageCurvesMenu(uint16_t encoderPos) {
@@ -741,7 +741,7 @@ void printManageCurvesMenu(uint16_t encoderPos) {
     setLign(0); tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 3) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.print("Retour");
-    
+
     // ----------Information about curves----------
     tft.setTextSize(3); setLign(2, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
@@ -751,7 +751,7 @@ void printManageCurvesMenu(uint16_t encoderPos) {
     setLign(4, 1); setColumn(17, 3); tft.print(' ');
     setLign(5, 1); setColumn(17, 3); tft.print(' ');
     setLign(6, 1); setColumn(17, 3); tft.print(' ');
-    
+
     // ----------Create a new curve----------
     tft.setTextSize(3); setLign(5, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 1) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
@@ -760,7 +760,7 @@ void printManageCurvesMenu(uint16_t encoderPos) {
     setLign(10, 1); setColumn(16, 3); tft.print(' ');
     setLign(11, 1); setColumn(16, 3); tft.print(' ');
     setLign(12, 1); setColumn(16, 3); tft.print(' ');
-    
+
     // ----------Delete a curve----------
     tft.setTextSize(3); setLign(8, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 2) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
@@ -799,7 +799,7 @@ void printMaxNbCurvesErrorMenu(void) {
 /*====================================================================================*
  *                              printChooseNameMenu                                   *
  *====================================================================================*
- * This function prints the menu where we select the name of the new curve we want 
+ * This function prints the menu where we select the name of the new curve we want
  * to create.
  */
 void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJminOth) {
@@ -952,7 +952,7 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
  *                              printNameContinueMenu                                 *
  *====================================================================================*
  * The name of the curve is already given.
- * This function prints the menu where we choose between continue with this name 
+ * This function prints the menu where we choose between continue with this name
  * or return back to take another name.
  */
 void printNameContinueMenu(uint16_t encoderPos, String displayName) {
@@ -975,7 +975,7 @@ void printNameContinueMenu(uint16_t encoderPos, String displayName) {
 /*====================================================================================*
  *                            clearPrintSelectValuesMenu                              *
  *====================================================================================*
- * This function clears the top of the screen when we select values of time or 
+ * This function clears the top of the screen when we select values of time or
  * temperature.
  */
 void clearPrintSelectValuesMenu(void) {
@@ -985,7 +985,7 @@ void clearPrintSelectValuesMenu(void) {
 /*====================================================================================*
  *                               printSelectValuesMenu                                *
  *====================================================================================*
- * This function prints the menu where we select the values of the new curve, to 
+ * This function prints the menu where we select the values of the new curve, to
  * select whether we create a new entry, delete one, validate or cancel.
  */
 void printSelectValuesMenu(uint16_t encoderPos, TimeTemp arrayTimeTemp[], uint8_t len) {
@@ -1046,7 +1046,7 @@ void printValues(TimeTemp arrayTimeTemp[], uint8_t len) {
 /*====================================================================================*
  *                              printSelectTimeTempMenu                               *
  *====================================================================================*
- * This function prints the menu where we select the values of the new curve, to 
+ * This function prints the menu where we select the values of the new curve, to
  * show the value we are modifying (time or temperature).
  */
 void printSelectTimeTempMenu(TimeTemp arrayTimeTemp[], uint8_t len, uint16_t Mode) {
@@ -1133,7 +1133,7 @@ void printDeleteCurveMenu(uint16_t encoderPos, String nameOfCurve) {
 /*====================================================================================*
  *                               printNameErrorMenu                                   *
  *====================================================================================*
- * This function prints the menu when the chosen name of file to delete or create 
+ * This function prints the menu when the chosen name of file to delete or create
  * is the one which is running.
  */
 void printNameErrorMenu(String nameOfCurve, uint16_t Mode) {
@@ -1149,7 +1149,7 @@ void printNameErrorMenu(String nameOfCurve, uint16_t Mode) {
     tft.print("est en cours d'utilisation.");
     setLign(16, 1); setColumn(2); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.print("Vous ne pouvez");
-    setLign(20, 1); setColumn(1); 
+    setLign(20, 1); setColumn(1);
     if (Mode == 431) tft.print("pas le remplacer.");
     else             tft.print("pas le supprimer.");
 }
@@ -1158,7 +1158,7 @@ void printNameErrorMenu(String nameOfCurve, uint16_t Mode) {
 /*====================================================================================*
  *                                printEndCycleMenu                                   *
  *====================================================================================*
- * This function prints the menu when the cycle has finished, when the buzzer is 
+ * This function prints the menu when the cycle has finished, when the buzzer is
  * running.
  */
 void printEndCycleMenu(void) {
@@ -1174,3 +1174,17 @@ void printEndCycleMenu(void) {
     tft.print(" OK ");
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 }
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   GERER ECONOMISEUR ECRAN
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+//static uint32_t gDateExtinction = 1000 ; // 20s après le démarrage
+
+//······················································································································
+
+void gererEconomiseurEcran (void) {
+
+}
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
