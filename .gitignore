@@ -3,12 +3,7 @@
 
 ## Other files
 *.pyc
-test-ACANSettings-on-desktop/build/
-*/*.xcodeproj/project.xcworkspace
-*/*.xcodeproj/xcuserdata
-test-ACAN2517Settings-on-desktop/build
-documentation-in-latex/acan2517.pdf
-build-path/*
+*.bin
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
