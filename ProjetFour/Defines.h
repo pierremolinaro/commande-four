@@ -10,14 +10,12 @@ const uint8_t pinB     = 34;
 const uint8_t clickPin = 39;
 
 // LEDs declaration
-const uint8_t LED1 = 32;
-const uint8_t LED2 = 26;
+const uint8_t LED_FOUR_CHAUD  = 32 ;
+const uint8_t LED_EN_MARCHE   = 26 ;
+const uint8_t RETRO_ECLAIRAGE =  2 ;
 
 // Button declaration
 const uint8_t BOUTON_BTN  = 36; // SVP
-
-// Retro-éclairage
-const uint8_t RETRO_ECLAIRAGE = 2 ; // Actif haut, correspond à LED_BUILTIN
 
 // Relay declaration
 const uint8_t ovenRelay = 27;

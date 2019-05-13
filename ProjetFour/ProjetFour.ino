@@ -72,11 +72,11 @@ static uint64_t delayBuzz = 0;
  *====================================================================================*/
 void setup() {
     // ----------DEBUGGING section of setup----------
-    Serial.begin(115200);     // DEBUGGING: opens serial port, sets data rate to 115200 bps
+    Serial.begin (115200) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
     // ----------LEDs section of setup----------
-    pinMode(LED1, OUTPUT); // setup the LED 1 pin
-    pinMode(LED2, OUTPUT); // setup the LED 2 pin
-    pinMode (RETRO_ECLAIRAGE, OUTPUT); // Au niveau bas, active le retro-éclairage
+    pinMode (LED_FOUR_CHAUD, OUTPUT) ; // setup the LED 1 pin
+    pinMode (RETRO_ECLAIRAGE, OUTPUT) ; // Au niveau haut, active le retro-éclairage
+    digitalWrite (RETRO_ECLAIRAGE, HIGH) ; // Au niveau haut, active le retro-éclairage
     pinMode (BOUTON_BTN, INPUT) ;
     // ----------Buzzer section of setup----------
     // attach the channel to the buzzer to be controlled
@@ -98,7 +98,7 @@ void setup() {
     nbCurves = numberFiles(valuesDir);
     getDisplayNames(arrayDisplayNames);
     // ----------TFT screen section of setup----------
-    initScreen();
+    initScreen () ;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ void setup() {
  *                                    LOOP                                            *
  *====================================================================================*/
 static uint32_t delayScreen = 2000;
-// static uint32_t blinkLED    = 2000;
+//static uint32_t blinkLED    = 2000;
 static uint32_t delaySD     = 0;
 
 void loop() {
@@ -123,9 +123,9 @@ void loop() {
     updateTemp();
     // ----------Updating the state of the LEDs----------
     // Light on the LED 1 if the oven is hot
-    digitalWrite(LED1, (getTemp() > 200));
+    digitalWrite (LED_FOUR_CHAUD, getTemp () > 200) ;
     // Light on the LED 2 if a process is running
-    digitalWrite(LED2, isRunning);
+    digitalWrite (LED_EN_MARCHE, isRunning) ;
     // ----------Changing Mode----------
     if (clickPressed() == true) {
         rotaryMenu(); // change the mode in function of which mode we are in and the position of the rotary encoder
@@ -177,15 +177,15 @@ void loop() {
             if (millis() > delayBuzz + deltaDelay) {
                 if (deltaDelay == 0) {
                     ledcWrite(PWMchannelBuzz, 128);
-                    digitalWrite(LED2, 1);
+                    digitalWrite(LED_EN_MARCHE, 1);
                 } else if (deltaDelay == 1000) {
                     ledcWrite (PWMchannelBuzz, 0);
-                    digitalWrite(LED2, !digitalRead(LED2));
+                    digitalWrite(LED_EN_MARCHE, !digitalRead(LED_EN_MARCHE));
                 } else if (deltaDelay == 4500) {
                     delayBuzz += 5000;
-                    digitalWrite(LED2, !digitalRead(LED2));
+                    digitalWrite(LED_EN_MARCHE, !digitalRead(LED_EN_MARCHE));
                 } else {
-                    digitalWrite(LED2, !digitalRead(LED2));
+                    digitalWrite(LED_EN_MARCHE, !digitalRead(LED_EN_MARCHE));
                 }
             }
         }
