@@ -71,34 +71,35 @@ static uint64_t delayBuzz = 0;
 /*====================================================================================*
  *                                    SETUP                                           *
  *====================================================================================*/
-void setup() {
-    // ----------DEBUGGING section of setup----------
-    Serial.begin (115200) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
-    // ----------LEDs section of setup----------
-    pinMode (LED_FOUR_CHAUD, OUTPUT) ; // setup the LED 1 pin
+
+void setup (void) {
+// ----------DEBUGGING section of setup----------
+  Serial.begin (115200) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
+// ----------LEDs section of setup----------
+  pinMode (LED_FOUR_CHAUD, OUTPUT) ;
 //--- Retro-eclairage
   initialiserRetroEclairage () ;
- // ----------Buzzer section of setup----------
-    // attach the channel to the buzzer to be controlled
-    ledcAttachPin (buzzer, PWMchannelBuzz);
-    // configure PWM functionalitites
-    ledcSetup (PWMchannelBuzz, PWMfrequency, PWMresolution);
-    // ----------Relay section of setup----------
-    pinMode (ovenRelay, OUTPUT);
+// ----------Buzzer section of setup----------
+// attach the channel to the buzzer to be controlled
+  ledcAttachPin (BUZZER_PIN, CANAL_PWM_BUZZER) ;
+// configure PWM functionalitites
+  ledcSetup (CANAL_PWM_BUZZER, FREQUENCE_BUZZER, RESOLUTION_PWM_BUZZER);
+// ----------Relay section of setup----------
+  pinMode (ovenRelay, OUTPUT) ;
  //--- Configurer le thermo-couple
   initialiserThermoCouple () ;
-    // ----------Rotary encoder section of setup----------
-    initEncoder () ;
-    // ----------Buttons section of setup----------
-    initButtons();
-    // ----------Clock section of setup----------
-    initClock();
-    // ----------SD card reader section of setup----------
-    initSDcard();
-    nbCurves = numberFiles(valuesDir);
-    getDisplayNames(arrayDisplayNames);
-    // ----------TFT screen section of setup----------
-    initScreen () ;
+// ----------Rotary encoder section of setup----------
+  initEncoder () ;
+// ----------Buttons section of setup----------
+  initButtons () ;
+// ----------Clock section of setup----------
+  initClock () ;
+// ----------SD card reader section of setup----------
+  initSDcard();
+  nbCurves = numberFiles(valuesDir);
+  getDisplayNames(arrayDisplayNames);
+// ----------TFT screen section of setup----------
+  initScreen () ;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -106,24 +107,18 @@ void setup() {
  *                                    LOOP                                            *
  *====================================================================================*/
 static uint32_t delayScreen = 2000;
-//static uint32_t blinkLED    = 2000;
 static uint32_t delaySD     = 0;
 
-void loop() {
+void loop (void) {
 //--- Retro-eclairage
   gererRetroEclairage () ;
-//---Blinking Led (supprimé, IO2 sert à contrôler le retro-éclairage)
-//  if (millis() > blinkLED) {
-//    blinkLED += 1500;
-//    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-//  }
-    // ----------Updating the time----------
-    updateTime();
-    // ----------Updating the temperature----------
-    updateTemp();
-    // ----------Updating the state of the LEDs----------
+// ----------Updating the time----------
+  updateTime () ;
+// ----------Updating the temperature----------
+  updateTemp () ;
+// ----------Updating the state of the LEDs----------
     // Light on the LED 1 if the oven is hot
-    digitalWrite (LED_FOUR_CHAUD, getTemp () > 200) ;
+    digitalWrite (LED_FOUR_CHAUD, getTemp () > 200.0) ;
     // Light on the LED 2 if a process is running
     digitalWrite (LED_EN_MARCHE, isRunning) ;
     // ----------Changing Mode----------
@@ -176,10 +171,10 @@ void loop() {
         for (uint16_t deltaDelay = 0; deltaDelay < 5000; deltaDelay += 500) {
             if (millis() > delayBuzz + deltaDelay) {
                 if (deltaDelay == 0) {
-                    ledcWrite(PWMchannelBuzz, 128);
+                    ledcWrite(CANAL_PWM_BUZZER, 128);
                     digitalWrite(LED_EN_MARCHE, 1);
                 } else if (deltaDelay == 1000) {
-                    ledcWrite (PWMchannelBuzz, 0);
+                    ledcWrite (CANAL_PWM_BUZZER, 0);
                     digitalWrite(LED_EN_MARCHE, !digitalRead(LED_EN_MARCHE));
                 } else if (deltaDelay == 4500) {
                     delayBuzz += 5000;
@@ -191,10 +186,10 @@ void loop() {
         }
     } else if (delayBuzz != 0 && Mode == 0) { // stop buzzing and blinking when we click, and clear the screen
         delayBuzz = 0;
-        ledcWrite (PWMchannelBuzz, 0);
-        ledcWrite (PWMchannelLED2, 0);
-        clearScreen();
-        clearPrintPermanent();
+        ledcWrite (CANAL_PWM_BUZZER, 0) ;
+        digitalWrite (LED_EN_MARCHE, LOW) ;
+        clearScreen () ;
+        clearPrintPermanent () ;
     }
     // ----------Delayed Start Mode----------
     if (Mode == 13) {

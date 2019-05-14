@@ -6,8 +6,8 @@
 // ----------Constants declaration----------
 
 //--- Canaux PWM (0 à 15)
-const uint8_t PWMchannelBuzz =  0;
-const uint8_t PWMchannelLED2 =  1;
+const uint8_t CANAL_PWM_BUZZER = 0 ;
+const uint8_t CANAL_PWM_LED_EN_MARCHE2 = 1 ;
 const uint8_t CANAL_PWM_RETRO_ECLAIRAGE = 2 ;
 
 // Rotary encoder declaration
@@ -20,8 +20,6 @@ const uint8_t LED_FOUR_CHAUD  =  2 ;
 
 //--- Led en marche (clignote à 1 Hz pour indiquer qu'un programme s'exécute)
 const uint8_t LED_EN_MARCHE   = 15 ; // TDO, contrôlé par PWM
-const uint32_t PWMfrequency   =  1;
-const uint8_t  PWMresolution  =  8; //Resolution 8, 10, 12, 15
 
 //--- Retro-eclairage
 const uint8_t RETRO_ECLAIRAGE = 32 ; // Contrôlé par PWM
@@ -35,7 +33,9 @@ const uint8_t BOUTON_BTN  = 36; // SVP
 const uint8_t ovenRelay = 27;
 
 // Buzzer declaration including a PWM
-const uint8_t  buzzer         = 25;
+const uint8_t  BUZZER_PIN = 25;
+const uint32_t FREQUENCE_BUZZER = 3500 ; // Hz
+const uint8_t  RESOLUTION_PWM_BUZZER = 8 ; //Resolution 8, 10, 12, 15
 
 // Creating a thermocouple instance with software SPI on any three digital IO pins
 const uint8_t MAX31855_DO  = 17;

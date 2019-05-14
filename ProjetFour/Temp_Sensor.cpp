@@ -32,21 +32,15 @@ void initialiserThermoCouple (void) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  updateTemp
+// This function writes the data read by the thermocouple in a static variable gRawValue.
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-// ----------Functions----------
-/*====================================================================================*
- *                                  updateTemp                                        *
- *====================================================================================*
- * This function stocks the data read by the thermocouple in a static variable gRawValue.
- */
 void updateTemp (void) {
   gRawValue = 0 ;
 
   digitalWrite (MAX31855_CS, LOW) ;
   delayMicroseconds (1) ;
-
-//  digitalWrite (MAX31855_CLK, LOW) ;
-//  delayMicroseconds (1) ;
 
   for (int32_t i = 31 ; i >= 0 ; i--) {
     digitalWrite (MAX31855_CLK, LOW);
@@ -63,13 +57,16 @@ void updateTemp (void) {
   digitalWrite (MAX31855_CS, HIGH) ;
 }
 
-/*====================================================================================*
- *                                 testErrorTemp                                      *
- *====================================================================================*
- * This function returns true if there is an error in the data read.
- */
-bool testErrorTemp(void) {
-    return((gRawValue & 0x7) > 0); // 3 last bits, if one is equal to 1, there is an error
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//  erreurCapteurTemperature (renvoie 0 si tout est ok)
+// Seuls les trois bits de poids faible sont utilisés :
+//      D2 : 0 --> ok, 1 --> SCV Fault : « the thermocouple is short-circuited to VCC »
+//      D1 : 0 --> ok, 1 --> SCG Fault : « the thermocouple is short-circuited to GND »
+//      D0 : 0 --> ok, 1 -->  OC Fault : « the thermocouple is open (no connections) »
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+uint32_t erreurCapteurTemperature (void) {
+  return gRawValue & 0x07 ;
 }
 
 /*====================================================================================*

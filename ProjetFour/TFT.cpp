@@ -1,5 +1,6 @@
 // ----------Include the header----------
 #include "TFT.h"
+#include "Temp_Sensor.h"
 
 // ----------Static variables in the file----------
 static TFT_eSPI tft = TFT_eSPI();
@@ -139,19 +140,34 @@ void setColumn(uint8_t column, uint8_t textSize) {
  * temperature, if the oven is running or a program is delayed,
  * and if so, the time left.
  */
-void printPermanent(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second,
+void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second,
                       double temp, bool isRunning, uint16_t timeLeft, bool isDelayed, uint16_t timeBeforeStart) {
-    tft.setTextColor(TFT_WHITE, TFT_BLACK); tft.setTextSize(2);
+    tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+    tft.setTextSize (2) ;
     // ----------Printing the date----------
     setLign(nbLign - 2);
     tft.printf("%02u/%02u/%04u", day, month, year);
     // ----------Printing the time----------
     setLign(nbLign - 1);
     tft.printf("%02u:%02u:%02u", hour, minute, second);
-    // ----------Printing the temperature----------
-    setLign(nbLign - 1); setColumn(nbColumn - 6);
-    tft.printf("%4u%cC", (uint16_t) temp, 247); // (char)247 -> °
-    // ----------Printing ON/OFF/Delayed----------
+// ----------Printing the temperature----------
+  setLign (nbLign - 1) ;
+  setColumn (nbColumn - 6) ;
+  const uint32_t codeErreur = erreurCapteurTemperature () ;
+  if (codeErreur == 0) { // Ok
+    tft.printf ("%4u%cC", (uint16_t) temp, 247) ; // (char)247 -> °
+  }else{
+    tft.setTextColor (TFT_RED, TFT_BLACK) ;
+    if ((codeErreur & ERREUR_CAPTEUR_ABSENT) != 0) {
+      tft.print ("Absent") ;
+    }else if ((codeErreur & ERREUR_CAPTEUR_COURT_CIRCUIT_GND) != 0) {
+      tft.print ("CC GND") ;
+    }else{
+      tft.print ("CC Vcc") ;
+    }
+    tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  }
+// ----------Printing ON/OFF/Delayed----------
     if (isRunning) { // it is running
         tft.setTextSize(2);
         setLign(nbLign - 2); setColumn(nbColumn - 4, 1); tft.print(" ");
@@ -201,11 +217,11 @@ void printPermanent(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uin
  * This function clears the bottom of the screen where are printed the permanent
  * information.
  */
-void clearPrintPermanent(void) {
-    setLign(nbLign - 2); setColumn(nbColumn - 8); tft.setTextSize(2);
-    tft.fillRect(tft.getCursorX()-1, tft.getCursorY()-1, 8*2*6, 1*2*8, TFT_BLACK);
-    setLign(nbLign*2 - 5, 1); setColumn(nbColumn*2 - 12, 1);
-    tft.fillRect(tft.getCursorX()-1, tft.getCursorY()-1, 12*1*6, 1*1*8, TFT_BLACK);
+void clearPrintPermanent (void) {
+  setLign (nbLign - 2) ; setColumn (nbColumn - 8) ; tft.setTextSize(2) ;
+  tft.fillRect (tft.getCursorX()-1, tft.getCursorY()-1, 8*2*6, 1*2*8, TFT_BLACK) ;
+  setLign (nbLign*2 - 5, 1); setColumn(nbColumn*2 - 12, 1) ;
+  tft.fillRect (tft.getCursorX()-1, tft.getCursorY()-1, 12*1*6, 1*1*8, TFT_BLACK) ;
 }
 
 // --------------------------------printMainMenu----------------------------------------------------------------------------------------------------------------------
