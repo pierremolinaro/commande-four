@@ -23,7 +23,7 @@ static uint32_t gRawValue;
 //  Configurer le thermo-couple
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void configurerThermoCouple (void) {
+void initialiserThermoCouple (void) {
   pinMode (MAX31855_CS, OUTPUT) ;
   digitalWrite (MAX31855_CS, HIGH) ;
   pinMode (MAX31855_CLK, OUTPUT) ;

@@ -12,8 +12,8 @@ static SPIClass * hspi = NULL;
  * and prints information about the SD card.
  */
 void initSDcard (void) {
-    hspi = new SPIClass(HSPI);
-    if(!SD.begin(15, *hspi)){ // 15: SS spin, SPIClass -> HSPI
+    hspi = new SPIClass (HSPI);
+    if(!SD.begin(SDCARD_CS, *hspi)){ // SS spin, SPIClass -> HSPI
         Serial.println("Card Mount Failed");
         return;
     }

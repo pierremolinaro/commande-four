@@ -75,18 +75,17 @@ void setup() {
     Serial.begin (115200) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
     // ----------LEDs section of setup----------
     pinMode (LED_FOUR_CHAUD, OUTPUT) ; // setup the LED 1 pin
-    pinMode (RETRO_ECLAIRAGE, OUTPUT) ; // Au niveau haut, active le retro-éclairage
-    digitalWrite (RETRO_ECLAIRAGE, HIGH) ; // Au niveau haut, active le retro-éclairage
-    pinMode (BOUTON_BTN, INPUT) ;
-    // ----------Buzzer section of setup----------
+//--- Retro-eclairage
+  initialiserRetroEclairage () ;
+ // ----------Buzzer section of setup----------
     // attach the channel to the buzzer to be controlled
     ledcAttachPin (buzzer, PWMchannelBuzz);
     // configure PWM functionalitites
     ledcSetup (PWMchannelBuzz, PWMfrequency, PWMresolution);
     // ----------Relay section of setup----------
     pinMode (ovenRelay, OUTPUT);
-  //--- Configurer le thermo-couple
-    configurerThermoCouple () ;
+ //--- Configurer le thermo-couple
+  initialiserThermoCouple () ;
     // ----------Rotary encoder section of setup----------
     initEncoder () ;
     // ----------Buttons section of setup----------
@@ -110,8 +109,8 @@ static uint32_t delayScreen = 2000;
 static uint32_t delaySD     = 0;
 
 void loop() {
-//--- Economiseur d'ecran
-  gererEconomiseurEcran () ;
+//--- Retro-eclairage
+  gererRetroEclairage () ;
 //---Blinking Led (supprimé, IO2 sert à contrôler le retro-éclairage)
 //  if (millis() > blinkLED) {
 //    blinkLED += 1500;

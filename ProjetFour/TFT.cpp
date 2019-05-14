@@ -1176,10 +1176,22 @@ void printEndCycleMenu(void) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   GERER ECONOMISEUR ECRAN
+//   GERER RETRO ECLAIRAGE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-static uint32_t gDateExtinction = 60 * 1000 ; // 20s après le démarrage
+static const uint16_t PWM_POUR_EXTINCTION = 1 << RESOLUTION_RETRO_ECLAIRAGE ;
+
+static uint32_t gDateExtinction = 60 * 1000 ; // Initialement, date extinction après le démarrage (en ms)
+static uint16_t gIntensite = 0 ; // 0 --> eclairage max, PWM_POUR_EXTINCTION -> éteint
+
+//······················································································································
+
+void initialiserRetroEclairage (void) {
+  pinMode (BOUTON_BTN, INPUT) ;
+  ledcAttachPin (RETRO_ECLAIRAGE, CANAL_PWM_RETRO_ECLAIRAGE) ;
+  ledcSetup (CANAL_PWM_RETRO_ECLAIRAGE, FREQUENCE_RETRO_ECLAIRAGE, RESOLUTION_RETRO_ECLAIRAGE);
+  gererRetroEclairage () ;
+}
 
 //······················································································································
 
@@ -1187,18 +1199,26 @@ void prolongerRetroEclairage (void) {
   const uint32_t nouvelleDateExtinction = millis () + 60 * 1000 ;
   if (gDateExtinction < nouvelleDateExtinction) {
     gDateExtinction = nouvelleDateExtinction ;
+    gIntensite = 0 ;
   }
 }
 
 //······················································································································
 
-void gererEconomiseurEcran (void) {
+void gererRetroEclairage (void) {
 // Appuyer sur le bouton prolonge la durée de retro-éclairage
   if (!digitalRead (BOUTON_BTN)) {
     prolongerRetroEclairage () ;
   }
-// Le retro-éclairage est activé par un niveau haut sur RETRO_ECLAIRAGE
-  digitalWrite (RETRO_ECLAIRAGE, gDateExtinction >= millis ()) ;
+//--- Contrôler le retro-éclairage
+  if ((gDateExtinction < millis ()) && (gIntensite < PWM_POUR_EXTINCTION)) {
+    gIntensite += 100 ;
+    if (gIntensite > PWM_POUR_EXTINCTION) {
+      gIntensite = PWM_POUR_EXTINCTION ; // Ne pas dépasser cette valeur ! 
+    }
+    gDateExtinction += 100 ; // Période de diminution de l'intensité
+  }
+  ledcWrite (CANAL_PWM_RETRO_ECLAIRAGE, gIntensite) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

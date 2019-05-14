@@ -330,11 +330,13 @@ void printNameErrorMenu(String nameOfCurve, uint16_t Mode);
 void printEndCycleMenu(void);
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   GERER ECONOMISEUR ECRAN
+//   GERER LE RETRO-ECLAIRAGE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void initialiserRetroEclairage (void) ;
 
 void prolongerRetroEclairage (void) ;
 
-void gererEconomiseurEcran (void) ;
+void gererRetroEclairage (void) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
