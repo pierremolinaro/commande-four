@@ -330,13 +330,3 @@ void printNameErrorMenu(String nameOfCurve, uint16_t Mode);
 void printEndCycleMenu(void);
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   GERER LE RETRO-ECLAIRAGE
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-void initialiserRetroEclairage (void) ;
-
-void prolongerRetroEclairage (void) ;
-
-void gererRetroEclairage (void) ;
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

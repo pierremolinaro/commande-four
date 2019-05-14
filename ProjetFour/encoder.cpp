@@ -1,6 +1,6 @@
 // ----------Include the header----------
 #include "encoder.h"
-#include "TFT.h"
+#include "Backlight.h"
 
 // ----------Static variables in the file----------
 static int16_t encoderPos = 0; // This variable stores our current value of encoder position.

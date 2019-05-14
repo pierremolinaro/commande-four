@@ -1,0 +1,81 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red251\green2\blue7;}
+{\*\expandedcolortbl;;\cssrgb\c100000\c14913\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww17060\viewh12920\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \
+\
+\
+
+\f1 \cf2 esptool.py v2.6\
+Serial port /dev/cu.SLAB_USBtoUART\
+Connecting........_\
+Chip is ESP32D0WDQ6 (revision 1)\
+Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None\
+MAC: 24:0a:c4:9d:b4:c0\
+Uploading stub...\
+Running stub...\
+Stub running...\
+Configuring flash size...\
+Warning: Could not auto-detect Flash size (FlashID=0x0, SizeID=0x0), defaulting to 4MB\
+Compressed 8192 bytes to 47...\
+\
+Writing at 0x0000e000... (100 %)\
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.0 seconds (effective 8014.6 kbit/s)...\
+\
+A fatal error occurred: Timed out waiting for packet header\
+A fatal error occurred: Timed out waiting for packet header\
+
+\f0 \cf0 \
+Quand l'ESP32 est en dehors de la carte :\
+
+\f1 \cf2 esptool.py v2.6\
+Serial port /dev/cu.SLAB_USBtoUART\
+Connecting........_____.\
+Chip is ESP32D0WDQ6 (revision 1)\
+Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None\
+MAC: 24:0a:c4:9d:b4:c0\
+Uploading stub...\
+Running stub...\
+Stub running...\
+Configuring flash size...\
+Auto-detected Flash size: 4MB\
+Compressed 8192 bytes to 47...\
+\
+Writing at 0x0000e000... (100 %)\
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.0 seconds (effective 7775.2 kbit/s)...\
+Hash of data verified.\
+Compressed 15328 bytes to 9994...\
+\
+Writing at 0x00001000... (100 %)\
+Wrote 15328 bytes (9994 compressed) at 0x00001000 in 0.9 seconds (effective 139.1 kbit/s)...\
+Hash of data verified.\
+Compressed 309072 bytes to 169262...\
+\
+Writing at 0x00010000... (9 %)\
+Writing at 0x00014000... (18 %)\
+Writing at 0x00018000... (27 %)\
+Writing at 0x0001c000... (36 %)\
+Writing at 0x00020000... (45 %)\
+Writing at 0x00024000... (54 %)\
+Writing at 0x00028000... (63 %)\
+Writing at 0x0002c000... (72 %)\
+Writing at 0x00030000... (81 %)\
+Writing at 0x00034000... (90 %)\
+Writing at 0x00038000... (100 %)\
+Wrote 309072 bytes (169262 compressed) at 0x00010000 in 14.9 seconds (effective 165.9 kbit/s)...\
+Hash of data verified.\
+Compressed 3072 bytes to 144...\
+\
+Writing at 0x00008000... (100 %)\
+Wrote 3072 bytes (144 compressed) at 0x00008000 in 0.0 seconds (effective 1434.8 kbit/s)...\
+Hash of data verified.\
+\
+Leaving...\
+Hard resetting via RTS pin...\
+
+\f0 \cf0 \
+\
+}

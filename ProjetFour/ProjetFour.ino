@@ -19,6 +19,7 @@ This sketch is used to control an oven in order to follow a temperature graph
 #include "Clock.h"
 #include "Temp_Sensor.h"
 #include "SD_Card.h"
+#include "Backlight.h"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Menu and submenu setting declarations

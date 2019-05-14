@@ -27,6 +27,7 @@ void initialiserThermoCouple (void) {
   pinMode (MAX31855_CS, OUTPUT) ;
   digitalWrite (MAX31855_CS, HIGH) ;
   pinMode (MAX31855_CLK, OUTPUT) ;
+  digitalWrite (MAX31855_CLK, HIGH) ;
   pinMode (MAX31855_DO, INPUT) ;
 }
 
@@ -42,21 +43,21 @@ void updateTemp (void) {
   gRawValue = 0 ;
 
   digitalWrite (MAX31855_CS, LOW) ;
-  delay (1) ;
+  delayMicroseconds (1) ;
 
-  digitalWrite (MAX31855_CLK, LOW) ;
-  delay (1) ;
+//  digitalWrite (MAX31855_CLK, LOW) ;
+//  delayMicroseconds (1) ;
 
   for (int32_t i = 31 ; i >= 0 ; i--) {
     digitalWrite (MAX31855_CLK, LOW);
-    delay (1) ;
+    delayMicroseconds (1) ;
     gRawValue <<= 1 ;
     if (digitalRead (MAX31855_DO)) {
       gRawValue |= 1 ;
     }
 
     digitalWrite (MAX31855_CLK, HIGH) ;
-    delay (1) ;
+    delayMicroseconds (1) ;
   }
 
   digitalWrite (MAX31855_CS, HIGH) ;
