@@ -28,12 +28,12 @@ void initialiserThermoCouple (void) {
   digitalWrite (MAX31855_CS, HIGH) ;
   pinMode (MAX31855_CLK, OUTPUT) ;
   digitalWrite (MAX31855_CLK, HIGH) ;
-  pinMode (MAX31855_DO, INPUT) ;
+  pinMode (MAX31855_DO, INPUT_PULLUP) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //  updateTemp
-// This function writes the data read by the thermocouple in a static variable gRawValue.
+// This function writes the data read from the thermocouple in a static variable gRawValue.
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void updateTemp (void) {

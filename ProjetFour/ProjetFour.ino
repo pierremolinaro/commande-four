@@ -107,6 +107,7 @@ void setup (void) {
  *                                    LOOP                                            *
  *====================================================================================*/
 static uint32_t delayScreen = 2000;
+static uint32_t gInstantAffichagePiedPage = 2000 ;
 static uint32_t delaySD     = 0;
 
 void loop (void) {
@@ -132,7 +133,7 @@ void loop (void) {
             isDelayed = false;
             isRunning = true;
             delaySD = millis() + 1000;
-            t_of_launching = getMinutesSince2000();
+            t_of_launching = getMinutesSince2000 ();
             wantedTemp = giveTemp(nameOfCurve, t_since_launching); // obtain the wanted temperature according to the duration with SD card info
         }
     }
@@ -223,17 +224,17 @@ void loop (void) {
         // we increment with a step of 10°C and from 0 to 1100°C
         arrayTimeTemp[len-1].Temp = 10*useRotaryEncoder(0, 110);
     }
+ //--- Affichage du pied de page toutes les secondes
+   if (millis () > gInstantAffichagePiedPage) {
+     gInstantAffichagePiedPage += 1000 ;
+     const uint16_t timeLeft = tmax - t_since_launching;
+     const uint16_t timeBeforeStart = t_delayed_start - getMinutesSince2000();
+     printPermanent (currentYear(), currentMonth(), currentDay(), currentHour(), currentMinute(),
+                     currentSecond(), isRunning, timeLeft, isDelayed, timeBeforeStart);
+   }
     // ----------Printing on the TFT screen----------
     if (millis() > delayScreen) { // printing every 100 ms
-        delayScreen += 100;
-        
-        // ---------Information printed on every screen---------
-        const uint16_t timeLeft = tmax - t_since_launching;
-        const uint16_t timeBeforeStart = t_delayed_start - getMinutesSince2000();
-        
-        printPermanent (currentYear(), currentMonth(), currentDay(), currentHour(), currentMinute(),
-                        currentSecond(), isRunning, timeLeft, isDelayed, timeBeforeStart);
-        
+        delayScreen += 100;        
         // ----------Printing the current menu----------
         if (Mode == 0) {
             printMainMenu(encoderPosition(nbMenus), isRunning, isDelayed);
@@ -252,6 +253,7 @@ void loop (void) {
         } else if (Mode == 15) {
             printChangeDelayMenu(launchDelay, tmax, currentHour(), currentMinute());
         } else if (Mode == 2) {
+            const uint16_t timeLeft = tmax - t_since_launching;
             printInfoMenu(getTemp(), wantedTemp, isRunning, timeLeft, increaseTemp);
         } else if (Mode == 3) {
             printSetTimeMenu(encoderPosition(nbMenus), currentYear(), currentMonth(), currentDay(), currentHour(), currentMinute());

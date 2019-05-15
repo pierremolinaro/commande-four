@@ -160,7 +160,7 @@ void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, ui
   setColumn (nbColumn - 6) ;
   const uint32_t codeErreur = erreurCapteurTemperature () ;
   if (codeErreur == 0) { // Ok
-    tft.printf ("%4u%cC", (uint16_t) getTemp (), 247) ; // (char)247 -> °
+    tft.printf ("%4d%cC", (int32_t) getTemp (), 247) ; // (char)247 -> °
   }else{
     tft.setTextColor (TFT_RED, TFT_BLACK) ;
     if ((codeErreur & ERREUR_CAPTEUR_ABSENT) != 0) {

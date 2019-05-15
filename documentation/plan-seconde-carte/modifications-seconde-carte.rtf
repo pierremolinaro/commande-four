@@ -20,6 +20,10 @@ Sur le sch\'e9ma, de nombreux d\'e9tails n\'e9cessitent une modification.\
 \b0  La mise sous / hors tension du four engendre un parasite \'e9lectrique qui plante l'ESP32. Solution : mettre un condensateur en amont du r\'e9gulateur 5V. Avec 47 \'b5F, on observe encore quelques plantages. Donc 470 \'b5F.\
 \
 
+\b Alimentation du module thermo-couple Adafruit 269.
+\b0  Il est aliment\'e9 sous 3,3V. Or, en regardant le sch\'e9ma, le module poss\'e8de son propre r\'e9gulateur 3,3V, aliment\'e9 par l'entr\'e9e 5V. Donc : connecter le 5V, d\'e9connecter le 3,3V. \
+\
+
 \b Signal RST/EN.
 \b0  Aucun plan valide pour le MH-ET LIVE MiniKit for ESP32, celui qui est donn\'e9 \'e0 la page http://forum.mhetlive.com/topic/8/mh-et-live-minikit-for-esp32 est faux). Une capa de 100nF est ajout\'e9e sur la patte RST/EN, comme conseill\'e9 \'e0 la page https://github.com/espressif/esptool/wiki/ESP32-Boot-Mode-Selection.\
 \
