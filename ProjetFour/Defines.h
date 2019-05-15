@@ -44,7 +44,7 @@ const uint8_t MAX31855_CLK = 16;
 
 // SDCARD pin (codé en dur dans la librairie SD : 
 //    SDCARD_SCK  --> 14 (TMS)
-//    SDCARD_MISO --> 12 (TDI)
+//    SDCARD_MISO --> 12 (TDI) Attention TDI doit être à 0 lors du flashage (sinon échec) --> Enlever la carte SD
 //    SDCARD_MOSI --> 13 (TCK)
 const uint8_t SDCARD_CS = 26 ;
 

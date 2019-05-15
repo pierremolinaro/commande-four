@@ -3,7 +3,7 @@
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 // La lecture par (soft) SPI renvoie une valeur sur 32 bits dont la composition est la suivante :
-//      D31 ... D18 : 14 bits signés donnant la température en Celcius
+//      D31 ... D18 : 14 bits signés donnant la température en quart de Celcius
 //      D17 : réservé, toujours lu à 0
 //      D16 : 1 --> faute, 0 --> ok
 //      D15 ... D4 : 12 bits donnant la température interne (inutilisés)

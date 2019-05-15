@@ -1,6 +1,7 @@
 // ----------Include the header----------
 #include "TFT.h"
 #include "Temp_Sensor.h"
+#include "FreeHeap.h"
 
 // ----------Static variables in the file----------
 static TFT_eSPI tft = TFT_eSPI();
@@ -13,13 +14,13 @@ static TFT_eSPI tft = TFT_eSPI();
  * and draws the logo of Centrale Nantes.
  */
 void initScreen(void) {
-    tft.init();
-    tft.setRotation(1);  // 0 & 2 Portrait. 1 & 3 landscape
-    drawBmp("/LogoECN.bmp");
-    delay(1000);
-    tft.fillScreen(TFT_BLACK); // black screen
-    tft.setTextSize(2);
-    tft.setCursor(0, 0);
+    tft.init ();
+    tft.setRotation (1) ;  // 0 & 2 Portrait. 1 & 3 landscape
+    drawBmp ("/LogoECN.bmp");
+    delay (1000) ;
+    tft.fillScreen (TFT_BLACK); // black screen
+    tft.setTextSize (2) ;
+    tft.setCursor (0, 0);
 }
 
 /*====================================================================================*
@@ -141,7 +142,7 @@ void setColumn(uint8_t column, uint8_t textSize) {
  * and if so, the time left.
  */
 void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second,
-                      double temp, bool isRunning, uint16_t timeLeft, bool isDelayed, uint16_t timeBeforeStart) {
+                     bool isRunning, uint16_t timeLeft, bool isDelayed, uint16_t timeBeforeStart) {
     tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
     tft.setTextSize (2) ;
     // ----------Printing the date----------
@@ -150,12 +151,16 @@ void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, ui
     // ----------Printing the time----------
     setLign(nbLign - 1);
     tft.printf("%02u:%02u:%02u", hour, minute, second);
-// ----------Printing the temperature----------
+//----- Afficher la RAM libre
   setLign (nbLign - 1) ;
+  setColumn (nbColumn - 6) ;
+  tft.printf ("%6u", ramLibre ()) ;
+// ----------Printing the temperature----------
+  setLign (nbLign - 2) ;
   setColumn (nbColumn - 6) ;
   const uint32_t codeErreur = erreurCapteurTemperature () ;
   if (codeErreur == 0) { // Ok
-    tft.printf ("%4u%cC", (uint16_t) temp, 247) ; // (char)247 -> °
+    tft.printf ("%4u%cC", (uint16_t) getTemp (), 247) ; // (char)247 -> °
   }else{
     tft.setTextColor (TFT_RED, TFT_BLACK) ;
     if ((codeErreur & ERREUR_CAPTEUR_ABSENT) != 0) {

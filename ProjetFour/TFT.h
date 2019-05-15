@@ -75,7 +75,7 @@ void setColumn(uint8_t column, uint8_t textSize = 2);
  * and if so, the time left.
  */
 void printPermanent(uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second,
-                      double temp, bool isRunning, uint16_t timeLeft, bool isDelayed, uint16_t timeBeforeStart);
+                    bool isRunning, uint16_t timeLeft, bool isDelayed, uint16_t timeBeforeStart);
 
 /*====================================================================================*
  *                             clearPrintPermanent                                    *

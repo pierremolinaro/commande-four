@@ -228,11 +228,11 @@ void loop (void) {
         delayScreen += 100;
         
         // ---------Information printed on every screen---------
-        uint16_t timeLeft = tmax - t_since_launching;
-        uint16_t timeBeforeStart = t_delayed_start - getMinutesSince2000();
+        const uint16_t timeLeft = tmax - t_since_launching;
+        const uint16_t timeBeforeStart = t_delayed_start - getMinutesSince2000();
         
-        printPermanent(currentYear(), currentMonth(), currentDay(), currentHour(), currentMinute(),
-                         currentSecond(), getTemp(), isRunning, timeLeft, isDelayed, timeBeforeStart);
+        printPermanent (currentYear(), currentMonth(), currentDay(), currentHour(), currentMinute(),
+                        currentSecond(), isRunning, timeLeft, isDelayed, timeBeforeStart);
         
         // ----------Printing the current menu----------
         if (Mode == 0) {
