@@ -164,13 +164,13 @@ uint8_t numberFiles(String dirname) {
  *====================================================================================*
  * This function gives the names of the files in the values directory.
  */
-void getDisplayNames(String arrayDisplayNames[]) {
+void getDisplayNames(String outFileNameArray []) {
     File root = SD.open(valuesDir.c_str());
     root.rewindDirectory();
     uint8_t len = 0;
     File file = root.openNextFile();
     while(file){
-        arrayDisplayNames[len] = extractValuesNameFile(file.name());
+        outFileNameArray [len] = extractValuesNameFile(file.name());
         len ++;
         file = root.openNextFile();
     }

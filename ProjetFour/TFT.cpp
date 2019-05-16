@@ -4,7 +4,7 @@
 #include "FreeHeap.h"
 
 // ----------Static variables in the file----------
-static TFT_eSPI tft = TFT_eSPI();
+static TFT_eSPI tft = TFT_eSPI () ;
 
 // ----------Functions----------
 /*====================================================================================*
@@ -14,7 +14,7 @@ static TFT_eSPI tft = TFT_eSPI();
  * and draws the logo of Centrale Nantes.
  */
 void initScreen(void) {
-    tft.init ();
+    tft.init () ;
     tft.setRotation (1) ;  // 0 & 2 Portrait. 1 & 3 landscape
     drawBmp ("/LogoECN.bmp");
     delay (1000) ;
@@ -239,43 +239,54 @@ void clearPrintPermanent (void) {
  * value of the delay.
  * If the oven is running, the starting menu turns into a menu to stop the oven.
  */
-void printMainMenu(uint16_t encoderPos, bool isRunning, bool isDelayed) {
-    tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    // ----------Start or Stop or Change Delay----------
-    setLign(0, 3);
-    if (isRunning) {
-        if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-        tft.printf(" Arr%cter Four ", 136); // (char)136 -> ê
-    } else if (isDelayed) {
-        if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-        tft.printf(" Changer Prog. ");
-    } else {
-        if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-        tft.printf(" D%cmarrer Four ", 130); // (char)130 -> é
-    }
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+void printMainMenu (uint16_t encoderPos, bool isRunning, bool isDelayed) {
+// ----------Start or Stop or Change Delay----------
+  setLign (0, 3) ;
+  tft.setTextSize (3) ;
+  if (encoderPos == 0) {
+    tft.setTextColor (TFT_YELLOW, TFT_BLACK);
+  }else{
+    tft.setTextColor (TFT_WHITE, TFT_BLACK);
+  }
+  if (isRunning) {
+    tft.printf(" Arr%cter Four ", 136); // (char)136 -> ê
+  }else if (isDelayed) {
+    tft.printf(" Changer Prog. ");
+  }else{
+    tft.printf(" D%cmarrer Four ", 130); // (char)130 -> é
+  }
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
-    // ----------Show Information----------
-    setLign(2, 3);
-    if (encoderPos == 1) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-    tft.print(" Afficher Infos ");
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-
-    // ----------Set Time----------
-    setLign(4, 3);
-    if (encoderPos == 2) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-    tft.printf(" R%cgler Heure ", 130); // (char)130 -> é
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-
-    // ----------Manage Curves----------
-    setLign(6, 3);
-    if (encoderPos == 3) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-    tft.printf(" G%crer Programmes", 130); // (char)130 -> é
-    tft.setTextSize(1);
-    setLign(18, 1); setColumn(17, 3); tft.print(' ');
-    setLign(19, 1); setColumn(17, 3); tft.print(' ');
-    setLign(20, 1); setColumn(17, 3); tft.print(' ');
-    tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+// ----------Show Information----------
+  setLign (2, 3) ;
+  if (encoderPos == 1) {
+    tft.setTextColor (TFT_YELLOW, TFT_BLACK);
+  }else{
+    tft.setTextColor (TFT_WHITE, TFT_BLACK);
+  }
+  tft.print(" Afficher Infos ");
+// ----------Set Time----------
+  setLign (4, 3) ;
+  if (encoderPos == 2) {
+    tft.setTextColor (TFT_YELLOW, TFT_BLACK);
+  }else{
+    tft.setTextColor (TFT_WHITE, TFT_BLACK);
+  }
+  tft.printf(" R%cgler Heure ", 130); // (char)130 -> é
+// ----------Manage Curves----------
+  setLign(6, 3);
+  if (encoderPos == 3) {
+    tft.setTextColor (TFT_YELLOW, TFT_BLACK);
+  }else{
+    tft.setTextColor (TFT_WHITE, TFT_BLACK);
+  }
+  tft.printf(" G%crer Programmes", 130); // (char)130 -> é
+ //---
+  tft.setTextSize(1);
+  setLign(18, 1); setColumn(17, 3); tft.print(' ');
+  setLign(19, 1); setColumn(17, 3); tft.print(' ');
+  setLign(20, 1); setColumn(17, 3); tft.print(' ');
+  tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
 }
 
 // ----------------------------printSelectCurveMenu-------------------------------------------------------------------------------------------------------------------
@@ -285,38 +296,39 @@ void printMainMenu(uint16_t encoderPos, bool isRunning, bool isDelayed) {
  * This function prints on the screen the menu to select the curve between those on
  * the SD card.
  */
-void printSelectCurveMenu(uint16_t encoderPos, uint8_t nbCurves, String arrayDisplayNames[], uint8_t numPage) {
-    // ----------Return----------
-    setLign(0); tft.setTextSize(2);
-    if (numPage > 0 && nbCurves <= 6*(numPage+1)) {
-        if (encoderPos == nbCurves - 6*numPage + 1) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-    }
-    else {
-        if (encoderPos == min(7, nbCurves)) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-    }
-    tft.print("Retour");
-
-    // ----------Select the curve----------
-    for (uint8_t numeroOfCurve = 0; numeroOfCurve < min(6, nbCurves-6*numPage); numeroOfCurve ++) {
-        setLign(3*numeroOfCurve+3, 1); setColumn(2); tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
-        String displayName = arrayDisplayNames[numeroOfCurve + 6*numPage];
-        if (encoderPos == numeroOfCurve) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-        tft.print(' ' + displayName + ' ');
-    }
-    tft.setTextColor(TFT_WHITE, TFT_BLACK);
-
-    // ----------Next page----------
-    if (nbCurves - 6*numPage > 6) {
-        setLign(21, 1); setColumn(18); tft.setTextSize(2);
-        if (encoderPos == 6) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-        tft.print(" Suivant");
-    }
-    // ----------First page----------
-    else if (numPage > 0) {
-        setLign(21, 1); setColumn(12); tft.setTextSize(2);
-        if (encoderPos == nbCurves - 6*numPage) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
-        tft.printf(" Premi%cre page", 138); // (char)138 -> è
-    }
+void printSelectCurveMenu (uint16_t encoderPos, uint8_t nbCurves, String inFileNameArray[], uint8_t numPage) {
+  tft.setTextSize (2) ;
+// ---------- Return----------
+  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  setLign (0) ;
+  if ((numPage > 0) && (nbCurves <= 6*(numPage+1))) {
+    if (encoderPos == (nbCurves - 6*numPage + 1)) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
+  }else{
+    if (encoderPos == min(7, nbCurves)) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
+  }
+  tft.print("Retour");
+//----------- Mode manuel
+  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  setColumn (10) ;
+  tft.print ("Mode manuel") ;
+// ----------Select the curve----------
+  for (uint8_t numeroOfCurve = 0; numeroOfCurve < min(6, nbCurves-6*numPage); numeroOfCurve ++) {
+    setLign(3*numeroOfCurve+3, 1); setColumn(2) ; tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    String displayName = inFileNameArray[numeroOfCurve + 6*numPage];
+    if (encoderPos == numeroOfCurve) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
+      tft.print(' ' + displayName + ' ');
+  }
+  tft.setTextColor(TFT_WHITE, TFT_BLACK);
+// ----------Next page----------
+  if (nbCurves - 6*numPage > 6) {
+    setLign(21, 1); setColumn(18);
+    if (encoderPos == 6) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
+    tft.print(" Suivant");
+  }else if (numPage > 0) { // ----------First page----------
+    setLign(21, 1); setColumn(12);
+    if (encoderPos == nbCurves - 6*numPage) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
+    tft.printf(" Premi%cre page", 138); // (char)138 -> è
+  }
 }
 
 // -----------------------------printShowValuesMenu-------------------------------------------------------------------------------------------------------------------
@@ -661,31 +673,43 @@ void printChangeDelayMenu(uint16_t launchDelay, uint16_t tmax, uint8_t hour, uin
  * This function prints the temperature, the command of temperature, the state of the
  * relay and the time left before the end of the running program.
  */
-void printInfoMenu(double temp, double command, bool isRunning, uint16_t timeLeft, bool increaseTemp) {
-    // ----------Return----------
-    setLign(0); tft.setTextSize(2); tft.setTextColor(TFT_BLACK, TFT_YELLOW);
+
+void printInfoMenu (double command, bool isRunning, uint16_t timeLeft, bool increaseTemp) {
+ // ----------Return----------
+    setLign (0) ; tft.setTextSize(2) ;
+    tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.print("Retour");
-    // ----------Temperature----------
-    setLign(3); setColumn(1); tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    tft.printf("Temp%crature : %7.2f%cC", 130, temp, 247); // (char)130 -> é, (char)247 -> °
-    // ----------Time left----------
-    setLign(5); setColumn(1); tft.setTextColor(TFT_WHITE, TFT_BLACK);
-    if (isRunning) tft.printf("Temps restant : %3uh%02umn", timeLeft/60, timeLeft%60);
-    // ----------Command----------
+ // ----------Temperature----------
+    setLign (3) ; setColumn (1) ;
+    tft.setTextColor (TFT_WHITE, TFT_BLACK);
+    tft.printf ("Temp%crature : %7.2f%cC", 130, getTemp (), 247); // (char)130 -> é, (char)247 -> °
+//--- Nombre de mesures incorrectes
+    setLign (4) ; setColumn (1) ;
+    tft.printf ("Mesures invalides : %u", obtenirNombreMesuresBrutesIncorrectes ());
+//--- Nombre de mesures rejetées
+    setLign (5) ; setColumn (1) ;
+    tft.printf ("Mesures rejet%ces : %u", 130, obtenirNombreMesuresBrutesIncoherentesRejetees ()); // (char)130 -> é
+//--- Nombre de mesures rejetées
+    setLign (6) ; setColumn (1) ;
+    tft.printf ("Moyennes invalides : %u", obtenirNombreMesuresMoyennesInvalides ());
+//--- Affichage quand un programme est en cours
+  if (isRunning) {
+  // ----------Time left----------
+    setLign(5); setColumn(1);
+    tft.printf("Temps restant : %3uh%02umn", timeLeft/60, timeLeft%60);
+  // ----------Command----------
     setLign(7); setColumn(1);
-    if (isRunning) tft.printf("Consigne : %6.2f%cC", command, 247); // (char)247 -> °
-    // ----------Relay ON/OFF----------
+    tft.printf("Consigne : %6.2f%cC", command, 247); // (char)247 -> °
+  // ----------Relay ON/OFF----------
     setLign(9); setColumn(1);
-    if (isRunning) {
-        tft.print("Relais : ");
-        if (increaseTemp) {
-            tft.setTextColor(TFT_GREEN, TFT_BLACK); tft.print("ON ");
-        }
-        else {
-            tft.setTextColor(TFT_RED, TFT_BLACK); tft.print("OFF");
-        }
-        tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    tft.print("Relais : ");
+    if (increaseTemp) {
+      tft.setTextColor(TFT_GREEN, TFT_BLACK); tft.print("ON ");
+    }else{
+      tft.setTextColor(TFT_RED, TFT_BLACK); tft.print("OFF");
     }
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+  }
 }
 
 // ------------------------------printSetTimeMenus--------------------------------------------------------------------------------------------------------------------

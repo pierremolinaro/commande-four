@@ -104,7 +104,7 @@ void printMainMenu(uint16_t encoderPos, bool isRunning, bool isDelayed);
  * This function prints on the screen the menu to select the curve between those on
  * the SD card.
  */
-void printSelectCurveMenu(uint16_t encoderPos, uint8_t nbCurves, String arrayDisplayNames[], uint8_t numPage);
+void printSelectCurveMenu(uint16_t encoderPos, uint8_t nbCurves, String inFileNameArray[], uint8_t numPage);
 
 // -----------------------------printShowValuesMenu---------------------------------------------------------------------
 /*====================================================================================*
@@ -206,7 +206,7 @@ void printChangeDelayMenu(uint16_t launchDelay, uint16_t tmax, uint8_t hour, uin
  * This function prints the temperature, the command of temperature, the state of the
  * relay and the time left before the end of the running program.
  */
-void printInfoMenu(double temp, double command, bool isRunning, uint16_t timeLeft, bool increaseTemp);
+void printInfoMenu (double command, bool isRunning, uint16_t timeLeft, bool increaseTemp);
 
 // ------------------------------printSetTimeMenus--------------------------------------------------------------------------------------------------------------------
 /*====================================================================================*

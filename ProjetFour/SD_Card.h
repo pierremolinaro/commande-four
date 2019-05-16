@@ -68,7 +68,7 @@ uint8_t numberFiles(String dirname);
  *====================================================================================*
  * This function gives the names of the files in the values directory.
  */
-void getDisplayNames(String arrayDisplayNames[]);
+void getDisplayNames(String outFileNameArray[]);
 
 /*====================================================================================*
  *                              extractCurveNameFile                                  *

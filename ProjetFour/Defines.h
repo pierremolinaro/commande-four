@@ -10,6 +10,9 @@ const uint8_t CANAL_PWM_BUZZER = 0 ;
 const uint8_t CANAL_PWM_LED_EN_MARCHE2 = 1 ;
 const uint8_t CANAL_PWM_RETRO_ECLAIRAGE = 2 ;
 
+//--- Numéro du timer (Attention, 0 et 1 sont invalides : conflit avec les PWM ?)
+const uint8_t NUMERO_TIMER_MESURE_TEMPERATURE = 2 ;
+
 // Rotary encoder declaration
 const uint8_t pinA     = 35;
 const uint8_t pinB     = 34;
