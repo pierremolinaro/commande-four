@@ -10,6 +10,8 @@ This sketch is used to control an oven in order to follow a temperature graph
 
 ************************************************************************************/
 
+//--- Type de carte : MH ET LIVE ESP32MiniKit
+
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // all headers
 #include "Defines.h"
@@ -20,11 +22,12 @@ This sketch is used to control an oven in order to follow a temperature graph
 #include "Temp_Sensor.h"
 #include "SD_Card.h"
 #include "Backlight.h"
+#include "ModeManuel.h"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Menu and submenu setting declarations
 static uint16_t gMode   = 0 ; // This is which menu mode we are in at any given time (top level or one of the submenus)
-static uint16_t nbMenus = 4 ; // This is the number of submenus of the mode we are in
+static uint16_t nbMenus = 5 ; // This is the number of submenus of the mode we are in
 
 // In order to set time
 static uint16_t settingYear   = 2000;
@@ -33,9 +36,13 @@ static uint8_t  settingDay    = 1;
 static uint8_t  settingHour   = 0;
 static uint8_t  settingMinute = 0;
 
-bool leapYear(uint16_t year) {
-    return(((year%4 == 0) && (year%100 != 0)) || (year%400 == 0));
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+static bool leapYear(uint16_t year) {
+  return(((year%4 == 0) && (year%100 != 0)) || (year%400 == 0));
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // The different curve patterns of temperature
 static String  gFileNameArray [maxnbCurves]; // to stock the names of the curves in the SD card
@@ -68,9 +75,8 @@ static uint8_t  MAJminOth   = 0; // 0 -> MAJ, 1 -> min, 2 -> Others
 static uint64_t delayBuzz = 0;
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-/*====================================================================================*
- *                                    SETUP                                           *
- *====================================================================================*/
+//                                    SETUP
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void setup (void) {
 // ----------DEBUGGING section of setup----------
@@ -103,9 +109,9 @@ void setup (void) {
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-/*====================================================================================*
- *                                    LOOP                                            *
- *====================================================================================*/
+//                                    LOOP
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 static uint32_t delayScreen = 2000;
 static uint32_t gInstantAffichagePiedPage = 2000 ;
 static uint32_t delaySD     = 0;
@@ -118,12 +124,12 @@ void loop (void) {
 // ----------Updating the temperature----------
   updateTemp () ;
 // ----------Updating the state of the LEDs----------
-    // Light on the LED 1 if the oven is hot
-    digitalWrite (LED_FOUR_CHAUD, getTemp () > 200.0) ;
-    // Light on the LED 2 if a process is running
-    digitalWrite (LED_EN_MARCHE, isRunning) ;
-    // ----------Changing Mode----------
-    if (clickPressed() == true) {
+// Light on the LED 1 if the oven is hot
+  digitalWrite (LED_FOUR_CHAUD, getTemp () > 200.0) ;
+// Light on the LED 2 if a process is running
+  digitalWrite (LED_EN_MARCHE, isRunning) ;
+// ----------Changing Mode----------
+    if (clickPressed ()) {
         rotaryMenu(); // change the mode in function of which mode we are in and the position of the rotary encoder
         nbSubMenus(); // update the number of submenus of the mode
     }
@@ -173,7 +179,7 @@ void loop (void) {
             if (millis() > delayBuzz + deltaDelay) {
                 if (deltaDelay == 0) {
                     ledcWrite(CANAL_PWM_BUZZER, 128);
-                    digitalWrite(LED_EN_MARCHE, 1);
+                    digitalWrite(LED_EN_MARCHE, HIGH);
                 } else if (deltaDelay == 1000) {
                     ledcWrite (CANAL_PWM_BUZZER, 0);
                     digitalWrite(LED_EN_MARCHE, !digitalRead(LED_EN_MARCHE));
@@ -203,6 +209,7 @@ void loop (void) {
     // ----------Setting Time Modes----------
     else if (gMode == 30) {
         settingHour = useRotaryEncoder(0, 23);
+
     } else if (gMode == 31) {
         settingMinute = useRotaryEncoder(0, 59);
     } else if (gMode == 32) {
@@ -238,7 +245,12 @@ void loop (void) {
         // ----------Printing the current menu----------
         if (gMode == 0) {
             printMainMenu (encoderPosition(nbMenus), isRunning, isDelayed);
-        } else if (gMode == 1) {
+        }else if (gMode == 999) { // Mode manuel
+           imprimerEcranModeManuel (encoderPosition(nbMenus)) ;
+        }else if (gMode == 998) {
+           reglageConsigneModeManuel () ;
+           imprimerEcranModeManuel (encoderPosition(nbMenus)) ;
+        }else if (gMode == 1) {
             printSelectCurveMenu (encoderPosition (nbMenus), nbCurves, gFileNameArray, numPage);
         } else if (gMode == 10) {
             printShowValuesMenu (encoderPosition(nbMenus));
@@ -306,8 +318,12 @@ void loop (void) {
 // To update the number of submenus when the mode changes
 void nbSubMenus(void) {
     switch (gMode) {
-        case 0  : nbMenus = 4;
+        case 0  : nbMenus = 5 ;
                   break;
+        case 999  : nbMenus = 3 ;
+                   break;
+        case 998  : nbMenus = 1 ;
+                   break;
         case 1  : if (numPage > 0 && nbCurves <= 6*(numPage+1)) { // last page
                       nbMenus = 2 + nbCurves - 6*numPage;
                   } else {
@@ -390,7 +406,10 @@ void rotaryMenu() {
                       break;
             case 3  : gMode = 4; // to go to curves managing menu
                       break;
-            default : if (isRunning) {
+            case 4  : gMode = 999 ; // Aller en mode manuel
+                      entreeModeManuel () ;
+                      break;
+            case 0 : if (isRunning) {
                           gMode = 14; // to go to stop menu
                       } else if (isDelayed) {
                           gMode = 15; // to go to change delay menu
@@ -401,8 +420,31 @@ void rotaryMenu() {
                           gMode = 1; // to go to Select curves menu
                           numPage = 0;
                       }
+            default : break ;
         }
     }
+    //---- Mode manuel
+    else if (gMode == 999) {
+      bool revenirPagePrincipale = false ;
+      bool saisirConsigne = false ;
+      actionModeManuel (encoderPosition(nbMenus), revenirPagePrincipale, saisirConsigne) ;
+      if (revenirPagePrincipale) {
+        gMode = 0 ;
+      }else if (saisirConsigne) {
+        gMode = 998 ;
+        doResetEncoderPos = false ;
+        doClearScreen = false ;
+      }else{
+        doResetEncoderPos = false ;
+        doClearScreen = false ;
+      }
+    }
+    //--- Reglage consigne mode manuel
+    else if (gMode == 998) {
+      quitterModeReglageConsigneModeManuel () ;
+      gMode = 999 ;
+      doResetEncoderPos = false;
+   }
     // ----------Select curves menu section----------
     else if (gMode == 1) {
         if (numPage > 0 && nbCurves <= 6*(numPage+1)) { // last page

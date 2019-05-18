@@ -12,6 +12,12 @@ static uint32_t gIntensite = PWM_MAX_INTENSITE ; // PWM_MAX_INTENSITE --> eclair
 
 //······················································································································
 
+uint32_t intensiteRetroEclairage (void) {
+  return gIntensite ;
+}
+
+//······················································································································
+
 void initialiserRetroEclairage (void) {
   pinMode (BOUTON_BTN, INPUT) ;
   ledcAttachPin (RETRO_ECLAIRAGE, CANAL_PWM_RETRO_ECLAIRAGE) ;

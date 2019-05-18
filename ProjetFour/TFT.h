@@ -9,6 +9,8 @@
 #include "Defines.h"
 #include "SD_Card.h"
 
+extern TFT_eSPI tft ;
+
 // ----------Constants declaration----------
 const uint8_t nbLign = 15; // with a text size of 2
 const uint8_t nbColumn = 26; // with a text size of 2
@@ -55,7 +57,7 @@ void clearScreen(void);
  * to write text in the given text size.
  * The default text size is 2.
  */
-void setLign(uint8_t lign, uint8_t textSize = 2);
+void setLign (uint8_t lign, uint8_t textSize);
 
 /*====================================================================================*
  *                                  setColumn                                         *
@@ -65,6 +67,8 @@ void setLign(uint8_t lign, uint8_t textSize = 2);
  * The default text size is 2.
  */
 void setColumn(uint8_t column, uint8_t textSize = 2);
+
+void setMenuColor (const bool inIsSelected) ;
 
 // -------------------------------printPermanent------------------------------------------------------------------------
 /*====================================================================================*
@@ -330,3 +334,5 @@ void printNameErrorMenu(String nameOfCurve, uint16_t Mode);
 void printEndCycleMenu(void);
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+void printColoredStatus (const uint32_t inValue) ;

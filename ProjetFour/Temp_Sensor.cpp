@@ -79,7 +79,7 @@ void initialiserThermoCouple (void) {
   pinMode (MAX31855_DO, INPUT) ;
 //--- Configurer le timer
   gTimer = timerBegin (NUMERO_TIMER_MESURE_TEMPERATURE, 80, true) ; // Toutes les 1µs, incrémentation
-  timerAttachInterrupt (gTimer, &routineInterruptionTimer, true) ; // Attacher la routine d'interruption
+  timerAttachInterrupt (gTimer, routineInterruptionTimer, true) ; // Attacher la routine d'interruption
   timerAlarmWrite (gTimer, 125000, true) ; // Interruption toutes les 125 000 µs = 125 ms
   timerAlarmEnable (gTimer) ; // Démarrer le timer
 }

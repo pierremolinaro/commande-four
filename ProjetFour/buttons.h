@@ -17,13 +17,6 @@
 void initButtons(void);
 
 /*====================================================================================*
- *                                    clickISR                                        *
- *====================================================================================*
- * This function updates the states of the button, keeping the last state.
- */
-void IRAM_ATTR clickISR(void);
-
-/*====================================================================================*
  *                                 clickPressed                                       *
  *====================================================================================*
  * This function returns true on a rising edge of the click, else returns false.

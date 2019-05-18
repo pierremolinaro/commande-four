@@ -7,22 +7,23 @@
 
 //--- Canaux PWM (0 à 15)
 const uint8_t CANAL_PWM_BUZZER = 0 ;
-const uint8_t CANAL_PWM_LED_EN_MARCHE2 = 1 ;
-const uint8_t CANAL_PWM_RETRO_ECLAIRAGE = 2 ;
+const uint8_t CANAL_PWM_RETRO_ECLAIRAGE = 1 ;
 
-//--- Numéro du timer (Attention, 0 et 1 sont invalides : conflit avec les PWM ?)
+//--- Numéro du timer (entre 0 et 3)
+const uint8_t NUMERO_TIMER_ENCODER_NUMERIQUE = 0 ;
+const uint8_t NUMERO_TIMER_CLIC_ENCODEUR = 1 ;
 const uint8_t NUMERO_TIMER_MESURE_TEMPERATURE = 2 ;
 
 // Rotary encoder declaration
-const uint8_t pinA     = 35;
-const uint8_t pinB     = 34;
-const uint8_t clickPin = 39;
+const uint8_t PIN_ENCODEUR_A    = 35;
+const uint8_t PIN_ENCODEUR_B    = 34;
+const uint8_t PIN_CLIC_ENCODEUR = 39 ;
 
 // LEDs declaration
-const uint8_t LED_FOUR_CHAUD  =  2 ;
+const uint8_t LED_FOUR_CHAUD  =  2 ;  // marquée L1 sur la sérigraphie
 
 //--- Led en marche (clignote à 1 Hz pour indiquer qu'un programme s'exécute)
-const uint8_t LED_EN_MARCHE   = 15 ; // TDO, contrôlé par PWM
+const uint8_t LED_EN_MARCHE   = 15 ; // TDO, contrôlé par PWM, marquée L2 sur la sérigraphie
 
 //--- Retro-eclairage
 const uint8_t RETRO_ECLAIRAGE = 32 ; // Contrôlé par PWM
@@ -41,9 +42,9 @@ const uint32_t FREQUENCE_BUZZER = 3500 ; // Hz
 const uint8_t  RESOLUTION_PWM_BUZZER = 8 ; //Resolution 8, 10, 12, 15
 
 // Creating a thermocouple instance with software SPI on any three digital IO pins
-const uint8_t MAX31855_DO  = 17;
-const uint8_t MAX31855_CS  =  4;
-const uint8_t MAX31855_CLK = 16;
+const uint8_t MAX31855_DO  = 17 ;
+const uint8_t MAX31855_CS  =  4 ;
+const uint8_t MAX31855_CLK = 16 ;
 
 // SDCARD pin (codé en dur dans la librairie SD : 
 //    SDCARD_SCK  --> 14 (TMS)
@@ -67,3 +68,8 @@ struct TimeTemp {
     uint16_t Time;
     float    Temp;
 };
+
+//------------------- Caractères accentues 
+#define DEGREE "\xF7"
+#define E_MIN_AIGU "\x82"
+#define E_MIN_CIRC "\x88"
