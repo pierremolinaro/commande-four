@@ -69,6 +69,6 @@ struct TimeTemp {
 };
 
 //------------------- Caractères accentues 
-#define DEGREE "\xF7"
+#define DEGREE_CHAR "\xF7"
 #define E_MIN_AIGU "\x82"
 #define E_MIN_CIRC "\x88"

@@ -13,7 +13,11 @@ This sketch is used to control an oven in order to follow a temperature graph
 //--- Type de carte : MH ET LIVE ESP32MiniKit
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// all headers
+//  Libraries
+//    - TFT_eSPI
+//    - Rtc_by_Makuna
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 #include "Defines.h"
 #include "RotaryEncoder.h"
 #include "TFT.h"

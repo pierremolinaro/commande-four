@@ -43,7 +43,7 @@ void imprimerEcranModeManuel (const uint8_t inIndiceSousMenuSelectionne) {
   tft.print (" Consigne : ") ;
   setMenuColor (inIndiceSousMenuSelectionne == 0) ;
   tft.setTextSize (gConsigneSelectionnee ? 3 : 2) ;
-  tft.printf ("%4d" DEGREE "C", gConsigneModeManuel) ;
+  tft.printf ("%4d" DEGREE_CHAR "C", gConsigneModeManuel) ;
 
   setLign (5, 2) ;
   tft.setTextSize (2) ;
