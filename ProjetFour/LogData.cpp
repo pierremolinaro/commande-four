@@ -28,7 +28,7 @@ static const char * RESULT_DIRECTORY = "/resultats" ;
 
 
 void writeLogFile (void) {
-  if (gWriteLogFile) {
+  if (gWriteLogFile && (sdCardStatus () == SDCardStatus::mounted)) {
   //--- Message
     Serial.print ("Result file : ") ; Serial.println (gLogData.mFileName) ;
   //--- Check if result directory exists
@@ -68,7 +68,8 @@ void writeLogFile (void) {
         line += String (record.mOvenIsOn) ;
         line += ";" ;
         line += String (record.mTemperature) ;
-        ok = f.println (line) ;
+        line += "\r\n" ;
+        ok = f.print (line) ;
       }
       Serial.print ("File appending: ") ; Serial.println (ok ? "yes" : "no") ;          
     }

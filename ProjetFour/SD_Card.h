@@ -15,9 +15,13 @@
  * This function inits the SD connection defining the used SPI,
  * and prints information about the SD card.
  */
-void initSDcard(void);
+void initSDcard (void);
 
-bool SDCardInserted (void) ;
+void updateSDCardStatus (void) ;
+
+enum class SDCardStatus { noCard, insertedNotMounted, mounted } ;
+
+SDCardStatus sdCardStatus (void) ;
 
 bool directoryExists (const String & inPath) ;
 

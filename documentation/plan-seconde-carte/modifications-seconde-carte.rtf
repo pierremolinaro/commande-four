@@ -78,4 +78,9 @@ Solution : \
 \
 On place aussi une r\'e9sistance de 10K\uc0\u937  entre le CS de la SDCard et le 3,3V, de fa\'e7on qu'il n'y ait pas d'acc\'e8s lors du boot, IO26 doit \'eatre flottant lors du boot (?). Maintenant, le flashage in-situ s'effectue avec le module SDCard, mais sans SDCard ins\'e9r\'e9e. Si on ins\'e8re une SDCard -> \'c9chec. Sans doute la SDCard, m\'eame non s\'e9lectionn\'e9e a une r\'e9sistance de pull-up qui affecte la tension  de IO12 (qui doit \'eatre \'e0 z\'e9ro lors du boot).\
 \
+
+\b 19 mai 2019. 
+\b0 Il s'av\'e8re que l'insertion et le retrait \'e0 chaud de la carte SD ne sont pas d\'e9tect\'e9s. Il faut en fait r\'e9cup\'e9rer le signal CD qui est ouvert si une carte est pr\'e9sente, et mis \'e0 z\'e9ro en l'absence de carte. On sacrifie le signal TFT_RESET (la patte correspondante de l'afficheur LCD est tir\'e9e \'e0 3,3V par 10 k\uc0\u937 ), et on relie IO33 \'e0 CD (et une r\'e9sistance de tirage de 10 k\u937  \'e0 3,3V).\
+\
+\
 }

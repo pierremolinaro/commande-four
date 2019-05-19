@@ -165,13 +165,20 @@ void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, ui
   tft.printf ("%02u:%02u:%02u", hour, minute, second);
 //---- Printing SDCard
   setLign (nbLign - 2, 2) ;
-  setColumn (nbColumn - 5) ;
-  if (SDCardInserted ()) {
+  setColumn (nbColumn - 6) ;
+  switch (sdCardStatus ()) {
+  case SDCardStatus::mounted :
     tft.setTextColor (TFT_GREEN, TFT_BLACK) ;
-    tft.print ("   SD") ;
-  }else{  
+    tft.print ("    SD") ;
+    break ;
+  case SDCardStatus::noCard :  
     tft.setTextColor (TFT_RED, TFT_BLACK) ;
-    tft.print ("No SD") ;
+    tft.print (" No SD") ;
+    break ;
+  case SDCardStatus::insertedNotMounted :  
+    tft.setTextColor (TFT_RED, TFT_BLACK) ;
+    tft.print ("Err SD") ;
+    break ;
   }
 // ----------Printing the temperature----------
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;

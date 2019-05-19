@@ -1,51 +1,67 @@
-// ----------Include the header----------
 #include "SD_Card.h"
+#include "Backlight.h"
 
-// ----------Static variables in the file----------
-static SPIClass hspi (HSPI) ;
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   INIT
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-// ----------Functions----------
-/*====================================================================================*
- *                                  initSDcard                                        *
- *====================================================================================*
- * This function inits the SD connection defining the used SPI,
- * and prints information about the SD card.
- */
 void initSDcard (void) {
-   // hspi = new SPIClass (HSPI);
-    if(!SD.begin (SDCARD_CS, hspi)){ // SS spin, SPIClass -> HSPI
-        Serial.println("Card Mount Failed");
-        return;
-    }
-    uint8_t cardType = SD.cardType();
-
-    if(cardType == CARD_NONE){
-        Serial.println("No SD card attached");
-        return;
-    }
-
-    Serial.print("SD Card Type: ");
-    if(cardType == CARD_MMC){
-        Serial.println("MMC");
-    } else if(cardType == CARD_SD){
-        Serial.println("SDSC");
-    } else if(cardType == CARD_SDHC){
-        Serial.println("SDHC");
-    } else {
-        Serial.println("UNKNOWN");
-    }
-
-    uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-    Serial.printf("SD Card Size: %lluMB\n", cardSize);
-    Serial.printf("Total space: %lluMB\n", SD.totalBytes() / (1024 * 1024));
-    Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
+  pinMode (SDCARD_CD, INPUT) ;
+  updateSDCardStatus () ;
 }
 
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   STATIC VARIABLES
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+static SPIClass hspi (HSPI) ;
+static SDCardStatus gSDCardStatus = SDCardStatus::noCard ; // Records current SD Card status
 
 //--------------------------------------------------------------------------------------------------------
 
-bool SDCardInserted (void) {
-  return SD.cardType() != CARD_NONE ;
+void updateSDCardStatus (void) {
+  const bool inserted = digitalRead (SDCARD_CD) == HIGH ;
+  switch (gSDCardStatus) {
+  case SDCardStatus::noCard :
+    if (inserted) {
+      extendBackLightDuration () ;
+      const bool mounted = SD.begin (SDCARD_CS, hspi) ; // SS spin, SPIClass -> HSPI
+      if (mounted) {
+        gSDCardStatus = SDCardStatus::mounted ;
+      }else{
+        SD.end () ;
+        gSDCardStatus = SDCardStatus::insertedNotMounted ;
+      }
+    }
+    break ;
+  case SDCardStatus::mounted :
+    if (!inserted) {
+      extendBackLightDuration () ;
+      SD.end () ;
+      gSDCardStatus = SDCardStatus::noCard ;
+    }
+    break ;
+  case SDCardStatus::insertedNotMounted :
+    if (inserted) {
+      const bool mounted = SD.begin (SDCARD_CS, hspi) ; // SS spin, SPIClass -> HSPI
+      if (mounted) {
+        extendBackLightDuration () ;
+        gSDCardStatus = SDCardStatus::mounted ;
+      }else{
+        SD.end () ;
+      }
+    }else{
+      extendBackLightDuration () ;
+      gSDCardStatus = SDCardStatus::noCard ;
+    }
+    break ;
+  }
+}
+
+//--------------------------------------------------------------------------------------------------------
+
+SDCardStatus sdCardStatus (void) {
+  return gSDCardStatus ;
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -53,10 +69,11 @@ bool SDCardInserted (void) {
 bool directoryExists (const String & inPath) {
   bool result = false ;
   File f = SD.open (inPath) ;
-   if (f) {
-     result = f.isDirectory () ;
-   }
-   return result ;  
+  if (f) {
+    result = f.isDirectory () ;
+  }
+  f.close () ;
+  return result ;  
 }
 
 //--------------------------------------------------------------------------------------------------------

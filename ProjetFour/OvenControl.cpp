@@ -155,7 +155,7 @@ static void executeOvenControl (void) {
     }else{
       gDelayForChangeCommand -= 1 ;
     }
-  //--- Record
+  //--- Record data for logging
     Record record ;
     record.mConsigne = gConsigne ;
     record.mOvenIsOn = gCurrentOvenCommand ;
