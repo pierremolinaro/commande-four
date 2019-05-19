@@ -1,4 +1,5 @@
 #include "OvenControl.h"
+#include "LogData.h"
 #include "TemperatureSensor.h"
 #include "Defines.h"
 #include "SD_Card.h"
@@ -54,8 +55,6 @@ enum class OvenMode { stopped, manualMode, automaticMode} ;
 
 static uint32_t gConsigne ;
 static uint32_t gRunningTime ; // In seconds
-static const uint32_t FILE_NAME_SIZE = 24 ;
-static char gFileName [FILE_NAME_SIZE] ;
 static OvenMode gOvenMode = OvenMode::stopped ;
 static uint8_t gDelayForChangeCommand ;
 static bool gCurrentOvenCommand ;
@@ -66,23 +65,15 @@ static const uint8_t DELAY_BETWEEN_COMMAND_CHANGE = 5 ; // In seconds
 //   LOG
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-typedef struct {
-  int mConsigne : 15 ;
-  int mOvenIsOn :  1 ;
-  int mTemperature : 15 ;
-} Record ;
-
-static const uint32_t RECORD_SIZE = 3600 ;
-static Record gRecording [RECORD_SIZE] ;
+static LogData gLogData ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   IMAGE OF LOG
+//   RUNNING TIME (in seconds)
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-static uint32_t gImageSize ;
-static Record gRecordImage [RECORD_SIZE] ;
-static char gFileNameImage [FILE_NAME_SIZE] ;
-static bool gWriteLogFile ;
+uint32_t ovenRunningTime (void) {
+  return gRunningTime ;
+}
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   START OVEN
@@ -94,8 +85,8 @@ void startOvenInManualMode (const uint32_t inConsigne, const RtcDateTime & inSta
     gRunningTime = 0 ;
     gDelayForChangeCommand = 0 ;
     gCurrentOvenCommand = false ;
-//--- File name
-    snprintf (gFileName, FILE_NAME_SIZE, "%u-%u-%u-%uh%umin%us",
+//--- Init log Data
+    snprintf (gLogData.mFileName, FILE_NAME_SIZE, "%u-%u-%u-%uh%umin%us",
       inStartDateTime.Day (),
       inStartDateTime.Month (),
       inStartDateTime.Year (),
@@ -103,6 +94,9 @@ void startOvenInManualMode (const uint32_t inConsigne, const RtcDateTime & inSta
       inStartDateTime.Minute (),
       inStartDateTime.Second ()
     ) ;
+    gLogData.mLogStartTime = 0 ;
+    gLogData.mLogImageSize = 0 ;
+  //--- Start oven
     gOvenMode = OvenMode::manualMode ;
   }
 }
@@ -123,14 +117,7 @@ void setConsigneInManualMode (const uint32_t inConsigne) { // Consigne in Celciu
 
 void stopOven (void) {
   if (gOvenMode != OvenMode::stopped) {
-    if (!gWriteLogFile) {
-      gImageSize = gRunningTime ;
-      for (uint32_t i=0 ; i < gImageSize ; i+=1) {
-        gRecordImage [i] = gRecording [i] ;
-      }
-      strcpy (gFileNameImage, gFileName) ;
-      gWriteLogFile = true ;
-    }
+    enterLogData (gLogData) ;
     gOvenMode = OvenMode::stopped ;
   }
 }
@@ -169,75 +156,20 @@ static void executeOvenControl (void) {
       gDelayForChangeCommand -= 1 ;
     }
   //--- Record
-    if (gRunningTime < RECORD_SIZE) {
-      Record record ;
-      record.mConsigne = gConsigne ;
-      record.mOvenIsOn = gCurrentOvenCommand ;
-      record.mTemperature = temperature ;
-      gRecording [gRunningTime] = record ;
+    Record record ;
+    record.mConsigne = gConsigne ;
+    record.mOvenIsOn = gCurrentOvenCommand ;
+    record.mTemperature = temperature ;
+    gLogData.mLogImage [gLogData.mLogImageSize] = record ;
+    gLogData.mLogImageSize += 1 ;
+  //--- If log array is full, write to file
+    if (gLogData.mLogImageSize == RECORD_SIZE) {
+      enterLogData (gLogData) ;
+      gLogData.mLogStartTime += gLogData.mLogImageSize ;
+      gLogData.mLogImageSize = 0 ;
     }
   //--- Increment running time
     gRunningTime += 1 ;
-  }
-}
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//  WRITE LOG FILE
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-static const char * RESULT_DIRECTORY = "/resultats" ;
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-void writeLogFile (void) {
-  if (gWriteLogFile) {
-  //--- Message
-    Serial.print ("Result file : ") ; Serial.println (gFileNameImage) ;
-  //--- Check if result directory exists
-    const bool resultDirectoryExists = directoryExists (RESULT_DIRECTORY) ;
-    Serial.print ("Result directory exists: ") ; Serial.println (resultDirectoryExists ? "yes" : "no") ;
-    bool ok = resultDirectoryExists ;
-  //--- Create result directory
-    if (! resultDirectoryExists) {
-      ok = createDirectory (RESULT_DIRECTORY) ;
-      Serial.print ("Result directory creation: ") ; Serial.println (ok ? "yes" : "no") ;
-    }
-  //--- Append data to file (or create file if does not exist)
-    File f ;
-    if (ok) {
-    //--- Build file path
-      String filePath (RESULT_DIRECTORY) ;
-      filePath += "/" ;
-      filePath += gFileNameImage ;
-      filePath += ".txt" ;
-      f = openFileForAppending (filePath) ;
-      ok = f ;
-      Serial.print ("Open file for appending: ") ; Serial.println (ok ? "yes" : "no") ;
-      if (!ok) { // Create file
-        f = openFileForCreation (filePath) ;
-        ok = f ;
-        Serial.print ("Open file for creation: ") ; Serial.println (ok ? "yes" : "no") ;
-      }
-    }
-  //--- Append data to file
-    if (ok) {
-      for (uint32_t i = 0 ; (i < gImageSize) && ok ; i++) {
-        const Record record = gRecordImage [i] ;
-        String line (i) ;
-        line += ";" ;
-        line += String (record.mConsigne) ;
-        line += ";" ;
-        line += String (record.mOvenIsOn) ;
-        line += ";" ;
-        line += String (record.mTemperature) ;
-        ok = f.println (line) ;
-      }
-      Serial.print ("File appending: ") ; Serial.println (ok ? "yes" : "no") ;          
-    }
-  //--- Close file
-    f.close () ;
-  //---
-    gWriteLogFile = false ;
   }
 }
 

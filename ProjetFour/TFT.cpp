@@ -165,7 +165,7 @@ void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, ui
   tft.printf ("%02u:%02u:%02u", hour, minute, second);
 //---- Printing SDCard
   setLign (nbLign - 2, 2) ;
-  setColumn (nbColumn - 6) ;
+  setColumn (nbColumn - 5) ;
   if (SDCardInserted ()) {
     tft.setTextColor (TFT_GREEN, TFT_BLACK) ;
     tft.print ("   SD") ;

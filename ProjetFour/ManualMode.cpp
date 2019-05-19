@@ -52,6 +52,13 @@ void imprimerEcranModeManuel (const uint8_t inIndiceSousMenuSelectionne) {
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
 
+  if (ovenIsRunning ()) {
+    const uint32_t runningTime = ovenRunningTime () ;
+    const uint32_t seconds = runningTime % 60 ;
+    const uint32_t minutes = (runningTime / 60) % 60 ;
+    const uint32_t hours = runningTime / 3600 ;
+    tft.printf ("%02u:%02u:%02u", hours, minutes, seconds) ; 
+  }
   setLign (7, 2) ;
   setMenuColor (inIndiceSousMenuSelectionne == 2) ;
   tft.print (" Retour") ;

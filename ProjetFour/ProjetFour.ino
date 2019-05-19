@@ -23,6 +23,7 @@ This sketch is used to control an oven in order to follow a temperature graph
 #include "Backlight.h"
 #include "ManualMode.h"
 #include "OvenControl.h"
+#include "LogData.h"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Menu and submenu setting declarations
