@@ -20,8 +20,9 @@ uint32_t intensiteRetroEclairage (void) {
 
 void initialiserRetroEclairage (void) {
   pinMode (BOUTON_BTN, INPUT) ;
-  ledcAttachPin (RETRO_ECLAIRAGE, CANAL_PWM_RETRO_ECLAIRAGE) ;
+  ledcAttachPin (PIN_BACKLIGHT, CANAL_PWM_RETRO_ECLAIRAGE) ;
   ledcSetup (CANAL_PWM_RETRO_ECLAIRAGE, FREQUENCE_RETRO_ECLAIRAGE, RESOLUTION_RETRO_ECLAIRAGE);
+//  Serial.print ("Backlight max: ") ; Serial.println (PWM_MAX_INTENSITE) ;
   gererRetroEclairage () ;
 }
 
@@ -47,6 +48,10 @@ void gererRetroEclairage (void) {
     gIntensite *= 9 ;
     gIntensite /= 10 ;
     gDateExtinction += 100 ; // Période de diminution de l'intensité
+//    Serial.print ("Extinction: ") ;
+//    Serial.print (gIntensite) ;
+//    Serial.print (", date: ") ;
+//    Serial.println (gDateExtinction) ;
   }
   ledcWrite (CANAL_PWM_RETRO_ECLAIRAGE, PWM_MAX_INTENSITE - gIntensite) ;
 }

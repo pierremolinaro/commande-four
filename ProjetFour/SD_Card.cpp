@@ -2,7 +2,7 @@
 #include "SD_Card.h"
 
 // ----------Static variables in the file----------
-static SPIClass * hspi = NULL;
+static SPIClass hspi (HSPI) ;
 
 // ----------Functions----------
 /*====================================================================================*
@@ -12,8 +12,8 @@ static SPIClass * hspi = NULL;
  * and prints information about the SD card.
  */
 void initSDcard (void) {
-    hspi = new SPIClass (HSPI);
-    if(!SD.begin (SDCARD_CS, *hspi)){ // SS spin, SPIClass -> HSPI
+   // hspi = new SPIClass (HSPI);
+    if(!SD.begin (SDCARD_CS, hspi)){ // SS spin, SPIClass -> HSPI
         Serial.println("Card Mount Failed");
         return;
     }
@@ -41,7 +41,42 @@ void initSDcard (void) {
     Serial.printf("Used space: %lluMB\n", SD.usedBytes() / (1024 * 1024));
 }
 
-// --------------------------------BasicFunctions----------------------------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------------------------
+
+bool SDCardInserted (void) {
+  return SD.cardType() != CARD_NONE ;
+}
+
+//--------------------------------------------------------------------------------------------------------
+
+bool directoryExists (const String & inPath) {
+  bool result = false ;
+  File f = SD.open (inPath) ;
+   if (f) {
+     result = f.isDirectory () ;
+   }
+   return result ;  
+}
+
+//--------------------------------------------------------------------------------------------------------
+
+bool createDirectory (const String & inPath) {
+  return SD.mkdir (inPath) ;
+}
+
+//--------------------------------------------------------------------------------------------------------
+
+File openFileForCreation (const String & inFilePath) {
+  return SD.open (inFilePath, FILE_WRITE) ;
+}
+
+//--------------------------------------------------------------------------------------------------------
+
+File openFileForAppending (const String & inFilePath) {
+  return SD.open (inFilePath, FILE_APPEND) ;
+}
+
 /*====================================================================================*
  *                                   writeFile                                        *
  *====================================================================================*

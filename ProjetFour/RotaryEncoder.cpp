@@ -1,5 +1,5 @@
 // ----------Include the header----------
-#include "encoder.h"
+#include "RotaryEncoder.h"
 #include "Backlight.h"
 
 // ----------Static variables in the file----------
@@ -9,6 +9,10 @@ static hw_timer_t * timer = NULL;
 static uint32_t gMinEncoderValue ;
 static uint32_t gCurrentEncoderValue ;
 static uint32_t gMaxEncoderValue ;
+
+//--- Push button variables
+static bool gLastClickState = true ;
+static volatile bool gClickPressed = false ;
 
 // ----------Functions----------
 
@@ -36,15 +40,23 @@ static void IRAM_ATTR encoderISR (void) {
     }
   }
   pinALast = pinACurrent;
+//--- Handle encoder push button
+  const bool clickOff = digitalRead (PIN_CLIC_ENCODEUR) ;
+  if (gLastClickState && !clickOff) {
+    gClickPressed = true ;
+  }
+  gLastClickState = clickOff ;
+
 }
 
 /*====================================================================================*
  *                                 initEncoder                                        *
  *====================================================================================*
- * This function sets the two pins of the rotary encoder as inputs, and creates an 
+ * This function sets the two pins of the rotary encoder as inputs, and creates an
  * attached interrupt activated every 1000µs.
  */
 void initEncoder (void) {
+    pinMode (PIN_CLIC_ENCODEUR, INPUT); // setup the button pin
     pinMode (PIN_ENCODEUR_A, INPUT) ; // set pinA as an input
     pinMode (PIN_ENCODEUR_B, INPUT) ; // set pinB as an input
     timer = timerBegin (NUMERO_TIMER_ENCODER_NUMERIQUE, 80, true);
@@ -94,10 +106,10 @@ void setEncoderPosition(int16_t newPosition) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   DEFINIR PLAGE ENCODEUR
+//   SET ENCODER RANGE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void definirPlageEncodeur (const uint32_t inMinValue, const uint32_t inCurrentValue, const uint32_t inMaxValue) {
+void setEncoderRange (const uint32_t inMinValue, const uint32_t inCurrentValue, const uint32_t inMaxValue) {
   gMinEncoderValue = inMinValue ;
   gCurrentEncoderValue = inCurrentValue ;
   gMaxEncoderValue = inMaxValue ;
@@ -112,11 +124,27 @@ void definirPlageEncodeur (const uint32_t inMinValue, const uint32_t inCurrentVa
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   OBTENIR ENCODEUR
+//   GET VALUE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 uint32_t getEncoderValue (void) {
   return gCurrentEncoderValue ;
 }
 
+/*====================================================================================*
+ *                                 clickPressed                                       *
+ *====================================================================================*
+ * This function returns true on a rising edge of the click, else returns false.
+ */
+bool clickPressed (void) {
+  bool result = false ;
+  if (gClickPressed) {
+    if (intensiteRetroEclairage () > 0) {
+      result = true ;
+    }
+    gClickPressed = false ;
+    prolongerRetroEclairage () ;
+  }
+  return result ;
+}
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

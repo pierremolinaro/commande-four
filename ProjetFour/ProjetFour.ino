@@ -15,14 +15,14 @@ This sketch is used to control an oven in order to follow a temperature graph
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // all headers
 #include "Defines.h"
-#include "buttons.h"
-#include "encoder.h"
+#include "RotaryEncoder.h"
 #include "TFT.h"
-#include "Clock.h"
-#include "Temp_Sensor.h"
+#include "RealTimeClock.h"
+#include "TemperatureSensor.h"
 #include "SD_Card.h"
 #include "Backlight.h"
-#include "ModeManuel.h"
+#include "ManualMode.h"
+#include "OvenControl.h"
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // Menu and submenu setting declarations
@@ -90,16 +90,11 @@ void setup (void) {
   ledcAttachPin (BUZZER_PIN, CANAL_PWM_BUZZER) ;
 // configure PWM functionalitites
   ledcSetup (CANAL_PWM_BUZZER, FREQUENCE_BUZZER, RESOLUTION_PWM_BUZZER);
-// ----------Relay section of setup----------
-  pinMode (ovenRelay, OUTPUT) ;
- //--- Configurer le thermo-couple
-  initialiserThermoCouple () ;
-// ----------Rotary encoder section of setup----------
+//--- Initializations
+  initTemperatureSensor () ;
   initEncoder () ;
-// ----------Buttons section of setup----------
-  initButtons () ;
-// ----------Clock section of setup----------
-  initClock () ;
+  initRealTimeClock () ;
+  initOvenControl () ;
 // ----------SD card reader section of setup----------
   initSDcard () ;
   nbCurves = numberFiles(valuesDir);
@@ -123,11 +118,13 @@ void loop (void) {
   updateTime () ;
 // ----------Updating the temperature----------
   updateTemp () ;
+
+  writeLogFile () ;
 // ----------Updating the state of the LEDs----------
 // Light on the LED 1 if the oven is hot
   digitalWrite (LED_FOUR_CHAUD, getTemp () > 200.0) ;
 // Light on the LED 2 if a process is running
-  digitalWrite (LED_EN_MARCHE, isRunning) ;
+//  digitalWrite (LED_EN_MARCHE, isRunning) ;
 // ----------Changing Mode----------
     if (clickPressed ()) {
         rotaryMenu(); // change the mode in function of which mode we are in and the position of the rotary encoder
@@ -152,7 +149,7 @@ void loop (void) {
             delayBuzz = millis();
             isRunning = false;
             increaseTemp = false;
-            digitalWrite(ovenRelay, LOW);
+            digitalWrite(PIN_OVEN_RELAY, LOW);
         }
     }
     if (isRunning) {
@@ -171,7 +168,7 @@ void loop (void) {
             increaseTemp = false;
         }
         // Adapting or not the activity of relay
-        digitalWrite(ovenRelay, increaseTemp);
+        digitalWrite (PIN_OVEN_RELAY, increaseTemp);
     }
     // ----------A cycle ends----------
     if (gMode == 5) { // buzz and blink during one second every 5 seconds
@@ -519,7 +516,7 @@ void rotaryMenu() {
             case 0  : gMode = 0; // to return to main menu
                       isRunning = false;
                       increaseTemp = false;
-                      digitalWrite(ovenRelay, increaseTemp);
+                      digitalWrite (PIN_OVEN_RELAY, increaseTemp);
                       clearPrintPermanent();
                       break;
             default : gMode = 0; // to return to main menu

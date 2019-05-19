@@ -17,6 +17,16 @@
  */
 void initSDcard(void);
 
+bool SDCardInserted (void) ;
+
+bool directoryExists (const String & inPath) ;
+
+bool createDirectory (const String & inPath) ;
+
+File openFileForAppending (const String & inFilePath) ;
+
+File openFileForCreation (const String & inFilePath) ;
+
 // --------------------------------BasicFunctions----------------------------------------------------------------------------------------------------------------------
 /*====================================================================================*
  *                                   writeFile                                        *

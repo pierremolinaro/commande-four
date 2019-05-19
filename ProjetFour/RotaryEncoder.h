@@ -11,19 +11,19 @@
 /*====================================================================================*
  *                                 initEncoder                                        *
  *====================================================================================*
- * This function sets the two pins of the rotary encoder as inputs, and creates an 
+ * This function sets the two pins of the rotary encoder as inputs, and creates an
  * attached interrupt activated every 1000µs.
  */
-void initEncoder(void);
+void initEncoder (void);
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   DEFINIR PLAGE ENCODEUR
+//   SET ENCODER RANGE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void definirPlageEncodeur (const uint32_t inMinValue, const uint32_t inCurrentValue, const uint32_t inMaxValue) ;
+void setEncoderRange (const uint32_t inMinValue, const uint32_t inCurrentValue, const uint32_t inMaxValue) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   OBTENIR ENCODEUR
+//   GET ENCODER VALUE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 uint32_t getEncoderValue (void) ;
@@ -52,3 +52,10 @@ uint16_t encoderPosition(uint16_t nbMenus);
  * If we give no argument, if reset the position to zero.
  */
 void setEncoderPosition(int16_t newPosition);
+
+/*====================================================================================*
+ *                                 clickPressed                                       *
+ *====================================================================================*
+ * This function returns true on a rising edge of the click, else returns false.
+ */
+bool clickPressed(void);

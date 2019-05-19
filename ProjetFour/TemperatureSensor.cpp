@@ -1,4 +1,5 @@
-#include "Temp_Sensor.h"
+#include "TemperatureSensor.h"
+#include "OvenControl.h"
 #include "Defines.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -64,6 +65,7 @@ static void IRAM_ATTR routineInterruptionTimer (void) {
   gIndiceTableauMesure += 1 ;
   if (gIndiceTableauMesure == TAILLE_TABLEAU_MESURES) {
     gIndiceTableauMesure = 0 ;
+    runOvenControl () ;
   }
 }
 
@@ -71,7 +73,7 @@ static void IRAM_ATTR routineInterruptionTimer (void) {
 //  Configurer le thermo-couple
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void initialiserThermoCouple (void) {
+void initTemperatureSensor (void) {
   pinMode (MAX31855_CS, OUTPUT) ;
   digitalWrite (MAX31855_CS, HIGH) ;
   pinMode (MAX31855_CLK, OUTPUT) ;
@@ -159,7 +161,7 @@ uint32_t erreurCapteurTemperature (void) {
 
 double getTemp (void) {
  return gMesure ;
-
- //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
 }
+
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

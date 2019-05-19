@@ -1,15 +1,16 @@
-#include "ModeManuel.h"
+#include "ManualMode.h"
 #include "TFT.h"
-#include "Temp_Sensor.h"
-#include "encoder.h"
-#include "FreeHeap.h"
+#include "TemperatureSensor.h"
+#include "RotaryEncoder.h"
+#include "MinFreeHeap.h"
+#include "OvenControl.h"
+#include "RealTimeClock.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   VARIABLES INTERNES AU MODE MANUEL
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static uint32_t gConsigneModeManuel ;
-static bool gFourEnMarche ;
 static bool gConsigneSelectionnee ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -23,7 +24,6 @@ void entreeModeManuel (void) {
   }else{
     gConsigneModeManuel = 0 ;
   }
-  gFourEnMarche = false ;
   gConsigneSelectionnee = false ;
 }
 
@@ -48,7 +48,7 @@ void imprimerEcranModeManuel (const uint8_t inIndiceSousMenuSelectionne) {
   setLign (5, 2) ;
   tft.setTextSize (2) ;
   setMenuColor (inIndiceSousMenuSelectionne == 1) ;
-  tft.print (gFourEnMarche ? (" Arr" E_MIN_CIRC "ter four") : (" D" E_MIN_AIGU "marrer four")) ;
+  tft.print (ovenIsRunning () ? (" Arr" E_MIN_CIRC "ter four") : (" D" E_MIN_AIGU "marrer four")) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
 
@@ -61,7 +61,7 @@ void imprimerEcranModeManuel (const uint8_t inIndiceSousMenuSelectionne) {
   tft.print (" Indicateurs : ") ;
   printColoredStatus (obtenirNombreMesuresBrutesIncorrectes ()) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-  tft.print (", ") ;
+  tft.print (" ") ;
   printColoredStatus (obtenirNombreMesuresBrutesIncoherentesRejetees ()) ;
  
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
@@ -78,20 +78,22 @@ void actionModeManuel (const uint8_t inIndiceSousMenuSelectionne,
                        bool & outSaisirConsigne) {
   if (inIndiceSousMenuSelectionne == 0) {
     gConsigneSelectionnee = true ;
-    outSaisirConsigne = gConsigneSelectionnee ;
+    outSaisirConsigne = true ;
     setLign (3, 2) ;
     setColumn (12, 2) ;
     tft.setTextSize (3) ;
     tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
     tft.print ("      ") ;
-    if (gConsigneSelectionnee) {
-      definirPlageEncodeur (0, gConsigneModeManuel, 1100) ;
-    }
+    setEncoderRange (0, gConsigneModeManuel, 1100) ;
   }else if (inIndiceSousMenuSelectionne == 1) {
-    gFourEnMarche ^= true ;
+    if (ovenIsRunning ()) {
+      stopOven () ;
+    }else{
+      startOvenInManualMode (gConsigneModeManuel, currentDateTime ()) ;
+    }
   }else if (inIndiceSousMenuSelectionne == 2) {
+    stopOven () ;
     outRevenirPagePrincipale = true ;
-    gFourEnMarche = false ;
   }
 }
 
@@ -112,6 +114,7 @@ void quitterModeReglageConsigneModeManuel (void) {
 
 void reglageConsigneModeManuel (void) {
   gConsigneModeManuel = getEncoderValue () ;
+  setConsigneInManualMode (gConsigneModeManuel) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

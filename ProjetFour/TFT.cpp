@@ -1,7 +1,7 @@
 // ----------Include the header----------
 #include "TFT.h"
-#include "Temp_Sensor.h"
-#include "FreeHeap.h"
+#include "TemperatureSensor.h"
+#include "MinFreeHeap.h"
 
 // ----------Static variables in the file----------
 TFT_eSPI tft = TFT_eSPI () ;
@@ -155,15 +155,26 @@ void setMenuColor (const bool inIsSelected) {
  */
 void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, uint8_t minute, uint8_t second,
                      bool isRunning, uint16_t timeLeft, bool isDelayed, uint16_t timeBeforeStart) {
-    tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-    tft.setTextSize (2) ;
-    // ----------Printing the date----------
-    setLign(nbLign - 2, 2);
-    tft.printf("%02u/%02u/%04u", day, month, year);
-    // ----------Printing the time----------
-    setLign(nbLign - 1, 2);
-    tft.printf("%02u:%02u:%02u", hour, minute, second);
+  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.setTextSize (2) ;
+// ----------Printing the date----------
+  setLign (nbLign - 2, 2);
+   tft.printf("%02u/%02u/%04u", day, month, year);
+// ----------Printing the time----------
+  setLign(nbLign - 1, 2);
+  tft.printf ("%02u:%02u:%02u", hour, minute, second);
+//---- Printing SDCard
+  setLign (nbLign - 2, 2) ;
+  setColumn (nbColumn - 6) ;
+  if (SDCardInserted ()) {
+    tft.setTextColor (TFT_GREEN, TFT_BLACK) ;
+    tft.print ("   SD") ;
+  }else{  
+    tft.setTextColor (TFT_RED, TFT_BLACK) ;
+    tft.print ("No SD") ;
+  }
 // ----------Printing the temperature----------
+  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   setLign (nbLign - 1, 2) ;
   setColumn (nbColumn - 6) ;
   const uint32_t codeErreur = erreurCapteurTemperature () ;
