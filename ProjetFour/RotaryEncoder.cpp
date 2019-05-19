@@ -90,7 +90,7 @@ uint16_t encoderPosition (uint16_t nbMenus) {
   const uint16_t encoderPosition = useRotaryEncoder (0, nbMenus-1) ;
   if (gPreviousEncoderPosition != encoderPosition) {
     gPreviousEncoderPosition = encoderPosition ;
-    prolongerRetroEclairage () ;
+    extendBackLightDuration () ;
   }
   return encoderPosition ;
 }
@@ -127,7 +127,13 @@ void setEncoderRange (const uint32_t inMinValue, const uint32_t inCurrentValue, 
 //   GET VALUE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
+static uint32_t gPreviousEncoderValue ;
+
 uint32_t getEncoderValue (void) {
+  if (gPreviousEncoderValue != gCurrentEncoderValue) {
+    gPreviousEncoderValue = gCurrentEncoderValue ;
+    extendBackLightDuration () ;
+  }
   return gCurrentEncoderValue ;
 }
 
@@ -139,11 +145,11 @@ uint32_t getEncoderValue (void) {
 bool clickPressed (void) {
   bool result = false ;
   if (gClickPressed) {
-    if (intensiteRetroEclairage () > 0) {
+    if (backlightIsON ()) {
       result = true ;
     }
     gClickPressed = false ;
-    prolongerRetroEclairage () ;
+    extendBackLightDuration () ;
   }
   return result ;
 }

@@ -7,7 +7,7 @@
 
 //--- Canaux PWM (0 à 15)
 const uint8_t CANAL_PWM_BUZZER = 0 ;
-const uint8_t CANAL_PWM_RETRO_ECLAIRAGE = 3 ;
+const uint8_t PWM_CHANNEL_BACKLIGHT = 3 ;
 
 //--- Numéro du timer (entre 0 et 3)
 const uint8_t NUMERO_TIMER_ENCODER_NUMERIQUE = 0 ;
@@ -26,11 +26,11 @@ const uint8_t LED_EN_MARCHE   = 15 ; // TDO, marquée L2 sur la sérigraphie
 
 //--- Backlight
 const uint8_t PIN_BACKLIGHT = 32 ; // Contrôlé par PWM
-const uint32_t FREQUENCE_RETRO_ECLAIRAGE = 5000 ; // Hz
-const uint32_t RESOLUTION_RETRO_ECLAIRAGE = 12 ; // En bits
+const uint32_t BACKLIGHT_FREQUENCY = 5000 ; // Hz
+const uint32_t BACKLIGHT_RESOLUTION = 12 ; // En bits
 
 // Button declaration
-const uint8_t BOUTON_BTN  = 36; // SVP
+const uint8_t BUTTON_ACTIVATE_BACKLIGHT  = 36; // SVP
 
 // Relay declaration
 const uint8_t PIN_OVEN_RELAY = 27 ;

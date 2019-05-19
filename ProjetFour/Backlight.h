@@ -6,12 +6,12 @@
 //   MANAGE BACKLIGHT
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void initialiserRetroEclairage (void) ;
+void initBacklight (void) ;
 
-void prolongerRetroEclairage (void) ;
+void extendBackLightDuration (void) ;
 
-void gererRetroEclairage (void) ;
+void updateBacklight (void) ;
 
-uint32_t intensiteRetroEclairage (void) ;
+bool backlightIsON (void) ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

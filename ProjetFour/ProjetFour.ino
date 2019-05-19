@@ -88,8 +88,8 @@ void setup (void) {
   Serial.begin (115200) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
 // ----------LEDs section of setup----------
   pinMode (LED_FOUR_CHAUD, OUTPUT) ;
-//--- Retro-eclairage
-  initialiserRetroEclairage () ;
+//--- Backlight
+  initBacklight () ;
 // ----------Buzzer section of setup----------
 // attach the channel to the buzzer to be controlled
   ledcAttachPin (BUZZER_PIN, CANAL_PWM_BUZZER) ;
@@ -118,7 +118,7 @@ static uint32_t delaySD     = 0;
 
 void loop (void) {
 //--- Retro-eclairage
-  gererRetroEclairage () ;
+  updateBacklight () ;
 // ----------Updating the time----------
   updateTime () ;
 // ----------Updating the temperature----------
