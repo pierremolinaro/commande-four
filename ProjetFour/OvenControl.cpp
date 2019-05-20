@@ -2,14 +2,15 @@
 #include "LogData.h"
 #include "TemperatureSensor.h"
 #include "Defines.h"
-#include "SD_Card.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   FORWARD DECLARATIONS
 //----------------------------------------------------------------------------------------------------------------------
 
-static void executeOvenControl (void) ;
+static void executeOvenControlTask (void) ;
 
+//----------------------------------------------------------------------------------------------------------------------
+//   SEMAPHORE
 //----------------------------------------------------------------------------------------------------------------------
 
 static SemaphoreHandle_t gSemaphore (xSemaphoreCreateCounting (10, 0)) ;
@@ -18,7 +19,7 @@ static SemaphoreHandle_t gSemaphore (xSemaphoreCreateCounting (10, 0)) ;
 //   RUN OVEN CONTROL
 //----------------------------------------------------------------------------------------------------------------------
 
-void runOvenControl (void) {
+void runOvenControlOnce (void) {
   xSemaphoreGive (gSemaphore) ;
 }
 
@@ -29,7 +30,7 @@ void runOvenControl (void) {
 static void OvenControlTask (void * pData) {
   while (1) {
     xSemaphoreTake (gSemaphore, portMAX_DELAY) ;
-    executeOvenControl () ;
+    executeOvenControlTask () ;
   }
 }
 
@@ -47,13 +48,13 @@ void initOvenControl (void) {
 //  OVEN MODES
 //----------------------------------------------------------------------------------------------------------------------
 
-enum class OvenMode { stopped, manualMode, automaticMode} ;
- 
+enum class OvenMode { stopped, manualMode, automaticMode } ;
+
 //----------------------------------------------------------------------------------------------------------------------
 //  OVEN VARIABLES
 //----------------------------------------------------------------------------------------------------------------------
 
-static uint32_t gConsigne ;
+static uint32_t gTemperatureReference ;
 static uint32_t gRunningTime ; // In seconds
 static OvenMode gOvenMode = OvenMode::stopped ;
 static uint8_t gDelayForChangeCommand ;
@@ -79,35 +80,35 @@ uint32_t ovenRunningTime (void) {
 //   START OVEN
 //----------------------------------------------------------------------------------------------------------------------
 
-void startOvenInManualMode (const uint32_t inConsigne, const RtcDateTime & inStartDateTime) { // Consigne in Celcius
+void startOvenInManualMode (const uint32_t inTemperatureReference, const RtcDateTime & inStartDateTime) { // Consigne in Celcius
   if (gOvenMode == OvenMode::stopped) {
-    gConsigne = inConsigne ;
+    gTemperatureReference = inTemperatureReference ;
     gRunningTime = 0 ;
     gDelayForChangeCommand = 0 ;
     gCurrentOvenCommand = false ;
-//--- Init log Data
+  //--- Init log Data
     snprintf (gLogData.mFileName, FILE_NAME_SIZE, "%u-%u-%u-%uh%umin%us",
-      inStartDateTime.Day (),
-      inStartDateTime.Month (),
-      inStartDateTime.Year (),
-      inStartDateTime.Hour (),
-      inStartDateTime.Minute (),
-      inStartDateTime.Second ()
-    ) ;
+              inStartDateTime.Day (),
+              inStartDateTime.Month (),
+              inStartDateTime.Year (),
+              inStartDateTime.Hour (),
+              inStartDateTime.Minute (),
+              inStartDateTime.Second ()
+             ) ;
     gLogData.mLogStartTime = 0 ;
     gLogData.mLogImageSize = 0 ;
-  //--- Start oven
+    //--- Start oven
     gOvenMode = OvenMode::manualMode ;
   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-//   SET CONSIGNE IN MANUAL MODE
+//   SET TEMPERATURE REFERENCE IN MANUAL MODE
 //----------------------------------------------------------------------------------------------------------------------
 
-void setConsigneInManualMode (const uint32_t inConsigne) { // Consigne in Celcius
+void setTemperatureReferenceInManualMode (const int32_t inTemperatureReference) { // Consigne in Celcius
   if (gOvenMode == OvenMode::manualMode) {
-    gConsigne = inConsigne ;
+    gTemperatureReference = inTemperatureReference ;
   }
 }
 
@@ -131,11 +132,28 @@ bool ovenIsRunning (void) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+//  OVEN CONTROL CORE
+//----------------------------------------------------------------------------------------------------------------------
+
+static void ovenControlCore (const uint32_t inSensorTemperature) {
+  if (gDelayForChangeCommand == 0) {
+    const bool ovenIsOn = inSensorTemperature < int32_t (gTemperatureReference) ;
+    digitalWrite (PIN_OVEN_RELAY, ovenIsOn) ;
+    if (gCurrentOvenCommand != ovenIsOn) {
+      gCurrentOvenCommand = ovenIsOn ;
+      gDelayForChangeCommand = DELAY_BETWEEN_COMMAND_CHANGE ;
+    }
+  }else{
+    gDelayForChangeCommand -= 1 ;
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 //  EXECUTE OVEN CONTROL
 //----------------------------------------------------------------------------------------------------------------------
 
-static void executeOvenControl (void) {
-//  Serial.print ("Oven at ") ; Serial.println (millis ()) ;
+static void executeOvenControlTask (void) {
+  //  Serial.print ("Oven at ") ; Serial.println (millis ()) ;
   if (gOvenMode == OvenMode::stopped) {
     digitalWrite (PIN_OVEN_RELAY, LOW) ;
     digitalWrite (LED_EN_MARCHE, LOW) ;
@@ -143,21 +161,12 @@ static void executeOvenControl (void) {
   //--- Blink running led
     digitalWrite (LED_EN_MARCHE, !digitalRead (LED_EN_MARCHE)) ;
   //--- Get Temperature
-    const int32_t temperature = lround (getTemp ()) ;
+    const int32_t temperature = lround (getSensorTemperature ()) ;
   //--- Control
-    if (gDelayForChangeCommand == 0) {
-      const bool ovenIsOn = temperature < int32_t (gConsigne) ;
-      digitalWrite (PIN_OVEN_RELAY, ovenIsOn) ;
-      if (gCurrentOvenCommand != ovenIsOn) {
-        gCurrentOvenCommand = ovenIsOn ;
-        gDelayForChangeCommand = DELAY_BETWEEN_COMMAND_CHANGE ;
-      }
-    }else{
-      gDelayForChangeCommand -= 1 ;
-    }
+    ovenControlCore (temperature) ;
   //--- Record data for logging
     Record record ;
-    record.mConsigne = gConsigne ;
+    record.mConsigne = gTemperatureReference ;
     record.mOvenIsOn = gCurrentOvenCommand ;
     record.mTemperature = temperature ;
     gLogData.mLogImage [gLogData.mLogImageSize] = record ;

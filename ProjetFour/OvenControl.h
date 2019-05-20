@@ -9,6 +9,8 @@
 #endif
 
 //----------------------------------------------------------------------------------------------------------------------
+//   HEADERS
+//----------------------------------------------------------------------------------------------------------------------
 
 #include <RtcDS1307.h>
 
@@ -19,22 +21,22 @@
 void initOvenControl (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
-//   RUN OVEN CONTROL
+//   RUN OVEN CONTROL ONCE
 //----------------------------------------------------------------------------------------------------------------------
 
-void runOvenControl (void) ;
+void runOvenControlOnce (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
 //   START OVEN IN MANUAL MODE
 //----------------------------------------------------------------------------------------------------------------------
 
-void startOvenInManualMode (const uint32_t inConsigne, const RtcDateTime & inStartDateTime) ; // Consigne in Celcius
+void startOvenInManualMode (const uint32_t inTemperatureReference, const RtcDateTime & inStartDateTime) ; // Consigne en Celcius
 
 //----------------------------------------------------------------------------------------------------------------------
-//   SET CONSIGNE IN MANUAL MODE
+//   SET TEMPERATURE REFERENCE IN MANUAL MODE
 //----------------------------------------------------------------------------------------------------------------------
 
-void setConsigneInManualMode (const uint32_t inConsigne) ; // Consigne in Celcius
+void setTemperatureReferenceInManualMode (const int32_t inTemperatureReference) ; // Consigne en Celcius
 
 //----------------------------------------------------------------------------------------------------------------------
 //   STOP OVEN

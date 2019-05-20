@@ -33,10 +33,10 @@ void clickInManualMode (const uint8_t inIndiceSousMenuSelectionne,
                         bool & outSaisirConsigne) ;
 
 //----------------------------------------------------------------------------------------------------------------------
-//   REGLAGE CONSIGNE MODE MANUEL
+//   SET MANUAL MODE TEMPERATURE REFERENCE
 //----------------------------------------------------------------------------------------------------------------------
 
-void reglageConsigneModeManuel (void) ;
+void setTemperatureInManualMode (void) ;
 
 void quitterModeReglageConsigneModeManuel (void) ;
 

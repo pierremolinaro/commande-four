@@ -1,6 +1,17 @@
+//----------------------------------------------------------------------------------------------------------------------
+//  INCLUDES
+//----------------------------------------------------------------------------------------------------------------------
+
 #include "TemperatureSensor.h"
 #include "OvenControl.h"
 #include "Defines.h"
+
+//----------------------------------------------------------------------------------------------------------------------
+//  CONSTANTS
+//----------------------------------------------------------------------------------------------------------------------
+
+static const uint32_t ACQUISITION_PERIOD = 125000 ; // In micro-seconds
+static const uint32_t SAMPLE_ARRAY_SIZE = 8 ;
 
 //----------------------------------------------------------------------------------------------------------------------
 // La lecture par (soft) SPI renvoie une valeur sur 32 bits dont la composition est la suivante :
@@ -19,19 +30,18 @@
 //    - Attention, le numéro du timer peut entrer en conflit avec les PWM (?)
 
 //----------------------------------------------------------------------------------------------------------------------
-//  Variables statiques
+//  STATIC VARIABLES
 //----------------------------------------------------------------------------------------------------------------------
 
 static hw_timer_t * gTimer = NULL ;
-static const uint32_t TAILLE_TABLEAU_MESURES = 8 ;
-static volatile uint32_t gTableauMesures [TAILLE_TABLEAU_MESURES] ;
-static uint32_t gIndiceTableauMesure ; // Entre 0 et TAILLE_TABLEAU_MESURES - 1
+static volatile uint32_t gSampleArray [SAMPLE_ARRAY_SIZE] ;
+static uint32_t gSampleArrayIndex ; // Entre 0 et SAMPLE_ARRAY_SIZE - 1
 
-static volatile uint32_t gNombreMesuresBrutesIncoherentesRejetees ;
-static volatile uint32_t gNombreMesuresBrutesIncorrectes ;
+static volatile uint32_t gRejectedInconsistentSampleCount ;
+static volatile uint32_t gFaultlySampleCount ;
 static uint32_t gNombreMesuresMoyennesInvalides ;
 
-static uint32_t gErreur ;
+static uint32_t gErrorFlags ;
 static double gMesure ;
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,19 +63,19 @@ static void IRAM_ATTR temperatureSensorISR (void) {
   }
   digitalWrite (MAX31855_CS, HIGH) ;
 //--- Accepter la mesure si D3 et D17 sont à zéro
-  const uint32_t MASQUE_ACCEPTATION = (1 << 3) | (1 << 17) ;
-  if ((rawValue & MASQUE_ACCEPTATION) != 0) {
-    gNombreMesuresBrutesIncoherentesRejetees += 1 ;
+  const uint32_t acceptationMask = (1 << 3) | (1 << 17) ;
+  if ((rawValue & acceptationMask) != 0) {
+    gRejectedInconsistentSampleCount += 1 ;
     rawValue = UINT32_MAX ; // Indiquer une valeur incohérente
-  }else if (erreurCapteurTemperature () != 0) { //--- Comptabiliser le nombre de mesures incorrectes
-    gNombreMesuresBrutesIncorrectes += 1 ;
+  }else if (temperatureSensorErrorFlags () != 0) { //--- Comptabiliser le nombre de mesures incorrectes
+    gFaultlySampleCount += 1 ;
   }
 //--- Entrer la mesure dans le tableau
-  gTableauMesures [gIndiceTableauMesure] = rawValue ;
-  gIndiceTableauMesure += 1 ;
-  if (gIndiceTableauMesure == TAILLE_TABLEAU_MESURES) {
-    gIndiceTableauMesure = 0 ;
-    runOvenControl () ;
+  gSampleArray [gSampleArrayIndex] = rawValue ;
+  gSampleArrayIndex += 1 ;
+  if (gSampleArrayIndex == SAMPLE_ARRAY_SIZE) {
+    gSampleArrayIndex = 0 ;
+    runOvenControlOnce () ;
   }
 }
 
@@ -80,58 +90,26 @@ void initTemperatureSensor (void) {
   digitalWrite (MAX31855_CLK, HIGH) ;
   pinMode (MAX31855_DO, INPUT) ;
 //--- Configurer le timer
-  gTimer = timerBegin (TIMER_TEMPERATURE_SENSOR, 80, true) ; // Toutes les 1µs, incrémentation
-  timerAttachInterrupt (gTimer, temperatureSensorISR, true) ; // Attacher la routine d'interruption
-  timerAlarmWrite (gTimer, 125000, true) ; // Interruption toutes les 125 000 µs = 125 ms
-  timerAlarmEnable (gTimer) ; // Démarrer le timer
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-//  updateTemp
-// This function writes the data read from the thermocouple in a static variable gRawValue.
-//----------------------------------------------------------------------------------------------------------------------
-
-void updateTemp (void) {
-  int32_t nombreMesuresValides = 0 ;
-  uint32_t indicateursErreur = 0 ; // 0 -> Pas d'erreur
-  int32_t mesuresCumulees = 0 ;
-  for (uint32_t i=0 ; i<TAILLE_TABLEAU_MESURES ; i++) {
-    const uint32_t mesure = gTableauMesures [i] ;
-    if (mesure != UINT32_MAX) { // Mesure incohérente rejetée
-      const uint32_t erreur = mesure & 0x07 ;
-      indicateursErreur |= erreur ;
-      if (erreur == 0) {
-        int32_t v = (int32_t) mesure ;
-        v >>= 18 ;
-        mesuresCumulees += v ;
-        nombreMesuresValides += 1 ;
-      }
-    }
-  }
-  if (nombreMesuresValides > 0) {
-    gErreur = 0 ;
-    gMesure = (mesuresCumulees * 0.25) / nombreMesuresValides ;
-  }else{
-    gErreur = indicateursErreur ;
-    gMesure = 2000.0 ;
-    gNombreMesuresMoyennesInvalides += 1 ;
-  }
+  gTimer = timerBegin (TIMER_TEMPERATURE_SENSOR, 80, true) ; // Every micro-second, incrementation
+  timerAttachInterrupt (gTimer, temperatureSensorISR, true) ; // Attach interrupt service routine
+  timerAlarmWrite (gTimer, ACQUISITION_PERIOD, true) ;
+  timerAlarmEnable (gTimer) ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // Obtenir le nombre de mesures incorrectes
 //----------------------------------------------------------------------------------------------------------------------
 
-uint32_t obtenirNombreMesuresBrutesIncorrectes (void) {
-  return gNombreMesuresBrutesIncorrectes ;
+uint32_t getFaultlySampleCount (void) {
+  return gFaultlySampleCount ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 // Obtenir le nombre de mesures incoherentes rejetees
 //----------------------------------------------------------------------------------------------------------------------
 
-uint32_t obtenirNombreMesuresBrutesIncoherentesRejetees (void) {
-  return gNombreMesuresBrutesIncoherentesRejetees ;
+uint32_t getRejectedInconsistentSampleCount (void) {
+  return gRejectedInconsistentSampleCount ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -143,6 +121,38 @@ uint32_t obtenirNombreMesuresMoyennesInvalides (void) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+//  updateTemp
+// This function writes the data read from the thermocouple in a static variable gRawValue.
+//----------------------------------------------------------------------------------------------------------------------
+
+void updateTemp (void) {
+  int32_t nombreMesuresValides = 0 ;
+  uint32_t errorFlags = 0 ; // 0 -> No error
+  int32_t mesuresCumulees = 0 ;
+  for (uint32_t i=0 ; i<SAMPLE_ARRAY_SIZE ; i++) {
+    const uint32_t mesure = gSampleArray [i] ;
+    if (mesure != UINT32_MAX) { // Mesure incohérente rejetée
+      const uint32_t erreur = mesure & 0x07 ;
+      errorFlags |= erreur ;
+      if (erreur == 0) {
+        int32_t v = (int32_t) mesure ;
+        v >>= 18 ;
+        mesuresCumulees += v ;
+        nombreMesuresValides += 1 ;
+      }
+    }
+  }
+  if (nombreMesuresValides > 0) {
+    gErrorFlags = 0 ;
+    gMesure = (mesuresCumulees * 0.25) / nombreMesuresValides ;
+  }else{
+    gErrorFlags = errorFlags ;
+    gMesure = 2000.0 ;
+    gNombreMesuresMoyennesInvalides += 1 ;
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 //  erreurCapteurTemperature (renvoie 0 si tout est ok)
 // Seuls les trois bits de poids faible sont utilisés :
 //      D2 : 0 --> ok, 1 --> SCV Fault : « the thermocouple is short-circuited to VCC »
@@ -150,18 +160,17 @@ uint32_t obtenirNombreMesuresMoyennesInvalides (void) {
 //      D0 : 0 --> ok, 1 -->  OC Fault : « the thermocouple is open (no connections) »
 //----------------------------------------------------------------------------------------------------------------------
 
-uint32_t erreurCapteurTemperature (void) {
-  return gErreur ;
+uint32_t temperatureSensorErrorFlags (void) {
+  return gErrorFlags ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-//                                    getTemp
+//    getSensorTemperature
 //----------------------------------------------------------------------------------------------------------------------
 // This function returns the temperature in Celcius
 
-double getTemp (void) {
- return gMesure ;
+double getSensorTemperature (void) {
+  return gMesure ;
 }
-
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ static bool gConsigneSelectionnee ;
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void enterManualMode (void) {
-  const int32_t v = lround (getTemp ()) - 10 ;
+  const int32_t v = lround (getSensorTemperature ()) - 10 ;
   if (v >= 0) {
     gConsigneModeManuel = (uint32_t) v ;
   }else{
@@ -34,9 +34,9 @@ void enterManualMode (void) {
 void printManualModeScreen (const uint8_t inIndiceSousMenuSelectionne) {
   setLign (0, 3) ;
   tft.setTextSize (3) ;
-  setColumn (3, 3) ;
+  setColumn (4, 3) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-  tft.print (" Mode Manuel") ;
+  tft.print ("Mode Manuel") ;
 
   setLign (3, 2) ;
   tft.setTextSize (2) ;
@@ -48,7 +48,7 @@ void printManualModeScreen (const uint8_t inIndiceSousMenuSelectionne) {
   setLign (5, 2) ;
   tft.setTextSize (2) ;
   setMenuColor (inIndiceSousMenuSelectionne == 1) ;
-  tft.print (ovenIsRunning () ? (" Arr" E_MIN_CIRC "ter four") : (" D" E_MIN_AIGU "marrer four")) ;
+  tft.print (ovenIsRunning () ? (" Arr" LOWERCASE_E_CIRCUM "ter four") : (" D" LOWERCASE_E_ACUTE "marrer four")) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
 
@@ -66,10 +66,10 @@ void printManualModeScreen (const uint8_t inIndiceSousMenuSelectionne) {
   setLign (10, 2) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" Indicateurs : ") ;
-  printColoredStatus (obtenirNombreMesuresBrutesIncorrectes ()) ;
+  printColoredStatus (getFaultlySampleCount ()) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
-  printColoredStatus (obtenirNombreMesuresBrutesIncoherentesRejetees ()) ;
+  printColoredStatus (getRejectedInconsistentSampleCount ()) ;
 
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   setLign (11, 2) ;
@@ -116,12 +116,12 @@ void quitterModeReglageConsigneModeManuel (void) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   REGLAGE CONSIGNE MODE MANUEL
+//   SET MANUAL MODE TEMPERATURE REFERENCE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void reglageConsigneModeManuel (void) {
+void setTemperatureInManualMode (void) {
   gConsigneModeManuel = getEncoderValue () ;
-  setConsigneInManualMode (gConsigneModeManuel) ;
+  setTemperatureReferenceInManualMode (gConsigneModeManuel) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

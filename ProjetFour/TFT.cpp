@@ -184,14 +184,14 @@ void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, ui
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   setLign (nbLign - 1, 2) ;
   setColumn (nbColumn - 6) ;
-  const uint32_t codeErreur = erreurCapteurTemperature () ;
+  const uint32_t codeErreur = temperatureSensorErrorFlags () ;
   if (codeErreur == 0) { // Ok
-    tft.printf ("%4ld" DEGREE_CHAR "C", lround (getTemp ())) ;
+    tft.printf ("%4ld" DEGREE_CHAR "C", lround (getSensorTemperature ())) ;
   }else{
     tft.setTextColor (TFT_RED, TFT_BLACK) ;
-    if ((codeErreur & ERREUR_CAPTEUR_ABSENT) != 0) {
+    if ((codeErreur & TEMPERATURE_SENSOR_ERROR_NO_CONNECTION) != 0) {
       tft.print ("Absent") ;
-    }else if ((codeErreur & ERREUR_CAPTEUR_COURT_CIRCUIT_GND) != 0) {
+    }else if ((codeErreur & TEMPERATURE_SENSOR_ERROR_SHORT_CIRCUITED_TO_GND) != 0) {
       tft.print ("CC GND") ;
     }else{
       tft.print ("CC Vcc") ;
@@ -285,11 +285,11 @@ void printMainMenu (uint16_t encoderPos, bool isRunning, bool isDelayed) {
 // ----------Set Time----------
   fixerCurseurDemieLignesPourTaille (6, 3) ;
   setMenuColor (encoderPos == 2) ;
-  tft.print (" R" E_MIN_AIGU "gler Heure ");
+  tft.print (" R" LOWERCASE_E_ACUTE "gler Heure ");
 // ----------Manage Curves----------
   fixerCurseurDemieLignesPourTaille (9, 3);
   setMenuColor (encoderPos == 3) ;
-  tft.print (" G" E_MIN_AIGU "rer Programmes");
+  tft.print (" G" LOWERCASE_E_ACUTE "rer Programmes");
 //---------- Mode Manuel
   fixerCurseurDemieLignesPourTaille (12, 3);
   setMenuColor (encoderPos == 4) ;
@@ -707,13 +707,13 @@ void printInfoMenu (double command, bool isRunning, uint16_t timeLeft, bool incr
 // ----------Temperature----------
   setLign (3, 2) ; setColumn (1) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK);
-  tft.printf ("Temp%crature : %7.2f%cC", 130, getTemp (), 247); // (char)130 -> é, (char)247 -> °
+  tft.printf ("Temp%crature : %7.2f%cC", 130, getSensorTemperature (), 247); // (char)130 -> é, (char)247 -> °
 //--- Nombre de mesures incorrectes
   setLign (4, 2) ; setColumn (1) ;
-  afficherCompteurErreurs ("Mesures invalides : ", obtenirNombreMesuresBrutesIncorrectes ()) ;
+  afficherCompteurErreurs ("Mesures invalides : ", getFaultlySampleCount ()) ;
 //--- Nombre de mesures rejetées
   setLign (5, 2) ; setColumn (1) ;
-  afficherCompteurErreurs ("Mesures rejet" "\x82" "es : ", obtenirNombreMesuresBrutesIncoherentesRejetees ()) ;
+  afficherCompteurErreurs ("Mesures rejet" "\x82" "es : ", getRejectedInconsistentSampleCount ()) ;
 //--- Nombre de moyennes invalides
   setLign (6, 2) ; setColumn (1) ;
   afficherCompteurErreurs ("Moyennes invalides : ", obtenirNombreMesuresMoyennesInvalides ()) ;

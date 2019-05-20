@@ -19,25 +19,23 @@ This sketch is used to control an oven in order to follow a temperature graph
 #endif
 
 //----------------------------------------------------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------------
 //  Libraries
 //    - TFT_eSPI
 //    - Rtc_by_Makuna
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 #include "Defines.h"
 #include "RotaryEncoder.h"
 #include "TFT.h"
 #include "RealTimeClock.h"
 #include "TemperatureSensor.h"
-#include "SD_Card.h"
+#include "SDCard.h"
 #include "Backlight.h"
 #include "ManualMode.h"
 #include "OvenControl.h"
 #include "LogData.h"
 
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 // Menu and submenu setting declarations
 static uint16_t gMode   = 0 ; // This is which menu mode we are in at any given time (top level or one of the submenus)
 static uint16_t nbMenus = 5 ; // This is the number of submenus of the mode we are in
@@ -49,13 +47,13 @@ static uint8_t  settingDay    = 1;
 static uint8_t  settingHour   = 0;
 static uint8_t  settingMinute = 0;
 
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 static bool leapYear(uint16_t year) {
   return(((year%4 == 0) && (year%100 != 0)) || (year%400 == 0));
 }
 
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 // The different curve patterns of temperature
 static String  gFileNameArray [maxnbCurves]; // to stock the names of the curves in the SD card
@@ -87,9 +85,9 @@ static uint8_t  MAJminOth   = 0; // 0 -> MAJ, 1 -> min, 2 -> Others
 // Declarations when a cycle ends
 static uint64_t delayBuzz = 0;
 
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //                                    SETUP
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 void setup (void) {
 // ----------DEBUGGING section of setup----------
@@ -116,9 +114,9 @@ void setup (void) {
   initScreen () ;
 }
 
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //                                    LOOP
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 static uint32_t delayScreen = 2000;
 static uint32_t gInstantAffichagePiedPage = 2000 ;
@@ -135,7 +133,7 @@ void loop (void) {
   writeLogFile () ;
 // ----------Updating the state of the LEDs----------
 // Light on the LED 1 if the oven is hot
-  digitalWrite (LED_FOUR_CHAUD, getTemp () > 200.0) ;
+  digitalWrite (LED_FOUR_CHAUD, getSensorTemperature () > 200.0) ;
 // Light on the LED 2 if a process is running
 //  digitalWrite (LED_EN_MARCHE, isRunning) ;
 // ----------Changing Mode----------
@@ -173,11 +171,11 @@ void loop (void) {
         // ----------Taking decision concerning the using of relay----------
         // If the current temp is in the tolerance of the wanted temperature, we don't change the bool 
         // If the current temperature is too low, oven heats
-        if (getTemp() < (wantedTemp - tolTemp)) { 
+        if (getSensorTemperature () < (wantedTemp - tolTemp)) { 
             increaseTemp = true; 
         }
         // If the current temperature is too high, oven stops
-        if (getTemp() > (wantedTemp + tolTemp)) {
+        if (getSensorTemperature () > (wantedTemp + tolTemp)) {
             increaseTemp = false;
         }
         // Adapting or not the activity of relay
@@ -258,7 +256,7 @@ void loop (void) {
         }else if (gMode == 999) { // Mode manuel
            printManualModeScreen (encoderPosition(nbMenus)) ;
         }else if (gMode == 998) {
-           reglageConsigneModeManuel () ;
+           setTemperatureInManualMode () ;
            printManualModeScreen (encoderPosition(nbMenus)) ;
         }else if (gMode == 1) {
             printSelectCurveMenu (encoderPosition (nbMenus), nbCurves, gFileNameArray, numPage);
@@ -321,10 +319,8 @@ void loop (void) {
     }
 }
 
-/*====================================================================================*
- *                                OTHER FUNCTIONS                                     *
- *====================================================================================*/
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+
 // To update the number of submenus when the mode changes
 void nbSubMenus(void) {
     switch (gMode) {
@@ -401,7 +397,8 @@ void nbSubMenus(void) {
     }
 }
 
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
+
 // To go from a mode to another
 void rotaryMenu() {
     bool doClearScreen = true;
@@ -960,9 +957,9 @@ void rotaryMenu() {
         setEncoderPosition(0); // to reset the encoderPosition to zero
     }
     if (doClearScreen) {
-        clearScreen();
+        clearScreen ();
     }
     Serial.printf("Mode %u\n", gMode);
 }
 
-//----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #include "LogData.h"
 #include "Defines.h"
-#include "SD_Card.h"
+#include "SDCard.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   STATIC VARIABLE

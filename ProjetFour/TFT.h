@@ -16,7 +16,7 @@
 
 // ----------Headers----------
 #include "Defines.h"
-#include "SD_Card.h"
+#include "SDCard.h"
 
 extern TFT_eSPI tft ;
 

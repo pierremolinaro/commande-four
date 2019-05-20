@@ -1,4 +1,3 @@
-// ----------Always begin by this pragma----------
 #pragma once
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -14,7 +13,7 @@
 #include <Arduino.h>
 
 //----------------------------------------------------------------------------------------------------------------------
-//  Initialiser le thermo-couple
+//  INIT
 //----------------------------------------------------------------------------------------------------------------------
 
 void initTemperatureSensor (void) ;
@@ -35,23 +34,23 @@ void updateTemp(void);
 //      D0 : 0 --> ok, 1 -->  OC Fault : « the thermocouple is open (no connections) »
 //----------------------------------------------------------------------------------------------------------------------
 
-const uint32_t ERREUR_CAPTEUR_ABSENT = 0x01 ;
-const uint32_t ERREUR_CAPTEUR_COURT_CIRCUIT_GND = 0x02 ;
-const uint32_t ERREUR_CAPTEUR_COURT_CIRCUIT_VCC = 0x04 ;
+const uint32_t TEMPERATURE_SENSOR_ERROR_NO_CONNECTION          = 0x01 ;
+const uint32_t TEMPERATURE_SENSOR_ERROR_SHORT_CIRCUITED_TO_GND = 0x02 ;
+const uint32_t TEMPERATURE_SENSOR_ERROR_SHORT_CIRCUITED_TO_VCC = 0x04 ;
 
-uint32_t erreurCapteurTemperature (void) ;
+uint32_t temperatureSensorErrorFlags (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Obtenir le nombre de mesures brutes incorrectes
 //----------------------------------------------------------------------------------------------------------------------
 
-uint32_t obtenirNombreMesuresBrutesIncorrectes (void) ;
+uint32_t getFaultlySampleCount (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Obtenir le nombre de mesures brutes incohérentes rejetées
 //----------------------------------------------------------------------------------------------------------------------
 
-uint32_t obtenirNombreMesuresBrutesIncoherentesRejetees (void) ;
+uint32_t getRejectedInconsistentSampleCount (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Obtenir le nombre de mesures moyennes invalides
@@ -59,9 +58,10 @@ uint32_t obtenirNombreMesuresBrutesIncoherentesRejetees (void) ;
 
 uint32_t obtenirNombreMesuresMoyennesInvalides (void) ;
 
-/*====================================================================================*
- *                                    getTemp                                         *
- *====================================================================================*
- * This function returns the temperature read with the thermocouple.
- */
-double getTemp(void);
+//----------------------------------------------------------------------------------------------------------------------
+// GET SENSOR TEMPERATURE (Celcius)
+//----------------------------------------------------------------------------------------------------------------------
+
+double getSensorTemperature (void) ;
+
+//----------------------------------------------------------------------------------------------------------------------
