@@ -1,11 +1,17 @@
 #include "MinFreeHeap.h"
 
-static uint32_t gMinRamLibre = UINT32_MAX ;
+//----------------------------------------------------------------------------------------------------------------------
 
-uint32_t ramLibre (void) {
-  const uint32_t freeRAM = ESP.getFreeHeap () ;
-  if (gMinRamLibre > freeRAM) {
-    gMinRamLibre = freeRAM ;
+static uint32_t gMinFreeHeap = UINT32_MAX ;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+uint32_t minFreeHeap (void) {
+  const uint32_t freeHeap = ESP.getFreeHeap () ;
+  if (gMinFreeHeap > freeHeap) {
+    gMinFreeHeap = freeHeap ;
   }
-  return gMinRamLibre ;
+  return gMinFreeHeap ;
 }
+
+//----------------------------------------------------------------------------------------------------------------------

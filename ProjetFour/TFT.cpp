@@ -721,7 +721,7 @@ void printInfoMenu (double command, bool isRunning, uint16_t timeLeft, bool incr
   setLign (7, 2) ;
   setColumn (1) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK);    
-  tft.printf ("RAM libre %6u octets", ramLibre ()) ;
+  tft.printf ("RAM libre %6u octets", minFreeHeap ()) ;
 //--- Affichage quand un programme est en cours
   if (isRunning) {
   // ----------Time left----------

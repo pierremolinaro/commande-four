@@ -10,7 +10,15 @@ This sketch is used to control an oven in order to follow a temperature graph
 
 ************************************************************************************/
 
-//--- Type de carte : MH ET LIVE ESP32MiniKit
+//----------------------------------------------------------------------------------------------------------------------
+//  Check board type
+//----------------------------------------------------------------------------------------------------------------------
+
+#ifndef ARDUINO_MH_ET_LIVE_ESP32MINIKIT
+  #error "Select 'MH ET LIVE ESP32MiniKit' board"
+#endif
+
+//----------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------
 //  Libraries
@@ -131,7 +139,7 @@ void loop (void) {
 // Light on the LED 2 if a process is running
 //  digitalWrite (LED_EN_MARCHE, isRunning) ;
 // ----------Changing Mode----------
-    if (clickPressed ()) {
+    if (encoderClickPressed ()) {
         rotaryMenu(); // change the mode in function of which mode we are in and the position of the rotary encoder
         nbSubMenus(); // update the number of submenus of the mode
     }
@@ -248,10 +256,10 @@ void loop (void) {
         if (gMode == 0) {
             printMainMenu (encoderPosition(nbMenus), isRunning, isDelayed);
         }else if (gMode == 999) { // Mode manuel
-           imprimerEcranModeManuel (encoderPosition(nbMenus)) ;
+           printManualModeScreen (encoderPosition(nbMenus)) ;
         }else if (gMode == 998) {
            reglageConsigneModeManuel () ;
-           imprimerEcranModeManuel (encoderPosition(nbMenus)) ;
+           printManualModeScreen (encoderPosition(nbMenus)) ;
         }else if (gMode == 1) {
             printSelectCurveMenu (encoderPosition (nbMenus), nbCurves, gFileNameArray, numPage);
         } else if (gMode == 10) {
@@ -409,7 +417,7 @@ void rotaryMenu() {
             case 3  : gMode = 4; // to go to curves managing menu
                       break;
             case 4  : gMode = 999 ; // Aller en mode manuel
-                      entreeModeManuel () ;
+                      enterManualMode () ;
                       break;
             case 0 : if (isRunning) {
                           gMode = 14; // to go to stop menu
@@ -429,7 +437,7 @@ void rotaryMenu() {
     else if (gMode == 999) {
       bool revenirPagePrincipale = false ;
       bool saisirConsigne = false ;
-      actionModeManuel (encoderPosition(nbMenus), revenirPagePrincipale, saisirConsigne) ;
+      clickInManualMode (encoderPosition(nbMenus), revenirPagePrincipale, saisirConsigne) ;
       if (revenirPagePrincipale) {
         gMode = 0 ;
       }else if (saisirConsigne) {

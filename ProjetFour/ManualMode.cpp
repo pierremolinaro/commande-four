@@ -7,17 +7,17 @@
 #include "RealTimeClock.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   VARIABLES INTERNES AU MODE MANUEL
+//   STATIC VARIABLES
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 static uint32_t gConsigneModeManuel ;
 static bool gConsigneSelectionnee ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   ENTREE DANS LE MODE MANUEL
+//   ENTER MANUAL MODE
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void entreeModeManuel (void) {
+void enterManualMode (void) {
   const int32_t v = lround (getTemp ()) - 10 ;
   if (v >= 0) {
     gConsigneModeManuel = (uint32_t) v ;
@@ -28,10 +28,10 @@ void entreeModeManuel (void) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   IMPRIMER ECRAN MODE MANUEL
+//   PRINT MANUAL MODE SCREEN
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-void imprimerEcranModeManuel (const uint8_t inIndiceSousMenuSelectionne) {
+void printManualModeScreen (const uint8_t inIndiceSousMenuSelectionne) {
   setLign (0, 3) ;
   tft.setTextSize (3) ;
   setColumn (3, 3) ;
@@ -57,7 +57,7 @@ void imprimerEcranModeManuel (const uint8_t inIndiceSousMenuSelectionne) {
     const uint32_t seconds = runningTime % 60 ;
     const uint32_t minutes = (runningTime / 60) % 60 ;
     const uint32_t hours = runningTime / 3600 ;
-    tft.printf ("%02u:%02u:%02u", hours, minutes, seconds) ; 
+    tft.printf ("%02u:%02u:%02u", hours, minutes, seconds) ;
   }
   setLign (7, 2) ;
   setMenuColor (inIndiceSousMenuSelectionne == 2) ;
@@ -70,19 +70,19 @@ void imprimerEcranModeManuel (const uint8_t inIndiceSousMenuSelectionne) {
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
   printColoredStatus (obtenirNombreMesuresBrutesIncoherentesRejetees ()) ;
- 
+
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   setLign (11, 2) ;
-  tft.printf (" RAM : %u octets", ramLibre ()) ;
+  tft.printf (" RAM : %u octets", minFreeHeap ()) ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   EXECUTER ECRAN MODE MANUEL
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
+//   CLICK IN MANUAL MODE
+//----------------------------------------------------------------------------------------------------------------------
 
-void actionModeManuel (const uint8_t inIndiceSousMenuSelectionne,
-                       bool & outRevenirPagePrincipale,
-                       bool & outSaisirConsigne) {
+void clickInManualMode (const uint8_t inIndiceSousMenuSelectionne,
+                        bool & outRevenirPagePrincipale,
+                        bool & outSaisirConsigne) {
   if (inIndiceSousMenuSelectionne == 0) {
     gConsigneSelectionnee = true ;
     outSaisirConsigne = true ;

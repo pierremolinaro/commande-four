@@ -1,6 +1,16 @@
 // ----------Always begin by this pragma----------
 #pragma once
 
+//----------------------------------------------------------------------------------------------------------------------
+//  Check board type
+//----------------------------------------------------------------------------------------------------------------------
+
+#ifndef ARDUINO_MH_ET_LIVE_ESP32MINIKIT
+  #error "Select 'MH ET LIVE ESP32MiniKit' board"
+#endif
+
+//----------------------------------------------------------------------------------------------------------------------
+
 // ----------Libraries----------
 #include <SD.h>
 #include <SPI.h>
@@ -35,14 +45,14 @@ File openFileForCreation (const String & inFilePath) ;
 /*====================================================================================*
  *                                   writeFile                                        *
  *====================================================================================*
- * This function creates a file (or replace it) and write on it the message given. 
+ * This function creates a file (or replace it) and write on it the message given.
  */
 void writeFile(String path, String message);
 
 /*====================================================================================*
  *                                  appendFile                                        *
  *====================================================================================*
- * This function appends to the file the message given, or creates a file with the 
+ * This function appends to the file the message given, or creates a file with the
  * message.
  */
 void appendFile(String path, String message);
@@ -87,7 +97,7 @@ void getDisplayNames(String outFileNameArray[]);
 /*====================================================================================*
  *                              extractCurveNameFile                                  *
  *====================================================================================*
- * This function gives the name of the curve, by giving the full name 
+ * This function gives the name of the curve, by giving the full name
  * in the curve directory.
  */
 String extractCurveNameFile(String fullCurveName);
@@ -95,7 +105,7 @@ String extractCurveNameFile(String fullCurveName);
 /*====================================================================================*
  *                              extractValuesNameFile                                 *
  *====================================================================================*
- * This function gives the name of the curve, by giving the full name 
+ * This function gives the name of the curve, by giving the full name
  * in the values directory.
  */
 String extractValuesNameFile(String fullValuesName);
@@ -125,7 +135,7 @@ void createValues(String displayName, TimeTemp arrayTimeTemp[], uint8_t len);
 /*====================================================================================*
  *                                 extractValues                                      *
  *====================================================================================*
- * This function extracts the values in the given file and writes them in 
+ * This function extracts the values in the given file and writes them in
  * the given array and returns the size of the array.
  */
 uint8_t extractValues(TimeTemp arrayTimeTemp[], String pathValues);

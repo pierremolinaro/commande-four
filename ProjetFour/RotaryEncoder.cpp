@@ -1,33 +1,37 @@
-// ----------Include the header----------
+//----------------------------------------------------------------------------------------------------------------------
+//   HEADER INCLUDES
+//----------------------------------------------------------------------------------------------------------------------
+
 #include "RotaryEncoder.h"
 #include "Backlight.h"
 
-// ----------Static variables in the file----------
-static int16_t encoderPos = 0; // This variable stores our current value of encoder position.
-static hw_timer_t * timer = NULL;
+//----------------------------------------------------------------------------------------------------------------------
+//   STATIC VARIABLES
+//----------------------------------------------------------------------------------------------------------------------
 
+static int16_t encoderPos = 0; // This variable stores our current value of encoder position.
+static hw_timer_t * gTimer = NULL;
+
+//--- Rotary variables
 static uint32_t gMinEncoderValue ;
 static uint32_t gCurrentEncoderValue ;
 static uint32_t gMaxEncoderValue ;
+static uint32_t gPreviousEncoderValue ;
 
-//--- Push button variables
+//--- Click variables
 static bool gLastClickState = true ;
 static volatile bool gClickPressed = false ;
 
-// ----------Functions----------
+//----------------------------------------------------------------------------------------------------------------------
+//   ENCODER INTERRUPT SERVICE ROUTINE
+//----------------------------------------------------------------------------------------------------------------------
 
-/*====================================================================================*
- *                                  encoderISR                                        *
- *====================================================================================*
- * This function is used to change the value of the encoder when we turn it.
- * It is an interruption function stocked in the RAM.
- */
 static void IRAM_ATTR encoderISR (void) {
   static bool pinALast = HIGH ;
-  const bool pinACurrent = digitalRead (PIN_ENCODEUR_A);
+  const bool pinACurrent = digitalRead (PIN_ENCODER_A);
   if ((pinALast == LOW) && (pinACurrent == HIGH)) { //Rising edge
         // If the outputB state is different to the outputA state, that means the encoder is rotating clockwise
-    if (digitalRead (PIN_ENCODEUR_B) == LOW) {
+    if (digitalRead (PIN_ENCODER_B) == LOW) {
        encoderPos ++ ;
        if (gCurrentEncoderValue <  gMaxEncoderValue) {
          gCurrentEncoderValue += 1 ;
@@ -41,29 +45,86 @@ static void IRAM_ATTR encoderISR (void) {
   }
   pinALast = pinACurrent;
 //--- Handle encoder push button
-  const bool clickOff = digitalRead (PIN_CLIC_ENCODEUR) ;
-  if (gLastClickState && !clickOff) {
+  const bool newClickState = digitalRead (PIN_ENCODER_CLICK) == HIGH ;
+  if (gLastClickState && !newClickState) {
     gClickPressed = true ;
   }
-  gLastClickState = clickOff ;
+  gLastClickState = newClickState ;
 
 }
 
-/*====================================================================================*
- *                                 initEncoder                                        *
- *====================================================================================*
- * This function sets the two pins of the rotary encoder as inputs, and creates an
- * attached interrupt activated every 1000µs.
- */
+//----------------------------------------------------------------------------------------------------------------------
+//   INIT
+//----------------------------------------------------------------------------------------------------------------------
+
 void initEncoder (void) {
-    pinMode (PIN_CLIC_ENCODEUR, INPUT); // setup the button pin
-    pinMode (PIN_ENCODEUR_A, INPUT) ; // set pinA as an input
-    pinMode (PIN_ENCODEUR_B, INPUT) ; // set pinB as an input
-    timer = timerBegin (NUMERO_TIMER_ENCODER_NUMERIQUE, 80, true);
-    timerAttachInterrupt(timer, encoderISR, true);
-    timerAlarmWrite (timer, 1000, true); // 1000 µs
-    timerAlarmEnable (timer) ;
+  pinMode (PIN_ENCODER_CLICK, INPUT); // setup the button pin
+  pinMode (PIN_ENCODER_A, INPUT) ; // set pinA as an input
+  pinMode (PIN_ENCODER_B, INPUT) ; // set pinB as an input
+  gTimer = timerBegin (TIMER_ROTARY_ENCODER, 80, true) ;
+  timerAttachInterrupt(gTimer, encoderISR, true) ;
+  timerAlarmWrite (gTimer, 1000, true) ; // 1000 µs
+  timerAlarmEnable (gTimer) ;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+//   SET ENCODER RANGE
+//----------------------------------------------------------------------------------------------------------------------
+
+void setEncoderRange (const uint32_t inMinValue, const uint32_t inCurrentValue, const uint32_t inMaxValue) {
+  gMinEncoderValue = inMinValue ;
+  gCurrentEncoderValue = inCurrentValue ;
+  gMaxEncoderValue = inMaxValue ;
+  if (gMaxEncoderValue < gMinEncoderValue) {
+    gMaxEncoderValue = gMinEncoderValue ;
+  }
+  if (gCurrentEncoderValue > gMaxEncoderValue) {
+    gCurrentEncoderValue = gMaxEncoderValue ;
+  }else if (gCurrentEncoderValue < gMinEncoderValue) {
+    gCurrentEncoderValue = gMinEncoderValue ;
+  }
+  gPreviousEncoderValue = gCurrentEncoderValue ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//   ENCODER VALUE DID CHANGE
+//----------------------------------------------------------------------------------------------------------------------
+
+bool encoderValueDidChange (void) {
+  return gPreviousEncoderValue != gCurrentEncoderValue ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//   GET VALUE
+//----------------------------------------------------------------------------------------------------------------------
+
+uint32_t getEncoderValue (void) {
+  if (gPreviousEncoderValue != gCurrentEncoderValue) {
+    gPreviousEncoderValue = gCurrentEncoderValue ;
+    extendBackLightDuration () ;
+  }
+  return gCurrentEncoderValue ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//   ENCODER CLICK PRESSED
+//----------------------------------------------------------------------------------------------------------------------
+
+bool encoderClickPressed (void) {
+  bool result = false ;
+  if (gClickPressed) {
+    if (backlightIsON ()) {
+      result = true ;
+    }
+    gClickPressed = false ;
+    extendBackLightDuration () ;
+  }
+  return result ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+
 
 /*====================================================================================*
  *                               useRotaryEncoder                                     *
@@ -104,53 +165,3 @@ uint16_t encoderPosition (uint16_t nbMenus) {
 void setEncoderPosition(int16_t newPosition) {
     encoderPos = newPosition;
 }
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   SET ENCODER RANGE
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-void setEncoderRange (const uint32_t inMinValue, const uint32_t inCurrentValue, const uint32_t inMaxValue) {
-  gMinEncoderValue = inMinValue ;
-  gCurrentEncoderValue = inCurrentValue ;
-  gMaxEncoderValue = inMaxValue ;
-  if (gMaxEncoderValue < gMinEncoderValue) {
-    gMaxEncoderValue = gMinEncoderValue ;
-  }
-  if (gCurrentEncoderValue > gMaxEncoderValue) {
-    gCurrentEncoderValue = gMaxEncoderValue ;
-  }else if (gCurrentEncoderValue < gMinEncoderValue) {
-    gCurrentEncoderValue = gMinEncoderValue ;
-  }
-}
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   GET VALUE
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-static uint32_t gPreviousEncoderValue ;
-
-uint32_t getEncoderValue (void) {
-  if (gPreviousEncoderValue != gCurrentEncoderValue) {
-    gPreviousEncoderValue = gCurrentEncoderValue ;
-    extendBackLightDuration () ;
-  }
-  return gCurrentEncoderValue ;
-}
-
-/*====================================================================================*
- *                                 clickPressed                                       *
- *====================================================================================*
- * This function returns true on a rising edge of the click, else returns false.
- */
-bool clickPressed (void) {
-  bool result = false ;
-  if (gClickPressed) {
-    if (backlightIsON ()) {
-      result = true ;
-    }
-    gClickPressed = false ;
-    extendBackLightDuration () ;
-  }
-  return result ;
-}
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————

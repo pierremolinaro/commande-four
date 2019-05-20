@@ -10,13 +10,13 @@ const uint8_t CANAL_PWM_BUZZER = 0 ;
 const uint8_t PWM_CHANNEL_BACKLIGHT = 3 ;
 
 //--- Numéro du timer (entre 0 et 3)
-const uint8_t NUMERO_TIMER_ENCODER_NUMERIQUE = 0 ;
-const uint8_t NUMERO_TIMER_MESURE_TEMPERATURE = 1 ;
+const uint8_t TIMER_ROTARY_ENCODER = 0 ;
+const uint8_t TIMER_TEMPERATURE_SENSOR = 1 ;
 
-// Rotary encoder declaration
-const uint8_t PIN_ENCODEUR_A    = 35;
-const uint8_t PIN_ENCODEUR_B    = 34;
-const uint8_t PIN_CLIC_ENCODEUR = 39 ;
+//--- Rotary encoder pin declarations
+const uint8_t PIN_ENCODER_A     = 35;
+const uint8_t PIN_ENCODER_B     = 34;
+const uint8_t PIN_ENCODER_CLICK = 39 ;
 
 // LEDs declaration
 const uint8_t LED_FOUR_CHAUD  =  2 ;  // marquée L1 sur la sérigraphie
