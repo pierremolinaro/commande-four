@@ -14,6 +14,10 @@ TFT_eSPI tft = TFT_eSPI () ;
  * and draws the logo of Centrale Nantes.
  */
 void initScreen(void) {
+  pinMode (TFT_RESET, OUTPUT) ;
+  digitalWrite (TFT_RESET, LOW) ;
+  delay (10) ;
+  digitalWrite (TFT_RESET, HIGH) ;
     tft.init () ;
     tft.setRotation (1) ;  // 0 & 2 Portrait. 1 & 3 landscape
     drawBmp ("/LogoECN.bmp");

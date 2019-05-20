@@ -98,9 +98,9 @@ void setup (void) {
   initBacklight () ;
 // ----------Buzzer section of setup----------
 // attach the channel to the buzzer to be controlled
-  ledcAttachPin (BUZZER_PIN, CANAL_PWM_BUZZER) ;
+//  ledcAttachPin (BUZZER_PIN, CANAL_PWM_BUZZER) ;
 // configure PWM functionalitites
-  ledcSetup (CANAL_PWM_BUZZER, FREQUENCE_BUZZER, RESOLUTION_PWM_BUZZER);
+//  ledcSetup (CANAL_PWM_BUZZER, FREQUENCE_BUZZER, RESOLUTION_PWM_BUZZER);
 //--- Initializations
   initTemperatureSensor () ;
   initEncoder () ;
@@ -186,10 +186,10 @@ void loop (void) {
         for (uint16_t deltaDelay = 0; deltaDelay < 5000; deltaDelay += 500) {
             if (millis() > delayBuzz + deltaDelay) {
                 if (deltaDelay == 0) {
-                    ledcWrite(CANAL_PWM_BUZZER, 128);
+                //    ledcWrite(CANAL_PWM_BUZZER, 128);
                     digitalWrite(LED_EN_MARCHE, HIGH);
                 } else if (deltaDelay == 1000) {
-                    ledcWrite (CANAL_PWM_BUZZER, 0);
+                 //   ledcWrite (CANAL_PWM_BUZZER, 0);
                     digitalWrite(LED_EN_MARCHE, !digitalRead(LED_EN_MARCHE));
                 } else if (deltaDelay == 4500) {
                     delayBuzz += 5000;
@@ -201,7 +201,7 @@ void loop (void) {
         }
     } else if (delayBuzz != 0 && gMode == 0) { // stop buzzing and blinking when we click, and clear the screen
         delayBuzz = 0;
-        ledcWrite (CANAL_PWM_BUZZER, 0) ;
+       // ledcWrite (CANAL_PWM_BUZZER, 0) ;
         digitalWrite (LED_EN_MARCHE, LOW) ;
         clearScreen () ;
         clearPrintPermanent () ;

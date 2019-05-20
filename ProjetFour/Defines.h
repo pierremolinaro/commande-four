@@ -6,8 +6,7 @@
 // ----------Constants declaration----------
 
 //--- Canaux PWM (0 à 15)
-const uint8_t CANAL_PWM_BUZZER = 0 ;
-const uint8_t PWM_CHANNEL_BACKLIGHT = 3 ;
+const uint8_t PWM_CHANNEL_BACKLIGHT = 0 ;
 
 //--- Numéro du timer (entre 0 et 3)
 const uint8_t TIMER_ROTARY_ENCODER = 0 ;
@@ -24,7 +23,10 @@ const uint8_t LED_FOUR_CHAUD  =  2 ;  // marquée L1 sur la sérigraphie
 //--- Led en marche (clignote à 1 Hz pour indiquer qu'un programme s'exécute)
 const uint8_t LED_EN_MARCHE   = 15 ; // TDO, marquée L2 sur la sérigraphie
 
-//--- Backlight
+//--- TFT RESET
+const uint8_t TFT_RESET = 25 ;
+
+//--- TFT Backlight
 const uint8_t PIN_BACKLIGHT = 32 ; // Contrôlé par PWM
 const uint32_t BACKLIGHT_FREQUENCY = 5000 ; // Hz
 const uint32_t BACKLIGHT_RESOLUTION = 12 ; // En bits
@@ -34,11 +36,6 @@ const uint8_t BUTTON_ACTIVATE_BACKLIGHT  = 36; // SVP
 
 // Relay declaration
 const uint8_t PIN_OVEN_RELAY = 27 ;
-
-// Buzzer declaration including a PWM
-const uint8_t  BUZZER_PIN = 25;
-const uint32_t FREQUENCE_BUZZER = 3500 ; // Hz
-const uint8_t  RESOLUTION_PWM_BUZZER = 8 ; //Resolution 8, 10, 12, 15
 
 // Creating a thermocouple instance with software SPI on any three digital IO pins
 const uint8_t MAX31855_DO  = 17 ;
