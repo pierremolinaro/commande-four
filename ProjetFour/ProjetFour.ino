@@ -42,7 +42,7 @@ void setup (void) {
 // ----------DEBUGGING section of setup----------
   Serial.begin (115200) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
 // ----------LEDs section of setup----------
-  pinMode (LED_FOUR_CHAUD, OUTPUT) ;
+  pinMode (LED_HOT_OVEN, OUTPUT) ;
 //--- Backlight
   initBacklight () ;
 //--- Initializations
@@ -62,7 +62,7 @@ void setup (void) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void loop (void) {
-//--- Baclight
+//--- Backlight
   updateBacklight () ;
 //----------Updating the time----------
   updateTime () ;
@@ -72,7 +72,7 @@ void loop (void) {
   writeLogFile () ;
 // ----------Updating the state of the LEDs----------
 // Light on the LED 1 if the oven is hot
-  digitalWrite (LED_FOUR_CHAUD, getSensorTemperature () > 200.0) ;
+  digitalWrite (LED_HOT_OVEN, getSensorTemperature () > 200.0) ;
 //--- Handle user interface
   updateUserInterface () ;
 //  handleLegacyMenus () ;

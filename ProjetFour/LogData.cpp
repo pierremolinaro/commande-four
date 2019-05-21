@@ -24,9 +24,6 @@ void enterLogData (const LogData & inData) {
 //   WRITE LOG FILE (done in main thread)
 //----------------------------------------------------------------------------------------------------------------------
 
-static const char * RESULT_DIRECTORY = "/resultats" ;
-
-
 void writeLogFile (void) {
   if (gWriteLogFile && (sdCardStatus () == SDCardStatus::mounted)) {
   //--- Message

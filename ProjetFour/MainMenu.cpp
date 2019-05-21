@@ -7,12 +7,13 @@
 #include "DisplayInfosMode.h"
 #include "ManualMode.h"
 #include "TimeSettingMode.h"
+#include "ProgramMode.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   MODE ENUMERATION
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-enum class Mode { main, manual, displayInfos, timeSetting, handleProfiles, automatic } ;
+enum class Mode { main, manual, displayInfos, timeSetting, program, automatic } ;
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   FORWARD DECLARATIONS
@@ -47,8 +48,8 @@ static void updateDisplay (void) {
   case Mode::timeSetting :
     printTimeSettingModeScreen () ;
     break ;
-  case Mode::handleProfiles :
-  
+  case Mode::program :
+    printProgramModeScreen () ;  
     break ;
   case Mode::automatic :
     break ;
@@ -104,8 +105,8 @@ static void handleRotaryEncoder (void) {
     case Mode::timeSetting :
       handleRotaryEncoderInTimeSettingMode () ;
       break ;
-    case Mode::handleProfiles :
-    
+    case Mode::program :
+      handleRotaryEncoderInProgramMode () ;  
       break ;
     case Mode::automatic :
       break ;
@@ -125,7 +126,7 @@ static void handleEncoderClick (void) {
       case 0 : newMode = Mode::automatic ; break ;
       case 1 : newMode = Mode::displayInfos ; break ;
       case 2 : newMode = Mode::timeSetting ; break ;
-      case 3 : newMode = Mode::handleProfiles ; break ;
+      case 3 : newMode = Mode::program ; break ;
       case 4 : newMode = Mode::manual ; break ;
       default : break ;
       }
@@ -139,8 +140,8 @@ static void handleEncoderClick (void) {
     case Mode::timeSetting :
       clickInTimeSettingMode (returnToMainMenu) ;
       break ;
-    case Mode::handleProfiles :
-      newMode = Mode::main ;
+    case Mode::program :
+      clickInProgramMode (returnToMainMenu) ;
       break ;
     case Mode::automatic :
       newMode = Mode::main ;
@@ -156,10 +157,10 @@ static void handleEncoderClick (void) {
       case Mode::automatic      :  ; break ;
       case Mode::displayInfos   : ; break ;
       case Mode::timeSetting    : enterTimeSettingMode () ; break ;
-      case Mode::handleProfiles : ; break ;
+      case Mode::program : enterProgramMode () ; break ;
       case Mode::manual         : enterManualMode () ; break ;
       }
-      tft.fillScreen (TFT_BLACK); // black screen
+      tft.fillScreen (TFT_BLACK) ;
     }
   }
 }
@@ -221,53 +222,11 @@ static void printFooter (void) {
     tft.setTextColor (TFT_RED, TFT_BLACK);
     tft.print("OFF");
   }
-//    if (isRunning) { // it is running
-//        tft.setTextSize(2);
-//        setLign(nbLign - 2, 2); setColumn(nbColumn - 4, 1); tft.print(" ");
-//        setLign(nbLign - 1, 2); setColumn(nbColumn - 4, 1); tft.print(" ");
-//        setLign(nbLign - 2, 2); setColumn(nbColumn + 6, 1); tft.print("  ");
-//        setLign(nbLign - 1, 2); setColumn(nbColumn + 6, 1); tft.print("  ");
-//        tft.setTextColor(TFT_GREEN, TFT_BLACK); tft.setTextSize(4);
-//        setLign(nbLign - 2, 2); setColumn(nbColumn - 2, 1);
-//        tft.print("ON");
-//    }
-//    else if (!isDelayed) { // it is not running
-//        tft.setTextSize(2);
-//        setLign(nbLign - 2, 2); setColumn(nbColumn + 8, 1); tft.print(" ");
-//        setLign(nbLign - 1, 2); setColumn(nbColumn + 8, 1); tft.print(" ");
-//        tft.setTextColor(TFT_RED, TFT_BLACK); tft.setTextSize(4);
-//        setLign(nbLign - 2, 2); setColumn(nbColumn - 4, 1);
-//        tft.print("OFF");
-//    }
-//    else { // it is delayed
-//        setLign(nbLign*2 - 4, 1); setColumn(nbColumn - 4, 1); tft.setTextSize(1); tft.print("            ");
-//        setLign(nbLign*2 - 1, 1); setColumn(nbColumn - 4, 1); tft.setTextSize(1); tft.print("            ");
-//        tft.setTextColor(TFT_ORANGE, TFT_BLACK); tft.setTextSize(2);
-//        setLign(nbLign*2 - 3, 1); setColumn(nbColumn - 4, 1);
-//        tft.printf("Diff%cr%c", 130, 130); // (char)130 -> é
-//    }
-//    tft.setTextColor(TFT_WHITE, TFT_BLACK); tft.setTextSize(2);
-
-    // ----------Printing time left if a program is running----------
-//    if (isRunning) {
-//        setLign(nbLign*2 - 5, 1); setColumn(nbColumn*2 - 12, 1); tft.setTextSize(1);
-//        tft.print("    restant:");
-//        setLign(nbLign - 2, 2); setColumn(nbColumn - 8); tft.setTextSize(2);
-//        tft.printf("%3uh%02umn", timeLeft/60, timeLeft%60);
-//    }
-//    // ----------Printing delay left if a program is delayed----------
-//    else if (isDelayed) {
-//        setLign(nbLign*2 - 5, 1); setColumn(nbColumn*2 - 12, 1); tft.setTextSize(1);
-//        tft.printf("avant d%cbut:", 130); // (char)130 -> é
-//        setLign(nbLign - 2, 2); setColumn(nbColumn - 8); tft.setTextSize(2);
-//        tft.printf("%3uh%02umn", timeBeforeStart/60, timeBeforeStart%60);
-//    } 
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void updateUserInterface (void) {
- // initializeMainMenu () ;
   updateDisplay () ;
   handleRotaryEncoder () ;
   handleEncoderClick () ;

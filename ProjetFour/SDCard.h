@@ -33,6 +33,8 @@ enum class SDCardStatus { noCard, insertedNotMounted, mounted } ;
 
 SDCardStatus sdCardStatus (void) ;
 
+uint32_t mountIndex (void) ; // Incremented each time a card is mounted
+
 bool directoryExists (const String & inPath) ;
 
 bool createDirectory (const String & inPath) ;

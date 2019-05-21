@@ -1,7 +1,8 @@
-// ----------Always begin by this pragma----------
 #pragma once
 
 #include <Arduino.h>
+
+//----------------------------------------------------------------------------------------------------------------------
 
 // ----------Constants declaration----------
 
@@ -18,7 +19,7 @@ const uint8_t PIN_ENCODER_B     = 34;
 const uint8_t PIN_ENCODER_CLICK = 39 ;
 
 // LEDs declaration
-const uint8_t LED_FOUR_CHAUD  =  2 ;  // marquée L1 sur la sérigraphie
+const uint8_t LED_HOT_OVEN = 2 ;  // marquée L1 sur la sérigraphie
 
 //--- Led en marche (clignote à 1 Hz pour indiquer qu'un programme s'exécute)
 const uint8_t LED_EN_MARCHE   = 15 ; // TDO, marquée L2 sur la sérigraphie
@@ -50,7 +51,7 @@ const uint8_t SDCARD_CS = 26 ;
 const uint8_t SDCARD_CD = 33 ;
 
 // Reading on the SD card declaration
-const String curvesDir = "/Courbes";
+//const String curvesDir = "/Courbes";
 const String valuesDir = "/ValeursCourbes";
 
 // The maximal length of the curve name
@@ -66,7 +67,22 @@ struct TimeTemp {
     float    Temp;
 };
 
-//------------------- Caractères accentues 
+//----------------------------------------------------------------------------------------------------------------------
+//  SD CARD
+//----------------------------------------------------------------------------------------------------------------------
+
+extern const char * const PROFILES_DIRECTORY ; // Defined in Defines.cpp
+extern const char * const RESULT_DIRECTORY   ; // Defined in Defines.cpp
+const uint32_t FILE_BASE_NAME_MAX_LENGTH = 20 ; // Without path, without .csv extension
+
+const uint32_t PROGRAM_POINT_MAX_COUNT = 50 ;
+
+//----------------------------------------------------------------------------------------------------------------------
+//  ACCENTED CHARACTERS
+//----------------------------------------------------------------------------------------------------------------------
+
 #define DEGREE_CHAR        "\xF7"
 #define LOWERCASE_E_ACUTE  "\x82"
 #define LOWERCASE_E_CIRCUM "\x88"
+
+//----------------------------------------------------------------------------------------------------------------------

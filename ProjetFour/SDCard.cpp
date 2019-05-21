@@ -15,6 +15,7 @@ void initSDcard (void) {
 //----------------------------------------------------------------------------------------------------------------------
 
 static SPIClass hspi (HSPI) ;
+static uint32_t gMountIndex ;
 static SDCardStatus gSDCardStatus = SDCardStatus::noCard ; // Records current SD Card status
 
 //--------------------------------------------------------------------------------------------------------
@@ -28,6 +29,7 @@ void updateSDCardStatus (void) {
       const bool mounted = SD.begin (SDCARD_CS, hspi) ; // SS spin, SPIClass -> HSPI
       if (mounted) {
         gSDCardStatus = SDCardStatus::mounted ;
+        gMountIndex += 1 ;
       }else{
         SD.end () ;
         gSDCardStatus = SDCardStatus::insertedNotMounted ;
@@ -47,6 +49,7 @@ void updateSDCardStatus (void) {
       if (mounted) {
         extendBackLightDuration () ;
         gSDCardStatus = SDCardStatus::mounted ;
+        gMountIndex += 1 ;
       }else{
         SD.end () ;
       }
@@ -64,6 +67,11 @@ SDCardStatus sdCardStatus (void) {
   return gSDCardStatus ;
 }
 
+//--------------------------------------------------------------------------------------------------------
+
+uint32_t mountIndex (void) { // Incremented each time a card is mounted
+  return gMountIndex ;
+}
 //--------------------------------------------------------------------------------------------------------
 
 bool directoryExists (const String & inPath) {
@@ -158,7 +166,7 @@ void deleteFile(String path) {
  * it gives the temperature corresponding to the time just after the given moment.
  */
 float giveTemp(String nameOfCurve, uint16_t t) {
-    String path = curvesDir + '/' + nameOfCurve + ".CSV";
+    String path = PROFILES_DIRECTORY + '/' + nameOfCurve + ".CSV";
     File file = SD.open(path.c_str());
     
     String w = "";
@@ -355,7 +363,7 @@ uint8_t extractValues(TimeTemp arrayTimeTemp[], String pathValues) {
  * by creating the broken lign.
  */
 void createCurve(String displayName, TimeTemp arrayTimeTemp[], uint8_t len) {
-    String pathCurve = curvesDir + '/' + displayName + ".CSV";
+    String pathCurve = PROFILES_DIRECTORY + '/' + displayName + ".CSV";
     
     // Writing on the new file the values every minute
     char lign[13];
@@ -392,7 +400,7 @@ void createAll(String displayName, TimeTemp arrayTimeTemp[], uint16_t len) {
  */
 void deleteCurve(String nameOfCurve) {
     deleteFile(valuesDir + "/valeurs" + nameOfCurve + ".CSV");
-    deleteFile(curvesDir + '/' + nameOfCurve + ".CSV");
+    deleteFile (PROFILES_DIRECTORY + '/' + nameOfCurve + ".CSV");
 }
 
 /*====================================================================================*

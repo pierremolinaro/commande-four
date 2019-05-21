@@ -10,7 +10,7 @@
 //   STATIC VARIABLES
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-static uint32_t gMenuItemIndex ;
+static uint32_t gSelectedItemIndex ;
 static uint32_t gTemperatureReference ;
 static bool gTemperatureReferenceSettingSelected ;
 
@@ -26,8 +26,8 @@ void enterManualMode (void) {
     gTemperatureReference = 0 ;
   }
   gTemperatureReferenceSettingSelected = false ;
-  gMenuItemIndex = 1 ;
-  setEncoderRange (0, gMenuItemIndex, 2, true) ;
+  gSelectedItemIndex = 0 ;
+  setEncoderRange (0, gSelectedItemIndex, 2, true) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -37,19 +37,19 @@ void enterManualMode (void) {
 void printManualModeScreen (void) {
   tft.setTextSize (3) ;
   setLign (0, 3) ;
-  setMenuColor (gMenuItemIndex == 2, false) ;
+  setMenuColor (gSelectedItemIndex == 2, false) ;
   tft.print (" Retour") ;
 
   setLign (2, 3) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" Consigne ") ;
-  setMenuColor (gMenuItemIndex == 0, gTemperatureReferenceSettingSelected) ;
+  setMenuColor (gSelectedItemIndex == 0, gTemperatureReferenceSettingSelected) ;
   tft.printf ("%4d" DEGREE_CHAR "C", gTemperatureReference) ;
 
   setLign (4, 3) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" Four ") ;
-  setMenuColor (gMenuItemIndex == 1, false) ;
+  setMenuColor (gSelectedItemIndex == 1, false) ;
   tft.print (ovenIsRunning () ? ("Arr" LOWERCASE_E_CIRCUM "ter") : ("D" LOWERCASE_E_ACUTE "marrer")) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
@@ -87,7 +87,7 @@ void handleRotaryEncoderInManualMode (void) {
     gTemperatureReference = getEncoderValue () ;
     setTemperatureReferenceInManualMode (gTemperatureReference) ;
   }else{
-    gMenuItemIndex = getEncoderValue () ;
+    gSelectedItemIndex = getEncoderValue () ;
   }
 }
 
@@ -96,7 +96,7 @@ void handleRotaryEncoderInManualMode (void) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void clickInManualMode (bool & outReturnToMainMenu) {
-  if (gMenuItemIndex == 0) {
+  if (gSelectedItemIndex == 0) {
     gTemperatureReferenceSettingSelected ^= true ;
 //    setLign (3, 2) ;
 //    setColumn (12, 2) ;
@@ -106,15 +106,15 @@ void clickInManualMode (bool & outReturnToMainMenu) {
     if (gTemperatureReferenceSettingSelected) {
       setEncoderRange (0, gTemperatureReference, 1100, false) ;
     }else{
-      setEncoderRange (0, gMenuItemIndex, 2, true) ;
+      setEncoderRange (0, gSelectedItemIndex, 2, true) ;
     }
-  }else if (gMenuItemIndex == 1) {
+  }else if (gSelectedItemIndex == 1) {
     if (ovenIsRunning ()) {
       stopOven () ;
     }else{
       startOvenInManualMode (gTemperatureReference, currentDateTime ()) ;
     }
-  }else if (gMenuItemIndex == 2) {
+  }else if (gSelectedItemIndex == 2) {
     stopOven () ;
     outReturnToMainMenu = true ;
   }

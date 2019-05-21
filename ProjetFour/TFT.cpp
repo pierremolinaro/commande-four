@@ -152,7 +152,7 @@ void setMenuColor (const bool inIsSelected, const bool inIsEditing) {
   }else if (inIsSelected) {
     tft.setTextColor (TFT_BLACK, TFT_CYAN) ;
   }else{
-    tft.setTextColor (TFT_CYAN, TFT_BLACK) ;
+    tft.setTextColor (TFT_GREEN, TFT_BLACK) ;
   } 
 }
 
