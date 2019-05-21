@@ -22,22 +22,26 @@ void enterManualMode (void) ;
 //   PRINT MANUAL MODE SCREEN
 //----------------------------------------------------------------------------------------------------------------------
 
-void printManualModeScreen (const uint8_t inIndiceSousMenuSelectionne) ;
+void printManualModeScreen (void) ;
+
+//----------------------------------------------------------------------------------------------------------------------
+//   HANDLE ROTARY ENCODER
+//----------------------------------------------------------------------------------------------------------------------
+
+void handleRotaryEncoderInManualMode (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
 //   CLICK IN MANUAL MODE
 //----------------------------------------------------------------------------------------------------------------------
 
-void clickInManualMode (const uint8_t inIndiceSousMenuSelectionne,
-                        bool & outRevenirPagePrincipale,
-                        bool & outSaisirConsigne) ;
+void clickInManualMode (bool & outReturnToMainMenu) ;
 
 //----------------------------------------------------------------------------------------------------------------------
 //   SET MANUAL MODE TEMPERATURE REFERENCE
 //----------------------------------------------------------------------------------------------------------------------
 
-void setTemperatureInManualMode (void) ;
+//void setTemperatureInManualMode (void) ;
 
-void quitterModeReglageConsigneModeManuel (void) ;
+//void quitterModeReglageConsigneModeManuel (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------

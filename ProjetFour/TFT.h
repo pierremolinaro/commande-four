@@ -34,13 +34,6 @@ const uint8_t nbColumn = 26; // with a text size of 2
 void initScreen(void);
 
 /*====================================================================================*
- *                                   drawBmp                                          *
- *====================================================================================*
- * This function prints on the screen a .bmp image from the SD card.
- */
-void drawBmp(String filename);
-
-/*====================================================================================*
  *                               read16 & read32                                      *
  *====================================================================================*
  * These functions read 16- and 32-bit types from the SD card file,
@@ -78,6 +71,10 @@ void setLign (uint8_t lign, uint8_t textSize);
 void setColumn(uint8_t column, uint8_t textSize = 2);
 
 void setMenuColor (const bool inIsSelected) ;
+
+void fixerCurseurDemieLignesPourTaille (const uint8_t inNombreDemieLignes, const uint8_t inTextSize) ;
+
+void afficherCompteurErreurs (const char * inMessage, const uint32_t inNombreErreurs) ;
 
 // -------------------------------printPermanent------------------------------------------------------------------------
 /*====================================================================================*

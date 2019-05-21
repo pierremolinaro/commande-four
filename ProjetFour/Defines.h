@@ -67,6 +67,6 @@ struct TimeTemp {
 };
 
 //------------------- Caractères accentues 
-#define DEGREE_CHAR       "\xF7"
-#define LOWERCASE_E_ACUTE "\x82"
+#define DEGREE_CHAR        "\xF7"
+#define LOWERCASE_E_ACUTE  "\x82"
 #define LOWERCASE_E_CIRCUM "\x88"

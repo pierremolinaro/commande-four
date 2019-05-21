@@ -6,79 +6,84 @@
 // ----------Static variables in the file----------
 TFT_eSPI tft = TFT_eSPI () ;
 
-// ----------Functions----------
-/*====================================================================================*
- *                                  initScreen                                        *
- *====================================================================================*
- * This function initialized the TFT screen and sets the rotation in landscape,
- * and draws the logo of Centrale Nantes.
- */
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   FORWARD DECLARATION
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+static void drawBmp (const char * inFilePath) ;
+
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   INIT
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+// This function initialized the TFT screen and sets the rotation in landscape, and draws the logo of Centrale Nantes.
+
 void initScreen(void) {
+//--- Reset TFT
   pinMode (TFT_RESET, OUTPUT) ;
   digitalWrite (TFT_RESET, LOW) ;
   delay (10) ;
   digitalWrite (TFT_RESET, HIGH) ;
-    tft.init () ;
-    tft.setRotation (1) ;  // 0 & 2 Portrait. 1 & 3 landscape
-    drawBmp ("/LogoECN.bmp");
-    delay (1000) ;
-    tft.fillScreen (TFT_BLACK); // black screen
-    tft.setTextSize (2) ;
-    tft.setCursor (0, 0);
+//--- Init
+  tft.init () ;
+  tft.setRotation (1) ;  // 0 & 2 Portrait. 1 & 3 landscape
+ //--- Splash screen
+  drawBmp ("/LogoECN.bmp");
+  delay (1000) ;
+//--- Clear screen
+  tft.fillScreen (TFT_BLACK); // black screen
+  tft.setTextSize (2) ;
+  tft.setCursor (0, 0);
 }
 
-/*====================================================================================*
- *                                   drawBmp                                          *
- *====================================================================================*
- * This function prints on the screen a .bmp image from the SD card.
- */
-void drawBmp(String filename) {
-    // Open requested file on SD card
-    File bmpFS = SD.open(filename.c_str());
-    if (!bmpFS) {
-      Serial.println("File not found");
-      return;
-    }
-    int16_t x = 0, y = 0;
-    uint32_t seekOffset;
-    uint16_t w, h, row, col;
-    uint8_t  r, g, b;
-    uint32_t startTime = millis();
-    if (read16(bmpFS) == 0x4D42) {
-        read32(bmpFS);
-        read32(bmpFS);
-        seekOffset = read32(bmpFS);
-        read32(bmpFS);
-        w = read32(bmpFS);
-        h = read32(bmpFS);
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//   DRAW SPLASH SCREEN
+//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-        if ((read16(bmpFS) == 1) && (read16(bmpFS) == 24) && (read32(bmpFS) == 0)) {
-            y += h - 1;
-            tft.setSwapBytes(true);
-            bmpFS.seek(seekOffset);
-            uint16_t padding = (4 - ((w * 3) & 3)) & 3;
-            uint8_t lineBuffer[w * 3 + padding];
-            for (row = 0; row < h; row++) {
-                bmpFS.read(lineBuffer, sizeof(lineBuffer));
-                uint8_t*  bptr = lineBuffer;
-                uint16_t* tptr = (uint16_t*)lineBuffer;
-                // Convert 24 to 16 bit colours
-                for (col = 0; col < w; col++) {
-                    b = *bptr++;
-                    g = *bptr++;
-                    r = *bptr++;
-                    *tptr++ = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
-                }
-                // Push the pixel row to screen, pushImage will crop the line if needed
-                // y is decremented as the BMP image is drawn bottom up
-                tft.pushImage(x, y--, w, 1, (uint16_t*)lineBuffer);
-            }
-            Serial.print("Loaded in "); Serial.print(millis() - startTime);
-            Serial.println(" ms");
+static void drawBmp (const char * inFilePath) {
+//--- Open requested file on SD card
+  File bmpFS = SD.open (inFilePath) ;
+  if (!bmpFS) {
+    Serial.println ("File not found") ;
+  }else{
+    const uint32_t startTime = millis();
+    if (read16(bmpFS) == 0x4D42) {
+      read32(bmpFS);
+      read32(bmpFS);
+      const uint32_t seekOffset = read32(bmpFS);
+      read32(bmpFS);
+      const uint16_t w = read32(bmpFS);
+      const uint16_t h = read32(bmpFS);
+      Serial.printf ("  Width %u, height %u\n", w, h) ;
+      if ((read16(bmpFS) == 1) && (read16(bmpFS) == 24) && (read32(bmpFS) == 0)) {
+        const int16_t x = 0 ;
+        int16_t y = h - 1 ;
+        tft.setSwapBytes (true);
+        bmpFS.seek (seekOffset);
+        const uint16_t padding = (4 - ((w * 3) & 3)) & 3;
+        uint8_t lineBuffer [w * 3 + padding];
+        for (uint16_t row = 0; row < h ; row++) {
+          bmpFS.read (lineBuffer, sizeof(lineBuffer));
+          uint8_t*  bptr = lineBuffer;
+          uint16_t* tptr = (uint16_t*)lineBuffer;
+        // Convert 24 to 16 bit colours
+          for (uint16_t col = 0; col < w; col++) {
+            const uint8_t b = *bptr++;
+            const uint8_t g = *bptr++;
+            const uint8_t r = *bptr++;
+            *tptr++ = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
+          }
+          // Push the pixel row to screen, pushImage will crop the line if needed
+          // y is decremented as the BMP image is drawn bottom up
+          tft.pushImage (x, y, w, 1, (uint16_t*) lineBuffer);
+          y -= 1 ;
         }
-        else Serial.println("BMP format not recognized.");
+        Serial.printf ("Loaded in %lu ms\n", millis () - startTime) ;
+      }else{
+        Serial.println("BMP format not recognized.");
+      }
     }
-    bmpFS.close();
+  }
+  bmpFS.close () ;
 }
 
 /*====================================================================================*
@@ -126,8 +131,8 @@ void setLign(uint8_t lign, uint8_t textSize) {
     tft.setCursor (1, lign*8*textSize + 1);
 }
 
-static void fixerCurseurDemieLignesPourTaille (const uint8_t inNombreDemieLignes, const uint8_t inTextSize) {
-    tft.setCursor (1, inNombreDemieLignes * 4 * inTextSize + 1);
+void fixerCurseurDemieLignesPourTaille (const uint8_t inNombreDemieLignes, const uint8_t inTextSize) {
+  tft.setCursor (1, inNombreDemieLignes * 4 * inTextSize + 1);
 }
 
 /*====================================================================================*
@@ -680,7 +685,7 @@ void printChangeDelayMenu(uint16_t launchDelay, uint16_t tmax, uint8_t hour, uin
     tft.printf("%c %02uh%02umn", 133, endH, endM); // (char)133 -> à
 }
 
-static void afficherCompteurErreurs (const char * inMessage, const uint32_t inNombreErreurs) {
+void afficherCompteurErreurs (const char * inMessage, const uint32_t inNombreErreurs) {
   tft.setTextColor (TFT_WHITE, TFT_BLACK);    
   tft.print (inMessage) ;
   if (inNombreErreurs == 0) {

@@ -1,15 +1,13 @@
-/************************************************************************************
-Project by Antoine COLSON and Clément NADER
-directed by Pierre MOLINARO and Jean-Claude BARDIAUX
-
-This sketch is used to control an oven in order to follow a temperature graph 
-
-#####################################################################################
-############################### A PROJECT FROM ECN  #################################
-#####################################################################################
-
-************************************************************************************/
-
+//----------------------------------------------------------------------------------------------------------------------
+// Project by Antoine COLSON and Clément NADER
+// directed by Pierre MOLINARO and Jean-Claude BARDIAUX
+//
+// This sketch is used to control an oven in order to follow a temperature graph 
+//
+//#####################################################################################################################
+//################################################ A PROJECT FROM ECN  ################################################
+//#####################################################################################################################
+//
 //----------------------------------------------------------------------------------------------------------------------
 //  Check board type
 //----------------------------------------------------------------------------------------------------------------------
@@ -25,6 +23,7 @@ This sketch is used to control an oven in order to follow a temperature graph
 //----------------------------------------------------------------------------------------------------------------------
 
 #include "Defines.h"
+#include "MainMenu.h"
 #include "RotaryEncoder.h"
 #include "TFT.h"
 #include "RealTimeClock.h"
@@ -36,23 +35,51 @@ This sketch is used to control an oven in order to follow a temperature graph
 #include "LogData.h"
 
 //----------------------------------------------------------------------------------------------------------------------
-// Menu and submenu setting declarations
-static uint16_t gMode   = 0 ; // This is which menu mode we are in at any given time (top level or one of the submenus)
-static uint16_t nbMenus = 5 ; // This is the number of submenus of the mode we are in
-
-// In order to set time
-static uint16_t settingYear   = 2000;
-static uint8_t  settingMonth  = 1;
-static uint8_t  settingDay    = 1;
-static uint8_t  settingHour   = 0;
-static uint8_t  settingMinute = 0;
-
+//                                    SETUP
 //----------------------------------------------------------------------------------------------------------------------
 
-static bool leapYear(uint16_t year) {
-  return(((year%4 == 0) && (year%100 != 0)) || (year%400 == 0));
+void setup (void) {
+// ----------DEBUGGING section of setup----------
+  Serial.begin (115200) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
+// ----------LEDs section of setup----------
+  pinMode (LED_FOUR_CHAUD, OUTPUT) ;
+//--- Backlight
+  initBacklight () ;
+//--- Initializations
+  initTemperatureSensor () ;
+  initEncoder () ;
+  initRealTimeClock () ;
+  initOvenControl () ;
+// ----------SD card reader section of setup----------
+  initSDcard () ;
+  legacySetup () ;
+// ----------TFT screen section of setup----------
+  initScreen () ;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+//                                    LOOP
+//----------------------------------------------------------------------------------------------------------------------
+
+void loop (void) {
+//--- Baclight
+  updateBacklight () ;
+//----------Updating the time----------
+  updateTime () ;
+// ----------Updating the temperature----------
+  updateTemp () ;
+  updateSDCardStatus () ; // Should be before writeLogFile
+  writeLogFile () ;
+// ----------Updating the state of the LEDs----------
+// Light on the LED 1 if the oven is hot
+  digitalWrite (LED_FOUR_CHAUD, getSensorTemperature () > 200.0) ;
+//--- Handle user interface
+  updateUserInterface () ;
+//  handleLegacyMenus () ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//   LEGACY MENU MANAGEMENT
 //----------------------------------------------------------------------------------------------------------------------
 
 // The different curve patterns of temperature
@@ -85,57 +112,39 @@ static uint8_t  MAJminOth   = 0; // 0 -> MAJ, 1 -> min, 2 -> Others
 // Declarations when a cycle ends
 static uint64_t delayBuzz = 0;
 
-//----------------------------------------------------------------------------------------------------------------------
-//                                    SETUP
+// Menu and submenu setting declarations
+static uint16_t gMode   = 0 ; // This is which menu mode we are in at any given time (top level or one of the submenus)
+static uint16_t nbMenus = 5 ; // This is the number of submenus of the mode we are in
+
+// In order to set time
+static uint16_t settingYear   = 2000;
+static uint8_t  settingMonth  = 1;
+static uint8_t  settingDay    = 1;
+static uint8_t  settingHour   = 0;
+static uint8_t  settingMinute = 0;
+
 //----------------------------------------------------------------------------------------------------------------------
 
-void setup (void) {
-// ----------DEBUGGING section of setup----------
-  Serial.begin (115200) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
-// ----------LEDs section of setup----------
-  pinMode (LED_FOUR_CHAUD, OUTPUT) ;
-//--- Backlight
-  initBacklight () ;
-// ----------Buzzer section of setup----------
-// attach the channel to the buzzer to be controlled
-//  ledcAttachPin (BUZZER_PIN, CANAL_PWM_BUZZER) ;
-// configure PWM functionalitites
-//  ledcSetup (CANAL_PWM_BUZZER, FREQUENCE_BUZZER, RESOLUTION_PWM_BUZZER);
-//--- Initializations
-  initTemperatureSensor () ;
-  initEncoder () ;
-  initRealTimeClock () ;
-  initOvenControl () ;
-// ----------SD card reader section of setup----------
-  initSDcard () ;
-  nbCurves = numberFiles(valuesDir);
-  getDisplayNames(gFileNameArray);
-// ----------TFT screen section of setup----------
-  initScreen () ;
+static bool leapYear(uint16_t year) {
+  return ((year%4 == 0) && (year%100 != 0)) || (year%400 == 0) ;
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-//                                    LOOP
 //----------------------------------------------------------------------------------------------------------------------
 
 static uint32_t delayScreen = 2000;
 static uint32_t gInstantAffichagePiedPage = 2000 ;
 static uint32_t delaySD     = 0;
 
-void loop (void) {
-//--- Retro-eclairage
-  updateBacklight () ;
-// ----------Updating the time----------
-  updateTime () ;
-// ----------Updating the temperature----------
-  updateTemp () ;
-  updateSDCardStatus () ; // Should be before writeLogFile
-  writeLogFile () ;
-// ----------Updating the state of the LEDs----------
-// Light on the LED 1 if the oven is hot
-  digitalWrite (LED_FOUR_CHAUD, getSensorTemperature () > 200.0) ;
-// Light on the LED 2 if a process is running
-//  digitalWrite (LED_EN_MARCHE, isRunning) ;
+//----------------------------------------------------------------------------------------------------------------------
+
+static void legacySetup (void) {
+  nbCurves = numberFiles(valuesDir);
+  getDisplayNames(gFileNameArray);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void handleLegacyMenus (void) {
 // ----------Changing Mode----------
     if (encoderClickPressed ()) {
         rotaryMenu(); // change the mode in function of which mode we are in and the position of the rotary encoder
@@ -254,10 +263,10 @@ void loop (void) {
         if (gMode == 0) {
             printMainMenu (encoderPosition(nbMenus), isRunning, isDelayed);
         }else if (gMode == 999) { // Mode manuel
-           printManualModeScreen (encoderPosition(nbMenus)) ;
+       //    printManualModeScreen (encoderPosition(nbMenus)) ;
         }else if (gMode == 998) {
-           setTemperatureInManualMode () ;
-           printManualModeScreen (encoderPosition(nbMenus)) ;
+       //    setTemperatureInManualMode () ;
+       //    printManualModeScreen (encoderPosition(nbMenus)) ;
         }else if (gMode == 1) {
             printSelectCurveMenu (encoderPosition (nbMenus), nbCurves, gFileNameArray, numPage);
         } else if (gMode == 10) {
@@ -434,7 +443,7 @@ void rotaryMenu() {
     else if (gMode == 999) {
       bool revenirPagePrincipale = false ;
       bool saisirConsigne = false ;
-      clickInManualMode (encoderPosition(nbMenus), revenirPagePrincipale, saisirConsigne) ;
+    //  clickInManualMode (encoderPosition(nbMenus), revenirPagePrincipale, saisirConsigne) ;
       if (revenirPagePrincipale) {
         gMode = 0 ;
       }else if (saisirConsigne) {
@@ -448,7 +457,7 @@ void rotaryMenu() {
     }
     //--- Reglage consigne mode manuel
     else if (gMode == 998) {
-      quitterModeReglageConsigneModeManuel () ;
+   //   quitterModeReglageConsigneModeManuel () ;
       gMode = 999 ;
       doResetEncoderPos = false;
    }

@@ -29,7 +29,10 @@ bool encoderClickPressed (void) ;
 //   SET ENCODER RANGE
 //----------------------------------------------------------------------------------------------------------------------
 
-void setEncoderRange (const uint32_t inMinValue, const uint32_t inCurrentValue, const uint32_t inMaxValue) ;
+void setEncoderRange (const uint32_t inMinValue,
+                      const uint32_t inCurrentValue,
+                      const uint32_t inMaxValue,
+                      const bool inRollover) ;
 
 //----------------------------------------------------------------------------------------------------------------------
 //   ENCODER VALUE DID CHANGE
@@ -73,4 +76,3 @@ uint16_t encoderPosition(uint16_t nbMenus);
  * If we give no argument, if reset the position to zero.
  */
 void setEncoderPosition(int16_t newPosition);
-

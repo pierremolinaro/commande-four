@@ -17,6 +17,7 @@ static uint32_t gMinEncoderValue ;
 static uint32_t gCurrentEncoderValue ;
 static uint32_t gMaxEncoderValue ;
 static uint32_t gPreviousEncoderValue ;
+static bool gRollover ;
 
 //--- Click variables
 static bool gLastClickState = true ;
@@ -35,11 +36,15 @@ static void IRAM_ATTR encoderISR (void) {
        encoderPos ++ ;
        if (gCurrentEncoderValue <  gMaxEncoderValue) {
          gCurrentEncoderValue += 1 ;
+       }else if (gRollover) {
+         gCurrentEncoderValue = gMinEncoderValue ;
        }
     }else{
       encoderPos --;
       if (gCurrentEncoderValue > gMinEncoderValue) {
         gCurrentEncoderValue -= 1 ;
+       }else if (gRollover) {
+         gCurrentEncoderValue = gMaxEncoderValue ;
       }
     }
   }
@@ -71,7 +76,11 @@ void initEncoder (void) {
 //   SET ENCODER RANGE
 //----------------------------------------------------------------------------------------------------------------------
 
-void setEncoderRange (const uint32_t inMinValue, const uint32_t inCurrentValue, const uint32_t inMaxValue) {
+void setEncoderRange (const uint32_t inMinValue,
+                      const uint32_t inCurrentValue,
+                      const uint32_t inMaxValue,
+                      const bool inRollover) {
+  gRollover = inRollover ;
   gMinEncoderValue = inMinValue ;
   gCurrentEncoderValue = inCurrentValue ;
   gMaxEncoderValue = inMaxValue ;
