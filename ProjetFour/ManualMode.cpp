@@ -26,8 +26,8 @@ void enterManualMode (void) {
     gTemperatureReference = 0 ;
   }
   gTemperatureReferenceSettingSelected = false ;
-  gMenuItemIndex = 0 ;
-  setEncoderRange (0, 0, 2, true) ;
+  gMenuItemIndex = 1 ;
+  setEncoderRange (0, gMenuItemIndex, 2, true) ;
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -35,26 +35,27 @@ void enterManualMode (void) {
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 void printManualModeScreen (void) {
-  setLign (0, 3) ;
   tft.setTextSize (3) ;
-  setColumn (4, 3) ;
-  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-  tft.print ("Mode manuel") ;
+  setLign (0, 3) ;
+  setMenuColor (gMenuItemIndex == 2, false) ;
+  tft.print (" Retour") ;
 
-  setLign (3, 2) ;
-  tft.setTextSize (2) ;
-  tft.print (" Consigne : ") ;
-  setMenuColor (gMenuItemIndex == 0, false) ;
-  tft.setTextSize (gTemperatureReferenceSettingSelected ? 3 : 2) ;
+  setLign (2, 3) ;
+  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.print (" Consigne ") ;
+  setMenuColor (gMenuItemIndex == 0, gTemperatureReferenceSettingSelected) ;
   tft.printf ("%4d" DEGREE_CHAR "C", gTemperatureReference) ;
 
-  setLign (5, 2) ;
-  tft.setTextSize (2) ;
+  setLign (4, 3) ;
+  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.print (" Four ") ;
   setMenuColor (gMenuItemIndex == 1, false) ;
-  tft.print (ovenIsRunning () ? (" Arr" LOWERCASE_E_CIRCUM "ter four") : (" D" LOWERCASE_E_ACUTE "marrer four")) ;
+  tft.print (ovenIsRunning () ? ("Arr" LOWERCASE_E_CIRCUM "ter") : ("D" LOWERCASE_E_ACUTE "marrer")) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
 
+  tft.setTextSize (3) ;
+  setLign (0, 3) ; setColumn (13) ;
   if (ovenIsRunning ()) {
     const uint32_t runningTime = ovenRunningTime () ;
     const uint32_t seconds = runningTime % 60 ;
@@ -62,11 +63,9 @@ void printManualModeScreen (void) {
     const uint32_t hours = runningTime / 3600 ;
     tft.printf ("%02u:%02u:%02u", hours, minutes, seconds) ;
   }
-  setLign (7, 2) ;
-  setMenuColor (gMenuItemIndex == 2, false) ;
-  tft.print (" Retour") ;
 
   setLign (10, 2) ;
+  tft.setTextSize (2) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" Indicateurs : ") ;
   printColoredStatus (getFaultlySampleCount ()) ;
@@ -99,11 +98,11 @@ void handleRotaryEncoderInManualMode (void) {
 void clickInManualMode (bool & outReturnToMainMenu) {
   if (gMenuItemIndex == 0) {
     gTemperatureReferenceSettingSelected ^= true ;
-    setLign (3, 2) ;
-    setColumn (12, 2) ;
-    tft.setTextSize (3) ;
-    tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-    tft.print ("      ") ;
+//    setLign (3, 2) ;
+//    setColumn (12, 2) ;
+//    tft.setTextSize (3) ;
+//    tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+//    tft.print ("      ") ;
     if (gTemperatureReferenceSettingSelected) {
       setEncoderRange (0, gTemperatureReference, 1100, false) ;
     }else{
@@ -120,25 +119,5 @@ void clickInManualMode (bool & outReturnToMainMenu) {
     outReturnToMainMenu = true ;
   }
 }
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-//void quitterModeReglageConsigneModeManuel (void) {
-//  gTemperatureReferenceSettingSelected = false ;
-//  setLign (3, 2) ;
-//  setColumn (12, 2) ;
-//  tft.setTextSize (3) ;
-//  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-//  tft.print ("      ") ;
-//}
-
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-//   SET MANUAL MODE TEMPERATURE REFERENCE
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
-
-//void setTemperatureInManualMode (void) {
-//  gTemperatureReference = getEncoderValue () ;
-//  setTemperatureReferenceInManualMode (gTemperatureReference) ;
-//}
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
