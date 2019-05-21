@@ -6,6 +6,7 @@
 #include "OvenControl.h"
 #include "DisplayInfosMode.h"
 #include "ManualMode.h"
+#include "TimeSettingMode.h"
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 //   MODE ENUMERATION
@@ -44,7 +45,7 @@ static void updateDisplay (void) {
     displayInfos () ;
     break ;
   case Mode::timeSetting :
-  
+    printTimeSettingModeScreen () ;
     break ;
   case Mode::handleProfiles :
   
@@ -65,32 +66,25 @@ static void displayMainMenu (void) {
 
   fixerCurseurDemieLignesPourTaille (0, 3) ;
   tft.setTextSize (3) ;
-  setMenuColor (gMainMenuSelectedIndex == 0) ;
+  setMenuColor (gMainMenuSelectedIndex == 0, false) ;
   tft.print (" D" LOWERCASE_E_ACUTE "marrer Four ") ;
 
 // ----------Show Information----------
   fixerCurseurDemieLignesPourTaille (3, 3) ;
-  setMenuColor (gMainMenuSelectedIndex == 1) ;
+  setMenuColor (gMainMenuSelectedIndex == 1, false) ;
   tft.print (" Afficher Infos ");
 // ----------Set Time----------
   fixerCurseurDemieLignesPourTaille (6, 3) ;
-  setMenuColor (gMainMenuSelectedIndex == 2) ;
+  setMenuColor (gMainMenuSelectedIndex == 2, false) ;
   tft.print (" R" LOWERCASE_E_ACUTE "gler Heure ");
 // ----------Manage Curves----------
   fixerCurseurDemieLignesPourTaille (9, 3);
-  setMenuColor (gMainMenuSelectedIndex == 3) ;
+  setMenuColor (gMainMenuSelectedIndex == 3, false) ;
   tft.print (" G" LOWERCASE_E_ACUTE "rer Programmes");
 //---------- Mode Manuel
   fixerCurseurDemieLignesPourTaille (12, 3);
-  setMenuColor (gMainMenuSelectedIndex == 4) ;
+  setMenuColor (gMainMenuSelectedIndex == 4, false) ;
   tft.print (" Mode manuel") ;
- //---
-//  tft.setTextSize(1);
-//  tft.setTextColor(TFT_WHITE, TFT_BLACK);
-//  setLign(18, 1); setColumn(17, 3); tft.print(' ');
-//  setLign(19, 1); setColumn(17, 3); tft.print(' ');
-//  setLign(20, 1); setColumn(17, 3); tft.print(' ');
-//  tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
 }
 
 //——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
@@ -108,7 +102,7 @@ static void handleRotaryEncoder (void) {
     
       break ;
     case Mode::timeSetting :
-    
+      handleRotaryEncoderInTimeSettingMode () ;
       break ;
     case Mode::handleProfiles :
     
@@ -124,6 +118,7 @@ static void handleRotaryEncoder (void) {
 static void handleEncoderClick (void) {
   if (encoderClickPressed ()) {
     Mode newMode = gMode ;
+    bool returnToMainMenu = false ;
     switch (gMode) {
     case Mode::main :
       switch (gMainMenuSelectedIndex) {
@@ -136,17 +131,13 @@ static void handleEncoderClick (void) {
       }
       break ;
     case Mode::manual :
-      { bool returnToMainMenu = false ;
-        clickInManualMode (returnToMainMenu) ;
-        if (returnToMainMenu) {
-          newMode = Mode::main ;
-        }
-      } break ;
+      clickInManualMode (returnToMainMenu) ;
+      break ;
     case Mode::displayInfos :
       newMode = Mode::main ;
       break ;
     case Mode::timeSetting :
-      newMode = Mode::main ;
+      clickInTimeSettingMode (returnToMainMenu) ;
       break ;
     case Mode::handleProfiles :
       newMode = Mode::main ;
@@ -155,15 +146,18 @@ static void handleEncoderClick (void) {
       newMode = Mode::main ;
       break ;
     }
+    if (returnToMainMenu) {
+      newMode = Mode::main ;
+    }
     if (gMode != newMode) {
       gMode = newMode ;
       switch (gMode) {
-      case Mode::main : gMainMenuInitialized = false ; break ;
-      case Mode::automatic :  ; break ;
-      case Mode::displayInfos : ; break ;
-      case Mode::timeSetting : ; break ;
+      case Mode::main           : gMainMenuInitialized = false ; break ;
+      case Mode::automatic      :  ; break ;
+      case Mode::displayInfos   : ; break ;
+      case Mode::timeSetting    : enterTimeSettingMode () ; break ;
       case Mode::handleProfiles : ; break ;
-      case Mode::manual : enterManualMode () ; break ;
+      case Mode::manual         : enterManualMode () ; break ;
       }
       tft.fillScreen (TFT_BLACK); // black screen
     }

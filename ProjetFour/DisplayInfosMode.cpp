@@ -9,7 +9,7 @@ void displayInfos (void) {
 // ----------Return----------
   setLign (0, 2) ;
   tft.setTextSize (2) ;
-  setMenuColor (true) ;
+  setMenuColor (true, false) ;
   tft.print ("Retour") ;
 // ----------Temperature----------
   setLign (3, 2) ; setColumn (1) ;

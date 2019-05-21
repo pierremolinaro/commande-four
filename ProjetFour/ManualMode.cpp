@@ -44,13 +44,13 @@ void printManualModeScreen (void) {
   setLign (3, 2) ;
   tft.setTextSize (2) ;
   tft.print (" Consigne : ") ;
-  setMenuColor (gMenuItemIndex == 0) ;
+  setMenuColor (gMenuItemIndex == 0, false) ;
   tft.setTextSize (gTemperatureReferenceSettingSelected ? 3 : 2) ;
   tft.printf ("%4d" DEGREE_CHAR "C", gTemperatureReference) ;
 
   setLign (5, 2) ;
   tft.setTextSize (2) ;
-  setMenuColor (gMenuItemIndex == 1) ;
+  setMenuColor (gMenuItemIndex == 1, false) ;
   tft.print (ovenIsRunning () ? (" Arr" LOWERCASE_E_CIRCUM "ter four") : (" D" LOWERCASE_E_ACUTE "marrer four")) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
@@ -63,7 +63,7 @@ void printManualModeScreen (void) {
     tft.printf ("%02u:%02u:%02u", hours, minutes, seconds) ;
   }
   setLign (7, 2) ;
-  setMenuColor (gMenuItemIndex == 2) ;
+  setMenuColor (gMenuItemIndex == 2, false) ;
   tft.print (" Retour") ;
 
   setLign (10, 2) ;

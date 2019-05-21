@@ -142,13 +142,15 @@ void fixerCurseurDemieLignesPourTaille (const uint8_t inNombreDemieLignes, const
  * to write text in the given text size.
  * The default text size is 2.
  */
-void setColumn(uint8_t column, uint8_t textSize) {
+void setColumn (uint8_t column, uint8_t textSize) {
     tft.setCursor(column*6*textSize + 1, tft.getCursorY());
 }
 
-void setMenuColor (const bool inIsSelected) {
-  if (inIsSelected) {
+void setMenuColor (const bool inIsSelected, const bool inIsEditing) {
+  if (inIsEditing) {
     tft.setTextColor (TFT_BLACK, TFT_YELLOW) ;
+  }else if (inIsSelected) {
+    tft.setTextColor (TFT_BLACK, TFT_CYAN) ;
   }else{
     tft.setTextColor (TFT_CYAN, TFT_BLACK) ;
   } 
@@ -278,7 +280,7 @@ void printMainMenu (uint16_t encoderPos, bool isRunning, bool isDelayed) {
 // ----------Start or Stop or Change Delay----------
   fixerCurseurDemieLignesPourTaille (0, 3) ;
   tft.setTextSize (3) ;
-  setMenuColor (encoderPos == 0) ;
+  setMenuColor (encoderPos == 0, false) ;
   if (isRunning) {
     tft.printf(" Arr%cter Four ", 136); // (char)136 -> ê
   }else if (isDelayed) {
@@ -289,19 +291,19 @@ void printMainMenu (uint16_t encoderPos, bool isRunning, bool isDelayed) {
 
 // ----------Show Information----------
   fixerCurseurDemieLignesPourTaille (3, 3) ;
-  setMenuColor (encoderPos == 1) ;
+  setMenuColor (encoderPos == 1, false) ;
   tft.print(" Afficher Infos ");
 // ----------Set Time----------
   fixerCurseurDemieLignesPourTaille (6, 3) ;
-  setMenuColor (encoderPos == 2) ;
+  setMenuColor (encoderPos == 2, false) ;
   tft.print (" R" LOWERCASE_E_ACUTE "gler Heure ");
 // ----------Manage Curves----------
   fixerCurseurDemieLignesPourTaille (9, 3);
-  setMenuColor (encoderPos == 3) ;
+  setMenuColor (encoderPos == 3, false) ;
   tft.print (" G" LOWERCASE_E_ACUTE "rer Programmes");
 //---------- Mode Manuel
   fixerCurseurDemieLignesPourTaille (12, 3);
-  setMenuColor (encoderPos == 4) ;
+  setMenuColor (encoderPos == 4, false) ;
   tft.print (" Mode manuel") ;
  //---
   tft.setTextSize(1);

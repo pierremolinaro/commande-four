@@ -70,7 +70,7 @@ void setLign (uint8_t lign, uint8_t textSize);
  */
 void setColumn(uint8_t column, uint8_t textSize = 2);
 
-void setMenuColor (const bool inIsSelected) ;
+void setMenuColor (const bool inIsSelected, const bool inIsEditing) ;
 
 void fixerCurseurDemieLignesPourTaille (const uint8_t inNombreDemieLignes, const uint8_t inTextSize) ;
 
