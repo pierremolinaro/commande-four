@@ -4,6 +4,7 @@
 
 #include "ProgramMode.h"
 #include "ProgramListMode.h"
+#include "RemoveFileMode.h"
 #include "RotaryEncoder.h"
 #include "TFT.h"
 
@@ -57,6 +58,7 @@ void printProgramModeScreen (void) {
   case ProgramSubMode::newPrgm :
     break ;
   case ProgramSubMode::supprPrgm :
+    printRemoveProgramModeScreen () ;
     break ;
   }
 }
@@ -76,6 +78,7 @@ void handleRotaryEncoderInProgramMode (void) {
   case ProgramSubMode::newPrgm :
     break ;
   case ProgramSubMode::supprPrgm :
+    handleRotaryEncoderInRemoveProgramMode () ;
     break ;
   }
 }
@@ -96,6 +99,10 @@ void clickInProgramMode (bool & outReturnToMainMenu) {
       enterProgramListMode () ;
       gSubMode = ProgramSubMode::listPrgms ;
       break ;
+    case 3 :
+      enterRemoveProgramMode () ;
+      gSubMode = ProgramSubMode::supprPrgm ;
+      break ;
     default :
       break ;
     }
@@ -106,6 +113,7 @@ void clickInProgramMode (bool & outReturnToMainMenu) {
   case ProgramSubMode::newPrgm :
     break ;
   case ProgramSubMode::supprPrgm :
+    clickInRemoveProgramMode (returnToProgramMainMenu) ;
     break ;
   }
   if (returnToProgramMainMenu) {

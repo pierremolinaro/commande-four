@@ -18,6 +18,14 @@ static uint32_t gCurrentSDCardMountIndex ;
 static bool gSDCardMounted ;
 
 //----------------------------------------------------------------------------------------------------------------------
+//   RESET PROGRAM LIST
+//----------------------------------------------------------------------------------------------------------------------
+
+void resetProgramList (void) {
+  gSDCardMounted = false ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 
 static void filterFilePath (String & ioFilePath, bool & outRetain) {
 //--- Suppress path

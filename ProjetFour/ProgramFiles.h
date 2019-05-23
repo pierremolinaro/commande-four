@@ -16,6 +16,8 @@
 //   PROGRAM FILE NAMES MANAGMENT
 //----------------------------------------------------------------------------------------------------------------------
 
+ void resetProgramList (void) ;
+
 void buildProgramFileNameArray (void) ;
 
 uint32_t programFileCount (void) ;

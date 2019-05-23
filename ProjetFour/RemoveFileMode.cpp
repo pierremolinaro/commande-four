@@ -3,7 +3,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 #include "PrintProgramList.h"
-#include "ProgramListMode.h"
+#include "RemoveFileMode.h"
 #include "ProgramFiles.h"
 #include "TFT.h"
 #include "SDCard.h"
@@ -14,9 +14,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 static uint32_t gSelectedItemIndex ;
+static uint32_t gSelectedDialogItemIndex ;
 static bool gSDCardIsMounted ;
 
-enum class DisplayPhase { list, graph, table } ;
+enum class DisplayPhase { list, dialog } ;
 
 static DisplayPhase gDisplayPhase = DisplayPhase::list ;
 
@@ -24,7 +25,7 @@ static DisplayPhase gDisplayPhase = DisplayPhase::list ;
 //   ENTER PROGRAM LIST MODE
 //----------------------------------------------------------------------------------------------------------------------
 
-void enterProgramListMode (void) {
+void enterRemoveProgramMode (void) {
   tft.fillScreen (TFT_BLACK) ;
   gSDCardIsMounted = false ;
   gDisplayPhase = DisplayPhase::list ;
@@ -34,52 +35,79 @@ void enterProgramListMode (void) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void printProgramListModeScreen (void) {
+static void displayRemoveDialog (void) {
+  tft.setTextSize (2) ;
+  setLineForTextSize (1, 3) ;
+  setColumnForTextSize (1, 3) ;
+  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.print ("Fichier") ;
+  setLineForTextSize (2, 3) ;
+  setColumnForTextSize (1, 3) ;
+  tft.print (programFileNameAtIndex (gSelectedItemIndex - 1)) ;
+//---
+  setLineForTextSize (4, 3) ;
+  setColumnForTextSize (1, 3) ;
+  setMenuColor (gSelectedDialogItemIndex == 0, false) ;
+  tft.print ("Ne pas supprimer") ;
+  setLineForTextSize (6, 3) ;
+  setColumnForTextSize (1, 3) ;
+  setMenuColor (gSelectedDialogItemIndex == 1, false) ;
+  tft.print ("Supprimer") ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void printRemoveProgramModeScreen (void) {
   switch (gDisplayPhase) {
   case DisplayPhase::list :
-    printProgramList (gSelectedItemIndex, "Liste") ;
+    printProgramList (gSelectedItemIndex, "Suppr.") ;
     break ;
-  case DisplayPhase::graph :
-    break ;
-  case DisplayPhase::table :
+  case DisplayPhase::dialog :
+    displayRemoveDialog () ;
     break ;
   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-//   HANDLE ROTARY ENCODER IN PROGRAM LISTMODE
+//   HANDLE ROTARY ENCODER IN REMOVE PROGRAM MODE
 //----------------------------------------------------------------------------------------------------------------------
 
-void handleRotaryEncoderInProgramListMode (void) {
-  if (gDisplayPhase == DisplayPhase::list) {
+void handleRotaryEncoderInRemoveProgramMode (void) {
+  switch (gDisplayPhase) {
+  case DisplayPhase::list :
     gSelectedItemIndex = getEncoderValue () ;
+    break ;
+  case DisplayPhase::dialog :
+    gSelectedDialogItemIndex = getEncoderValue () ;
+    break ;
   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-//   CLICK IN PROGRAM LIST MODE
+//   CLICK IN REMOVE PROGRAM MODE
 //----------------------------------------------------------------------------------------------------------------------
 
-void clickInProgramListMode (bool & outReturnToMainMenu) {
+void clickInRemoveProgramMode (bool & outReturnToMainMenu) {
   if (gSelectedItemIndex == 0) {
     outReturnToMainMenu = true ;
   }else{
     tft.fillScreen (TFT_BLACK) ;
     switch (gDisplayPhase) {
     case DisplayPhase::list :
-      { const String fileName = programFileNameAtIndex (gSelectedItemIndex - 1) ;
-        const bool ok = readProgramFile (fileName) ;
-        Serial.printf ("Read '%s' --> %d\n", fileName.c_str (), ok) ;
-        if (ok) {
-          gDisplayPhase = DisplayPhase::graph ;
-          plotGraph () ;
-        }
-      } break ;
-    case DisplayPhase::graph :
-      printTable () ;
-      gDisplayPhase = DisplayPhase::table ;
+      gSelectedDialogItemIndex = 0 ;
+      setEncoderRange (0, gSelectedDialogItemIndex, 1, true) ;
+      gDisplayPhase = DisplayPhase::dialog ;
       break ;
-    case DisplayPhase::table :
+    case DisplayPhase::dialog :
+      if (gSelectedDialogItemIndex == 1) {
+        const String fileName = programFileNameAtIndex (gSelectedItemIndex - 1) ;
+        const String filePath = String (PROFILES_DIRECTORY) + '/' + fileName + ".CSV" ;
+        const bool ok = SD.remove (filePath.c_str ()) ;
+        Serial.printf ("Remove file '%s': %s\n", filePath.c_str (), ok ? "done" : "error") ;
+        if (ok) {
+          resetProgramList () ;
+        }
+      }
       gDisplayPhase = DisplayPhase::list ;
       setEncoderRange (0, gSelectedItemIndex, 0, true) ;
       break ;
