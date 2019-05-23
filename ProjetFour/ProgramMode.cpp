@@ -38,16 +38,16 @@ void printProgramModeScreen (void) {
   switch (gSubMode) {
   case ProgramSubMode::main :
     tft.setTextSize (3) ;
-    setLign (0, 3) ;
+    setLineForTextSize (0, 3) ;
     setMenuColor (gSelectedItemIndex == 0, false) ;
     tft.print (" Retour") ;
-    setLign (2, 3) ;
+    setLineForTextSize (2, 3) ;
     setMenuColor (gSelectedItemIndex == 1, false) ;
     tft.print (" Infos programmes") ;
-    setLign (4, 3) ;
+    setLineForTextSize (4, 3) ;
     setMenuColor (gSelectedItemIndex == 2, false) ;
     tft.print (" Nouv. programme") ;
-    setLign (6, 3) ;
+    setLineForTextSize (6, 3) ;
     setMenuColor (gSelectedItemIndex == 3, false) ;
     tft.print (" Suppr. programme") ;
     break ;

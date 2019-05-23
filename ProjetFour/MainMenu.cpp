@@ -171,15 +171,15 @@ static void printFooter (void) {
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.setTextSize (2) ;
 // ----------Printing the date----------
-  setLign (nbLign - 2, 2);
+  setLineForTextSize (nbLign - 2, 2);
   const RtcDateTime now = currentDateTime () ;
   tft.printf ("%02u/%02u/%04u", now.Day (), now.Month (), now.Year ());
 // ----------Printing the time----------
-  setLign(nbLign - 1, 2);
+  setLineForTextSize (nbLign - 1, 2);
   tft.printf ("%02u:%02u:%02u", now.Hour (), now.Minute (), now.Second ()) ;
 //---- Printing SDCard
-  setLign (nbLign - 2, 2) ;
-  setColumn (nbColumn - 6) ;
+  setLineForTextSize (nbLign - 2, 2) ;
+  setColumnForTextSize (nbColumn - 6) ;
   switch (sdCardStatus ()) {
   case SDCardStatus::mounted :
     tft.setTextColor (TFT_GREEN, TFT_BLACK) ;
@@ -196,8 +196,8 @@ static void printFooter (void) {
   }
 // ----------Printing the temperature----------
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-  setLign (nbLign - 1, 2) ;
-  setColumn (nbColumn - 6) ;
+  setLineForTextSize (nbLign - 1, 2) ;
+  setColumnForTextSize (nbColumn - 6) ;
   const uint32_t codeErreur = temperatureSensorErrorFlags () ;
   if (codeErreur == 0) { // Ok
     tft.printf ("%4ld" DEGREE_CHAR "C", lround (getSensorTemperature ())) ;
@@ -213,7 +213,7 @@ static void printFooter (void) {
     tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   }
 // ----------Printing ON/OFF/Delayed----------
-  setLign(nbLign - 2, 2); setColumn(nbColumn - 2, 1) ; 
+  setLineForTextSize (nbLign - 2, 2); setColumnForTextSize (nbColumn - 2, 1) ; 
   tft.setTextSize (4) ;
   if (ovenIsRunning ()) {
     tft.setTextColor (TFT_GREEN, TFT_BLACK);

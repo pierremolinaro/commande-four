@@ -53,13 +53,13 @@ uint32_t read32(fs::File &f);
 void clearScreen(void);
 
 /*====================================================================================*
- *                                   setLign                                          *
+ *                                   setLineForTextSize                                          *
  *====================================================================================*
  * This function sets the cursor at the given lign and at the first column in order
  * to write text in the given text size.
  * The default text size is 2.
  */
-void setLign (uint8_t lign, uint8_t textSize);
+void setLineForTextSize (uint8_t lign, uint8_t textSize);
 
 /*====================================================================================*
  *                                  setColumn                                         *
@@ -68,7 +68,7 @@ void setLign (uint8_t lign, uint8_t textSize);
  * to write text in the given text size.
  * The default text size is 2.
  */
-void setColumn(uint8_t column, uint8_t textSize = 2);
+void setColumnForTextSize (uint8_t column, uint8_t textSize = 2);
 
 void setMenuColor (const bool inIsSelected, const bool inIsEditing) ;
 

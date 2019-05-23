@@ -28,6 +28,10 @@ String programFileNameAtIndex (const uint32_t inIndex) ;
 
 bool readProgramFile (const String & inFileName) ;
 
+String programName (void) ;
+
 void plotGraph (void) ;
+
+void printTable (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------

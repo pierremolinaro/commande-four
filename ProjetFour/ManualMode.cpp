@@ -36,17 +36,17 @@ void enterManualMode (void) {
 
 void printManualModeScreen (void) {
   tft.setTextSize (3) ;
-  setLign (0, 3) ;
+  setLineForTextSize (0, 3) ;
   setMenuColor (gSelectedItemIndex == 2, false) ;
   tft.print (" Retour") ;
 
-  setLign (2, 3) ;
+  setLineForTextSize (2, 3) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" Consigne ") ;
   setMenuColor (gSelectedItemIndex == 0, gTemperatureReferenceSettingSelected) ;
   tft.printf ("%4d" DEGREE_CHAR "C", gTemperatureReference) ;
 
-  setLign (4, 3) ;
+  setLineForTextSize (4, 3) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" Four ") ;
   setMenuColor (gSelectedItemIndex == 1, false) ;
@@ -55,7 +55,7 @@ void printManualModeScreen (void) {
   tft.print (" ") ;
 
   tft.setTextSize (3) ;
-  setLign (0, 3) ; setColumn (13) ;
+  setLineForTextSize (0, 3) ; setColumnForTextSize (13) ;
   if (ovenIsRunning ()) {
     const uint32_t runningTime = ovenRunningTime () ;
     const uint32_t seconds = runningTime % 60 ;
@@ -64,7 +64,7 @@ void printManualModeScreen (void) {
     tft.printf ("%02u:%02u:%02u", hours, minutes, seconds) ;
   }
 
-  setLign (10, 2) ;
+  setLineForTextSize (10, 2) ;
   tft.setTextSize (2) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" Indicateurs : ") ;
@@ -74,7 +74,7 @@ void printManualModeScreen (void) {
   printColoredStatus (getRejectedInconsistentSampleCount ()) ;
 
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-  setLign (11, 2) ;
+  setLineForTextSize (11, 2) ;
   tft.printf (" RAM : %u octets", minFreeHeap ()) ;
 }
 
@@ -98,8 +98,8 @@ void handleRotaryEncoderInManualMode (void) {
 void clickInManualMode (bool & outReturnToMainMenu) {
   if (gSelectedItemIndex == 0) {
     gTemperatureReferenceSettingSelected ^= true ;
-//    setLign (3, 2) ;
-//    setColumn (12, 2) ;
+//    setLineForTextSize (3, 2) ;
+//    setColumnForTextSize (12, 2) ;
 //    tft.setTextSize (3) ;
 //    tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
 //    tft.print ("      ") ;

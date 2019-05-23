@@ -178,12 +178,20 @@ typedef struct {
 
 //.....................................................................................................................
 
-static ProgramDescriptor programDescriptor ;
+static ProgramDescriptor gProgramDescriptor ;
+static String gFileName ;
+
+//----------------------------------------------------------------------------------------------------------------------
+
+String programName (void) {
+  return gFileName ;
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 
 bool readProgramFile (const String & inFileName) {
-  programDescriptor.mPointCount = 0 ;
+  gFileName = inFileName ;
+  gProgramDescriptor.mPointCount = 0 ;
   const String filePath = String (PROFILES_DIRECTORY) + '/' + inFileName + ".CSV" ;
   // Serial.printf ("File path '%s'\n", filePath.c_str ()) ;
   File f = SD.open (filePath, FILE_READ) ;
@@ -227,26 +235,26 @@ bool readProgramFile (const String & inFileName) {
       }
     //--- Enter point
       if (ok) {
-        ok = programDescriptor.mPointCount < PROGRAM_POINT_MAX_COUNT ;
+        ok = gProgramDescriptor.mPointCount < PROGRAM_POINT_MAX_COUNT ;
       }
       if (ok) {
-        programDescriptor.mPoints [programDescriptor.mPointCount].mTime = timePoint ;
-        programDescriptor.mPoints [programDescriptor.mPointCount].mTemperatureReference = temperaturePoint ;
-        programDescriptor.mPointCount += 1 ;
+        gProgramDescriptor.mPoints [gProgramDescriptor.mPointCount].mTime = timePoint ;
+        gProgramDescriptor.mPoints [gProgramDescriptor.mPointCount].mTemperatureReference = temperaturePoint ;
+        gProgramDescriptor.mPointCount += 1 ;
       }
     }
   }
   f.close () ;
 //--- Check program validity
   if (ok) {
-    ok = programDescriptor.mPointCount > 1 ;
+    ok = gProgramDescriptor.mPointCount > 1 ;
   }
   if (ok) {
-    ok = programDescriptor.mPoints [0].mTime == 0 ;
+    ok = gProgramDescriptor.mPoints [0].mTime == 0 ;
   }
   if (ok) {
-    for (uint32_t i = 1 ; (i < programDescriptor.mPointCount) && ok ; i++) {
-      ok = programDescriptor.mPoints [i - 1].mTime < programDescriptor.mPoints [i].mTime ;
+    for (uint32_t i = 1 ; (i < gProgramDescriptor.mPointCount) && ok ; i++) {
+      ok = gProgramDescriptor.mPoints [i - 1].mTime < gProgramDescriptor.mPoints [i].mTime ;
     }
   }
 //----
@@ -254,17 +262,23 @@ bool readProgramFile (const String & inFileName) {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// DISPLAY PROGRAM
+// PLOT GRAPH
 //----------------------------------------------------------------------------------------------------------------------
 
 void plotGraph (void) {
-  if (programDescriptor.mPointCount > 1) {
-    const uint32_t tmax = programDescriptor.mPoints [programDescriptor.mPointCount - 1].mTime ;
+  setLineForTextSize (0, 2) ; setColumnForTextSize (0, 2) ; tft.setTextSize (2) ;
+  setMenuColor (true, false) ;
+  tft.print ("Suivant") ;
+  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.print (" ") ;
+  tft.print (gFileName) ;
+  if (gProgramDescriptor.mPointCount > 1) {
+    const uint32_t tmax = gProgramDescriptor.mPoints [gProgramDescriptor.mPointCount - 1].mTime ;
   //--- Compute temperature max
     uint32_t maxTemperature = 0 ;
     uint32_t minTemperature = UINT32_MAX ;
-    for (uint32_t i=0 ; i<programDescriptor.mPointCount ; i++) {
-      const uint32_t t = programDescriptor.mPoints [i].mTemperatureReference ;
+    for (uint32_t i=0 ; i<gProgramDescriptor.mPointCount ; i++) {
+      const uint32_t t = gProgramDescriptor.mPoints [i].mTemperatureReference ;
       maxTemperature = max (maxTemperature, t) ;
       minTemperature = min (minTemperature, t) ;
     }
@@ -273,11 +287,11 @@ void plotGraph (void) {
     tft.setCursor (16, 32) ;
     tft.drawRect (tft.getCursorX (), tft.getCursorY (), w, h, TFT_WHITE) ;
 
-    uint16_t x0 = tft.getCursorX () + programDescriptor.mPoints[0].mTime / tmax * w ;
-    uint16_t y0 = tft.getCursorY () + h - programDescriptor.mPoints[0].mTemperatureReference / maxTemperature * h ;
-    for (uint8_t i = 1 ; i < programDescriptor.mPointCount ; i++) {
-      const uint16_t x1 = tft.getCursorX () + ((double) programDescriptor.mPoints[i].mTime / tmax) * w ;
-      const uint16_t y1 = tft.getCursorY () + h - ((double) programDescriptor.mPoints[i].mTemperatureReference / maxTemperature) * h ;
+    uint16_t x0 = tft.getCursorX () + gProgramDescriptor.mPoints[0].mTime / tmax * w ;
+    uint16_t y0 = tft.getCursorY () + h - gProgramDescriptor.mPoints[0].mTemperatureReference / maxTemperature * h ;
+    for (uint8_t i = 1 ; i < gProgramDescriptor.mPointCount ; i++) {
+      const uint16_t x1 = tft.getCursorX () + ((double) gProgramDescriptor.mPoints[i].mTime / tmax) * w ;
+      const uint16_t y1 = tft.getCursorY () + h - ((double) gProgramDescriptor.mPoints[i].mTemperatureReference / maxTemperature) * h ;
       tft.drawLine (x0, y0, x1, y1, TFT_YELLOW) ; 
       x0 = x1 ; y0 = y1 ;
     }
@@ -285,8 +299,64 @@ void plotGraph (void) {
     tft.setCursor ( 12, 192) ; tft.print ("0") ;
     tft.setCursor (  0,  24) ; tft.printf ("%4u" DEGREE_CHAR "C", maxTemperature) ;
     tft.setCursor (280, 192) ; tft.printf("%4umn", tmax) ;
- //   tft.setTextColor(TFT_WHITE, TFT_BLACK); tft.setTextSize(2);
   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// PRINT TABLE
+//----------------------------------------------------------------------------------------------------------------------
+
+static void drawGrid (void) {
+  tft.setTextSize(2); tft.setTextColor(TFT_WHITE);
+  const uint16_t smallLineColor = TFT_NAVY ;
+  const uint16_t largeLineColor = TFT_LIGHTGREY ;
+// ----------Write the name of the table lines----------
+  setLineForTextSize ( 5, 1); setColumnForTextSize ( 1, 1); tft.print ("Temps(min)");
+  setLineForTextSize ( 7, 1); setColumnForTextSize ( 1, 1); tft.print ("Temp" LOWERCASE_E_ACUTE "rature(" DEGREE_CHAR "C)") ;
+// ----------Draw the small lines----------
+  setLineForTextSize ( 7, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, smallLineColor);
+  setLineForTextSize (11, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, smallLineColor);
+  setLineForTextSize (23, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  1*2*8, smallLineColor);
+  setLineForTextSize ( 9, 1); setColumnForTextSize (11, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1,  5*2*6,  8*2*8, smallLineColor);
+  setLineForTextSize ( 5, 1); setColumnForTextSize (31, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1,  5*2*6, 10*2*8, smallLineColor);
+// ----------Draw the large lines of the table----------
+  setLineForTextSize ( 5, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, largeLineColor);
+  setLineForTextSize ( 9, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  6*2*8, largeLineColor);
+  setLineForTextSize (17, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, largeLineColor);
+  setLineForTextSize ( 5, 1); setColumnForTextSize (31, 1); tft.drawFastVLine(tft.getCursorX()-1, tft.getCursorY()-1, 2*2*8, largeLineColor);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+static void setCursorForTable (const uint8_t numTime, const bool TimeOrTemp) { // TimeOrTemp : 0 -> time, 1 -> temp
+  const uint8_t lign   = (numTime+3)/5 ;
+  const uint8_t column = (numTime+3)%5 ;
+  setLineForTextSize (5+lign*2*2 + TimeOrTemp*2, 1) ;
+  setColumnForTextSize (2+column*5*2, 1) ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+void printTable (void) {
+  setLineForTextSize (0, 2) ; setColumnForTextSize (0, 2) ; tft.setTextSize (2) ;
+  setMenuColor (true, false) ;
+  tft.print ("Retour") ;
+  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.print (" ") ;
+  tft.print (gFileName) ;
+//---
+  drawGrid () ;
+//--- Print values
+//  TimeTemp arrayTimeTemp[22];
+//  String pathValues = valuesDir + "/valeurs" + nameOfCurve + ".CSV";
+//  uint8_t len = extractValues(arrayTimeTemp, pathValues);
+//  (arrayTimeTemp, len);
+  tft.setTextSize(2);
+  for (uint32_t i = 0 ; i < min (gProgramDescriptor.mPointCount, 26) ; i++) {
+    tft.setTextColor (TFT_YELLOW) ; setCursorForTable (i, false) ; tft.printf("%4u", gProgramDescriptor.mPoints[i].mTime) ;
+    tft.setTextColor (TFT_PINK) ; setCursorForTable (i, true) ; tft.printf("%4u", gProgramDescriptor.mPoints[i].mTemperatureReference) ;
+  }
+
 }
 
 //----------------------------------------------------------------------------------------------------------------------
