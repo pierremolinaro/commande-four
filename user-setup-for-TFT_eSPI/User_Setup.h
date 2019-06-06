@@ -29,7 +29,7 @@
 
 #define TFT_CS   (5)  // Chip select control pin D8
 #define TFT_DC   (0)  // Data Command control pin
-#define TFT_RST  (33)  // Reset pin (could connect to NodeMCU RST, see next
+#define TFT_RST  (25)  // Reset pin (could connect to NodeMCU RST, see next
 
 #define TFT_MISO (19)
 #define TFT_MOSI (23)
