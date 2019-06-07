@@ -1,0 +1,86 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf600
+{\fonttbl\f0\fnil\fcharset0 Cambria;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red251\green2\blue7;}
+{\*\expandedcolortbl;;\cssrgb\c100000\c14913\c0;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww17720\viewh9660\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs28 \cf0 Sont list\'e9es ici les changements vis-\'e0-vis de la premi\'e8re carte.\
+\
+R\'e9organisation du placement des composants, suite au retrait des interrupteurs \'e0 glissi\'e8re.\
+\
+L'\'e9cran LCD est tourn\'e9 de 90\'b0 dans la sens horaire, de fa\'e7on \'e0 avoir une face avant oppos\'e9e aux connexions avec le four. Le module SDCard est aussi d\'e9plac\'e9 vers la face avant. Le module ESP32 est tourn\'e9 de 180\'b0, si bien que le connecteur de programmation est facilement accessible sur la face gauche. Il n'est plus en dessous de l'afficheur. Le poussoir externe de RESET est supprim\'e9, celui sur le module ESP32 est maintenant facilement accessible. Le buzzer est mis sur la face sup\'e9rieure.\
+\
+La commande du retro-\'e9clairage de l'afficheur LCD est ajout\'e9e.\
+\
+Sur le sch\'e9ma, de nombreux d\'e9tails n\'e9cessitent une modification.\
+\
+
+\b Condensateur sur l'alimentation.
+\b0  La mise sous / hors tension du four engendre un parasite \'e9lectrique qui plante l'ESP32. Solution : mettre un condensateur en amont du r\'e9gulateur 5V. Avec 47 \'b5F, on observe encore quelques plantages. Donc 470 \'b5F.\
+\
+
+\b Alimentation du module thermo-couple Adafruit 269.
+\b0  Il est aliment\'e9 sous 3,3V. Or, en regardant le sch\'e9ma, le module poss\'e8de son propre r\'e9gulateur 3,3V, aliment\'e9 par l'entr\'e9e 5V. Donc : connecter le 5V, d\'e9connecter le 3,3V. \
+\
+
+\b Signal RST/EN.
+\b0  Aucun plan valide pour le MH-ET LIVE MiniKit for ESP32, celui qui est donn\'e9 \'e0 la page http://forum.mhetlive.com/topic/8/mh-et-live-minikit-for-esp32 est faux). Une capa de 100nF est ajout\'e9e sur la patte RST/EN, comme conseill\'e9 \'e0 la page https://github.com/espressif/esptool/wiki/ESP32-Boot-Mode-Selection.\
+\
+
+\b Contr\'f4le du retro-\'e9clairage.
+\b0  Il faut une entr\'e9e suppl\'e9mentaire, j'avais pens\'e9 \'e0 IO2, utilis\'e9 par la led BUILTIN. Attention, connecter quelque chose sur IO2 doit se faire avec pr\'e9caution, car IO2 doit \'eatre au niveau bas lors du BOOT (https://github.com/espressif/esptool/wiki/ESP32-Boot-Mode-Selection). mon montage d'essai ne le v\'e9rifiait pas, si bien que l'ESP32 ne pouvait plus \'eatre flash\'e9 
+\i in-situ
+\i0 , je devais l'\'f4ter de la carte pour effectuer le flashage. Voici le message d'erreur :\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f1\fs24 \cf2 esptool.py v2.6\
+Serial port /dev/cu.SLAB_USBtoUART\
+Connecting........_\
+Chip is ESP32D0WDQ6 (revision 1)\
+Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None\
+MAC: 24:0a:c4:9d:b4:c0\
+Uploading stub...\
+Running stub...\
+Stub running...\
+Configuring flash size...\
+Warning: Could not auto-detect Flash size (FlashID=0x0, SizeID=0x0), defaulting to 4MB\
+Compressed 8192 bytes to 47...\
+\
+Writing at 0x0000e000... (100 %)\
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.0 seconds (effective 8014.6 kbit/s)...\
+\
+A fatal error occurred: Timed out waiting for packet header\
+A fatal error occurred: Timed out waiting for packet header\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs28 \cf0 \
+\
+Solution : \
+	- mettre sur IO2 la commande l'une des leds externes : la connexion impose un niveau bas sur IO2 lors du BOOT ;\
+	- affecter le port lib\'e9r\'e9 \'e0 la commande du retro-\'e9clairage.\
+\
+C'est IO32 qui est \'e9chang\'e9 avec IO2. La commande du retro-\'e9clairage n\'e9cessite in transistor PNP (BC557) et une r\'e9sistance de 4,7k\uc0\u937  (voir plan)\
+\
+
+\b Probl\'e8me avec le module SDCard.
+\b0  Encore plus vicieux. La SDCard est sur le HSPI de l'ESP32, et la librairie SD exige les affectations suivantes : MISO --> IO12 (TDI), MOSI --> IO13 (TCK), SCK --> IO14 (TMS), et l'on peut choisir le port pour CS : ce qui a \'e9t\'e9 choisi est IO15. Or le document https://randomnerdtutorials.com/esp32-pinout-reference-gpios/ indique que IO14 et IO15 
+\i output PWM signal at boot
+\i0 , et que 
+\i boot fail if IO12 pulled high
+\i0 . Or IO14 et IO15 activent les drivers du module SDCard, ce qui active MISO donc IO12 --> \'e9chec du flashage.\
+\
+Pour flasher in-situ, il faut que le module SDCard soit \'f4t\'e9.\
+\
+Solution : \
+	- utiliser IO15 pour commander l'autre led externe : elle s'allumera lors du boot mais ce n'est pas g\'eanant ;\
+	- affecter le port lib\'e9r\'e9 IO26 au CS de la SDCard.\
+\
+On place aussi une r\'e9sistance de 10K\uc0\u937  entre le CS de la SDCard et le 3,3V, de fa\'e7on qu'il n'y ait pas d'acc\'e8s lors du boot, IO26 doit \'eatre flottant lors du boot (?). Maintenant, le flashage in-situ s'effectue avec le module SDCard, mais sans SDCard ins\'e9r\'e9e. Si on ins\'e8re une SDCard -> \'c9chec. Sans doute la SDCard, m\'eame non s\'e9lectionn\'e9e a une r\'e9sistance de pull-up qui affecte la tension  de IO12 (qui doit \'eatre \'e0 z\'e9ro lors du boot).\
+\
+
+\b 19 mai 2019. 
+\b0 Il s'av\'e8re que l'insertion et le retrait \'e0 chaud de la carte SD ne sont pas d\'e9tect\'e9s. Il faut en fait r\'e9cup\'e9rer le signal CD qui est ouvert si une carte est pr\'e9sente, et mis \'e0 z\'e9ro en l'absence de carte. On sacrifie le signal TFT_RESET (la patte correspondante de l'afficheur LCD est tir\'e9e \'e0 3,3V par 10 k\uc0\u937 ), et on relie IO33 \'e0 CD (et une r\'e9sistance de tirage de 10 k\u937  \'e0 3,3V).\
+\
+\
+}
