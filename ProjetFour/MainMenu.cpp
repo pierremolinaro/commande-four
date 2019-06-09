@@ -5,34 +5,35 @@
 #include "TemperatureSensor.h"
 #include "OvenControl.h"
 #include "DisplayInfosMode.h"
+#include "AutomaticMode.h"
 #include "ManualMode.h"
 #include "TimeSettingMode.h"
 #include "ProgramMode.h"
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 //   MODE ENUMERATION
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 enum class Mode { main, manual, displayInfos, timeSetting, program, automatic } ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 //   FORWARD DECLARATIONS
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 static void displayMainMenu (void) ;
 static void printFooter (void) ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 //   STATIC VARIABLES
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 static uint32_t gMainMenuSelectedIndex ;
 static Mode gMode = Mode::main ;
 static bool gMainMenuInitialized ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 // UPDATE DISPLAY
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 static void updateDisplay (void) {
   switch (gMode) {
@@ -49,15 +50,16 @@ static void updateDisplay (void) {
     printTimeSettingModeScreen () ;
     break ;
   case Mode::program :
-    printProgramModeScreen () ;  
+    printProgramModeScreen () ;
     break ;
   case Mode::automatic :
+    printAutomaticModeScreen () ;
     break ;
   }
   printFooter () ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 static void displayMainMenu (void) {
   if (!gMainMenuInitialized) {
@@ -65,30 +67,30 @@ static void displayMainMenu (void) {
     gMainMenuInitialized = true ;
   }
 
-  fixerCurseurDemieLignesPourTaille (0, 3) ;
+  setLineForTextSize (0, 3) ;
   tft.setTextSize (3) ;
   setMenuColor (gMainMenuSelectedIndex == 0, false) ;
   tft.print (" D" LOWERCASE_E_ACUTE "marrer Four ") ;
 
 // ----------Show Information----------
-  fixerCurseurDemieLignesPourTaille (3, 3) ;
+  setLineForTextSize (1, 3, true) ;
   setMenuColor (gMainMenuSelectedIndex == 1, false) ;
   tft.print (" Afficher Infos ");
 // ----------Set Time----------
-  fixerCurseurDemieLignesPourTaille (6, 3) ;
+  setLineForTextSize (3, 3) ;
   setMenuColor (gMainMenuSelectedIndex == 2, false) ;
   tft.print (" R" LOWERCASE_E_ACUTE "gler Heure ");
 // ----------Manage Curves----------
-  fixerCurseurDemieLignesPourTaille (9, 3);
+  setLineForTextSize (4, 3, true);
   setMenuColor (gMainMenuSelectedIndex == 3, false) ;
   tft.print (" G" LOWERCASE_E_ACUTE "rer Programmes");
 //---------- Mode Manuel
-  fixerCurseurDemieLignesPourTaille (12, 3);
+  setLineForTextSize (6, 3);
   setMenuColor (gMainMenuSelectedIndex == 4, false) ;
   tft.print (" Mode manuel") ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 static void handleRotaryEncoder (void) {
   if (encoderValueDidChange ()) {
@@ -100,21 +102,22 @@ static void handleRotaryEncoder (void) {
       handleRotaryEncoderInManualMode () ;
       break ;
     case Mode::displayInfos :
-    
+
       break ;
     case Mode::timeSetting :
       handleRotaryEncoderInTimeSettingMode () ;
       break ;
     case Mode::program :
-      handleRotaryEncoderInProgramMode () ;  
+      handleRotaryEncoderInProgramMode () ;
       break ;
     case Mode::automatic :
+      handleRotaryEncoderInAutomaticMode () ;
       break ;
     }
   }
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 static void handleEncoderClick (void) {
   if (encoderClickPressed ()) {
@@ -144,7 +147,7 @@ static void handleEncoderClick (void) {
       clickInProgramMode (returnToMainMenu) ;
       break ;
     case Mode::automatic :
-      newMode = Mode::main ;
+      clickInAutomaticMode (returnToMainMenu) ;
       break ;
     }
     if (returnToMainMenu) {
@@ -154,10 +157,10 @@ static void handleEncoderClick (void) {
       gMode = newMode ;
       switch (gMode) {
       case Mode::main           : gMainMenuInitialized = false ; break ;
-      case Mode::automatic      :  ; break ;
+      case Mode::automatic      : enterAutomaticMode () ; break ;
       case Mode::displayInfos   : ; break ;
       case Mode::timeSetting    : enterTimeSettingMode () ; break ;
-      case Mode::program : enterProgramMode () ; break ;
+      case Mode::program        : enterProgramMode () ; break ;
       case Mode::manual         : enterManualMode () ; break ;
       }
       tft.fillScreen (TFT_BLACK) ;
@@ -165,7 +168,7 @@ static void handleEncoderClick (void) {
   }
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 static void printFooter (void) {
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
@@ -179,17 +182,17 @@ static void printFooter (void) {
   tft.printf ("%02u:%02u:%02u", now.Hour (), now.Minute (), now.Second ()) ;
 //---- Printing SDCard
   setLineForTextSize (nbLign - 2, 2) ;
-  setColumnForTextSize (nbColumn - 6) ;
+  setColumnForTextSize (nbColumn - 6, 2) ;
   switch (sdCardStatus ()) {
   case SDCardStatus::mounted :
     tft.setTextColor (TFT_GREEN, TFT_BLACK) ;
     tft.print ("    SD") ;
     break ;
-  case SDCardStatus::noCard :  
+  case SDCardStatus::noCard :
     tft.setTextColor (TFT_RED, TFT_BLACK) ;
     tft.print (" No SD") ;
     break ;
-  case SDCardStatus::insertedNotMounted :  
+  case SDCardStatus::insertedNotMounted :
     tft.setTextColor (TFT_RED, TFT_BLACK) ;
     tft.print ("Err SD") ;
     break ;
@@ -197,7 +200,7 @@ static void printFooter (void) {
 // ----------Printing the temperature----------
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   setLineForTextSize (nbLign - 1, 2) ;
-  setColumnForTextSize (nbColumn - 6) ;
+  setColumnForTextSize (nbColumn - 6, 2) ;
   const uint32_t codeErreur = temperatureSensorErrorFlags () ;
   if (codeErreur == 0) { // Ok
     tft.printf ("%4ld" DEGREE_CHAR "C", lround (getSensorTemperature ())) ;
@@ -213,7 +216,7 @@ static void printFooter (void) {
     tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   }
 // ----------Printing ON/OFF/Delayed----------
-  setLineForTextSize (nbLign - 2, 2); setColumnForTextSize (nbColumn - 2, 1) ; 
+  setLineForTextSize (nbLign - 2, 2); setColumnForTextSize (nbColumn - 2, 1) ;
   tft.setTextSize (4) ;
   if (ovenIsRunning ()) {
     tft.setTextColor (TFT_GREEN, TFT_BLACK);
@@ -224,7 +227,7 @@ static void printFooter (void) {
   }
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 void updateUserInterface (void) {
   updateDisplay () ;
@@ -232,4 +235,4 @@ void updateUserInterface (void) {
   handleEncoderClick () ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------

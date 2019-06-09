@@ -24,9 +24,9 @@ static const uint32_t RECORD_SIZE = 60 ;
 //----------------------------------------------------------------------------------------------------------------------
 
 typedef struct {
-  int mConsigne : 15 ;
-  unsigned mOvenIsOn :  1 ;
-  int mTemperature : 15 ;
+  int mConsigne ;
+  int mTemperature ;
+  bool mOvenIsOn ;
 } Record ;
 
 typedef struct {

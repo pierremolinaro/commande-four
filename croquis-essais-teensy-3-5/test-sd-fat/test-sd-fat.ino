@@ -181,6 +181,7 @@ void setup() {
     return;
   }
 #else  // USE_SDIO
+  SPI.setSCK (14) ;
   // Initialize at the highest speed supported by the board that is
   // not over 50 MHz. Try a lower speed if SPI errors occur.
   if (!sd.cardBegin(SD_CHIP_SELECT, SD_SCK_MHZ(25))) {

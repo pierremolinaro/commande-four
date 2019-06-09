@@ -83,6 +83,7 @@ const uint32_t PROGRAM_POINT_MAX_COUNT = 50 ;
 
 #define DEGREE_CHAR        "\xF7"
 #define LOWERCASE_E_ACUTE  "\x82"
+#define LOWERCASE_A_ACUTE  "\x85"
 #define LOWERCASE_E_CIRCUM "\x88"
 
 //----------------------------------------------------------------------------------------------------------------------

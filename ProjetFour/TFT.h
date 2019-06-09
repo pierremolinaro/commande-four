@@ -59,7 +59,7 @@ void clearScreen(void);
  * to write text in the given text size.
  * The default text size is 2.
  */
-void setLineForTextSize (uint8_t lign, uint8_t textSize);
+void setLineForTextSize (const uint8_t inLine, const uint8_t inTextSize, const bool inAddHalfLine = false) ;
 
 /*====================================================================================*
  *                                  setColumn                                         *
@@ -68,11 +68,11 @@ void setLineForTextSize (uint8_t lign, uint8_t textSize);
  * to write text in the given text size.
  * The default text size is 2.
  */
-void setColumnForTextSize (uint8_t column, uint8_t textSize = 2);
+void setColumnForTextSize (const uint8_t inColumn, const uint8_t inTextSize) ;
 
 void setMenuColor (const bool inIsSelected, const bool inIsEditing) ;
 
-void fixerCurseurDemieLignesPourTaille (const uint8_t inNombreDemieLignes, const uint8_t inTextSize) ;
+void printWithPadding (const char * inString, const uint32_t inSize) ;
 
 void afficherCompteurErreurs (const char * inMessage, const uint32_t inNombreErreurs) ;
 

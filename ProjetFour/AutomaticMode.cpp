@@ -1,0 +1,317 @@
+#include "AutomaticMode.h"
+#include "PrintProgramList.h"
+#include "ProgramListMode.h"
+#include "ProgramFiles.h"
+#include "TFT.h"
+#include "SDCard.h"
+#include "RotaryEncoder.h"
+#include "RealTimeClock.h"
+#include "OvenControl.h"
+#include "TemperatureSensor.h"
+
+//----------------------------------------------------------------------------------------------------------------------
+//   STATIC VARIABLES
+//----------------------------------------------------------------------------------------------------------------------
+
+static uint32_t gSelectedItemIndex ;
+static uint32_t gDelayedStartInMinutes ;
+static bool gSDCardIsMounted ;
+
+enum class DisplayPhase { list, graph, table, startConfiguration, running } ;
+
+static DisplayPhase gDisplayPhase = DisplayPhase::list ;
+
+static uint32_t gSelectedItemIndexInStartScreenSubMode ;
+static bool gEditionInStartScreenSubMode ;
+
+//----------------------------------------------------------------------------------------------------------------------
+//   ENTER AUTOMATIC MODE
+//----------------------------------------------------------------------------------------------------------------------
+
+void enterAutomaticMode (void) {
+  tft.fillScreen (TFT_BLACK) ;
+  gSDCardIsMounted = false ;
+  gDisplayPhase = DisplayPhase::list ;
+  gSelectedItemIndex = 0 ;
+  gSelectedItemIndexInStartScreenSubMode = 0 ;
+  setEncoderRange (0, gSelectedItemIndex, 0, true) ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//   PRINT START SCREEN
+//----------------------------------------------------------------------------------------------------------------------
+
+static void displayAutomaticStartScreen (void) {
+// ----------Return----------
+  setLineForTextSize (0, 2) ;
+  tft.setTextSize (2) ;
+  setMenuColor (gSelectedItemIndexInStartScreenSubMode == 0, false) ;
+  tft.print ("Abandon") ;
+//--- Programme
+  tft.setTextColor (TFT_WHITE, TFT_BLACK);
+  tft.printf (" %s", programName ().c_str ()) ;
+//--- Durée
+  setLineForTextSize (1, 2, true) ; setColumnForTextSize (1, 2) ;
+  const uint32_t programDuration = programDurationInMinutes () ;
+  tft.printf ("Dur" LOWERCASE_E_ACUTE "e : %u h %u min", programDuration / 60, programDuration % 60) ;
+//--- Démarrage différé
+  setLineForTextSize (3, 2) ; setColumnForTextSize (1, 2) ;
+  tft.print ("Diff" LOWERCASE_E_ACUTE "r" LOWERCASE_E_ACUTE " de ") ;
+  setMenuColor (gSelectedItemIndexInStartScreenSubMode == 1, gEditionInStartScreenSubMode) ;
+  tft.printf ("%02u", gDelayedStartInMinutes / 60) ;
+  tft.setTextColor (TFT_WHITE, TFT_BLACK);
+  tft.print (" h ") ;
+  setMenuColor (gSelectedItemIndexInStartScreenSubMode == 2, gEditionInStartScreenSubMode) ;
+  tft.printf ("%02u", gDelayedStartInMinutes % 60) ;
+  tft.setTextColor (TFT_WHITE, TFT_BLACK);
+  tft.print (" min") ;
+//--- Démarrage effectif
+  const uint32_t start = gDelayedStartInMinutes + currentHour () * 60 + currentMinute () ;
+  setLineForTextSize (4, 2, true) ; setColumnForTextSize (1, 2) ;
+  tft.print ("D" LOWERCASE_E_ACUTE "marrage effectif :") ;
+  setLineForTextSize (5, 2, true) ; setColumnForTextSize (3, 2) ;
+  uint32_t spaces = 0 ;
+  switch (start / 60 / 24) {
+  case 0 :
+    tft.print ("aujourd'hui") ;
+    spaces = 1 ;
+    break ; 
+  case 1 :
+    tft.print ("demain") ;
+    spaces = 6 ;
+    break ;
+  default :
+    tft.printf ("dans %u jours", start / 60 / 24) ;
+    break ;
+  }
+  tft.printf (" " LOWERCASE_A_ACUTE " %02u:%02u", (start / 60) % 24, start % 60) ;
+  for (uint32_t i=0 ; i<spaces ; i++) {
+    tft.print (" ") ;
+  }
+//--- Fin prévue
+  const uint32_t endTime = start + programDurationInMinutes () ;
+  setLineForTextSize (7, 2) ; setColumnForTextSize (1, 2) ;
+  tft.print ("Fin pr" LOWERCASE_E_ACUTE "vue :") ;
+  setLineForTextSize (8, 2) ; setColumnForTextSize (3, 2) ;
+  spaces = 0 ;
+  switch (endTime / 60 / 24) {
+  case 0 :
+    tft.print ("aujourd'hui") ;
+    spaces = 1 ;
+    break ; 
+  case 1 :
+    tft.print ("demain") ;
+    spaces = 6 ;
+    break ;
+  default :
+    tft.printf ("dans %u jours", endTime / 60 / 24) ;
+    break ;
+  }
+  tft.printf (" " LOWERCASE_A_ACUTE " %02u:%02u", (endTime / 60) % 24, endTime % 60) ;
+  for (uint32_t i=0 ; i<spaces ; i++) {
+    tft.print (" ") ;
+  }
+//--- Démarrer
+  setLineForTextSize (7, 3) ; setColumnForTextSize (5, 3) ; tft.setTextSize (3) ;
+  setMenuColor (gSelectedItemIndexInStartScreenSubMode == 3, false) ;
+  tft.print ("D" LOWERCASE_E_ACUTE "marrer") ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//   PRINT RUNNING SCREEN
+//----------------------------------------------------------------------------------------------------------------------
+
+static void displayAutomaticRunningScreen (void) {
+// ----------Return----------
+  setLineForTextSize (0, 2) ;
+  tft.setTextSize (2) ;
+  setMenuColor (true, false) ;
+  tft.print ("Arret") ;
+//--- Programme
+  tft.setTextColor (TFT_WHITE, TFT_BLACK);
+  tft.printf (" %s", programName ().c_str ()) ;
+//--- Start delay
+  setLineForTextSize (1, 2, true) ; setColumnForTextSize (1, 2) ;
+  const uint32_t startDelayInSeconds = delayForStartingInSeconds () ;
+  const uint32_t MESSAGE_SIZE = 26 ;
+  char message [MESSAGE_SIZE] ;
+  if (startDelayInSeconds > 0) {
+    if (startDelayInSeconds < 60) {
+      snprintf (message, MESSAGE_SIZE, "D" LOWERCASE_E_ACUTE "marrage dans %u s", startDelayInSeconds) ;
+    }else if (startDelayInSeconds < 3600) {
+      snprintf (message, MESSAGE_SIZE, "D" LOWERCASE_E_ACUTE "marrage dans %u min %u s", startDelayInSeconds / 60, startDelayInSeconds % 60) ;
+    }else{
+      snprintf (message, MESSAGE_SIZE, "D" LOWERCASE_E_ACUTE "marrage dans %u h %u min", startDelayInSeconds / 3600, (startDelayInSeconds / 60) % 60) ;
+    }
+    printWithPadding (message, MESSAGE_SIZE) ;
+  }else{ // Running
+  //--- Running time
+    const uint32_t runningTime = ovenRunningTime () ;
+    if (runningTime < 60) {
+      snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u s", runningTime) ;
+    }else if (runningTime < 3600) {
+      snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u min %u s", runningTime / 60, runningTime % 60) ;
+    }else{
+      snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u h %u min %u s", runningTime / 3600, (runningTime / 60) % 60, runningTime % 60) ; 
+    }
+    printWithPadding (message, MESSAGE_SIZE) ;
+  //--- Leaving time
+    const uint32_t programDurationInSecondes = programDurationInMinutes () * 60 ;
+    if (programDurationInSecondes > runningTime) {
+      const uint32_t t = programDurationInSecondes - runningTime ;
+      if (t < 60) {
+        snprintf (message, MESSAGE_SIZE, "Reste : %u s", t) ;
+      }else if (t < 3600) {
+        snprintf (message, MESSAGE_SIZE, "Reste : %u min %u s", t / 60, t % 60) ;
+      }else{
+        snprintf (message, MESSAGE_SIZE, "Reste : %u h %u min %u s", t / 3600, (t / 60) % 60, t % 60) ; 
+      }
+      setLineForTextSize (3, 2) ; setColumnForTextSize (1, 2) ;
+      printWithPadding (message, MESSAGE_SIZE) ;
+    }
+  //--- Reference
+    setLineForTextSize (4, 2, true) ; setColumnForTextSize (1, 2) ;
+    snprintf (message, MESSAGE_SIZE, "Consigne : %.2f " DEGREE_CHAR "C", temperatureReference ()) ;
+    printWithPadding (message, MESSAGE_SIZE) ;
+  //--- Temperature
+    setLineForTextSize (6, 2) ; setColumnForTextSize (1, 2) ;
+    snprintf (message, MESSAGE_SIZE, "Temp" LOWERCASE_E_ACUTE "rature : %.1f " DEGREE_CHAR "C", getSensorTemperature ()) ;
+    printWithPadding (message, MESSAGE_SIZE) ;
+  //--- Fin prévue
+    const RtcDateTime t = currentDateTime () ;
+    const uint32_t remaining = t.Hour () * 60 + t.Minute () + programDurationInMinutes () - runningTime / 60 ;
+    setLineForTextSize (7, 2, true) ; setColumnForTextSize (1, 2) ;
+    tft.print ("Fin pr" LOWERCASE_E_ACUTE "vue :") ;
+    setLineForTextSize (8, 2, true) ; setColumnForTextSize (3, 2) ;
+    uint32_t spaces = 0 ;
+    switch (remaining / 60 / 24) {
+    case 0 :
+      tft.print ("aujourd'hui") ;
+      spaces = 1 ;
+      break ; 
+    case 1 :
+      tft.print ("demain") ;
+      spaces = 6 ;
+      break ;
+    default :
+      tft.printf ("dans %u jours", remaining / 60 / 24) ;
+      break ;
+    }
+    tft.printf (" " LOWERCASE_A_ACUTE " %02u:%02u", (remaining / 60) % 24, remaining % 60) ;
+    for (uint32_t i=0 ; i<spaces ; i++) {
+      tft.print (" ") ;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//   PRINT AUTOMATIC MODE
+//----------------------------------------------------------------------------------------------------------------------
+
+void printAutomaticModeScreen (void) {
+  switch (gDisplayPhase) {
+  case DisplayPhase::list :
+    printProgramList (gSelectedItemIndex, "Liste") ;
+    break ;
+  case DisplayPhase::graph :
+    break ;
+  case DisplayPhase::table :
+    break ;
+  case DisplayPhase::startConfiguration :
+    displayAutomaticStartScreen () ;
+    break ;
+  case DisplayPhase::running :
+    displayAutomaticRunningScreen () ;
+    break ;
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//   HANDLE ROTARY ENCODER IN AUTOMATIC MODE
+//----------------------------------------------------------------------------------------------------------------------
+
+void handleRotaryEncoderInAutomaticMode (void) {
+  if (gDisplayPhase == DisplayPhase::list) {
+    gSelectedItemIndex = getEncoderValue () ;
+  }else if (gDisplayPhase == DisplayPhase::startConfiguration) {
+    if (gEditionInStartScreenSubMode) {
+      if (gSelectedItemIndexInStartScreenSubMode == 1) { // Hour
+       const uint32_t v = getEncoderValue () ;
+        if ((v == 0) && (gDelayedStartInMinutes >= 60)) {
+          gDelayedStartInMinutes -= 60 ;
+        }else if (v == 2) {
+          gDelayedStartInMinutes += 60 ;
+        }
+        setEncoderRange (0, 1, 2, false) ;
+      }else if (gSelectedItemIndexInStartScreenSubMode == 2) { // Minute
+        const uint32_t v = getEncoderValue () ;
+        if ((v == 0) && (gDelayedStartInMinutes > 0)) {
+          gDelayedStartInMinutes -= 1 ;
+        }else if (v == 2) {
+          gDelayedStartInMinutes += 1 ;
+        }
+        setEncoderRange (0, 1, 2, false) ;
+      }
+    }else{
+      gSelectedItemIndexInStartScreenSubMode = getEncoderValue () ;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+//   CLICK IN AUTOMATIC MODE
+//----------------------------------------------------------------------------------------------------------------------
+
+void clickInAutomaticMode (bool & outReturnToMainMenu) {
+  if (gSelectedItemIndex == 0) {
+    outReturnToMainMenu = true ;
+  }else{
+    tft.fillScreen (TFT_BLACK) ;
+    switch (gDisplayPhase) {
+    case DisplayPhase::list :
+      { const String fileName = programFileNameAtIndex (gSelectedItemIndex - 1) ;
+        const bool ok = readProgramFile (fileName) ;
+        Serial.printf ("Read '%s' --> %d\n", fileName.c_str (), ok) ;
+        if (ok) {
+          gDisplayPhase = DisplayPhase::graph ;
+          plotGraph () ;
+        }
+      } break ;
+    case DisplayPhase::graph :
+      printTable ("Suivant") ;
+      gDisplayPhase = DisplayPhase::table ;
+      break ;
+    case DisplayPhase::table :
+      gDisplayPhase = DisplayPhase::startConfiguration ;
+      gSelectedItemIndexInStartScreenSubMode = 0 ;
+      setEncoderRange (0, gSelectedItemIndexInStartScreenSubMode, 3, true) ;
+     break ;
+    case DisplayPhase::startConfiguration :
+      switch (gSelectedItemIndexInStartScreenSubMode) {
+      case 1 : // Hour selection
+      case 2 : // Minute selection
+        gEditionInStartScreenSubMode ^= true ;
+        if (gEditionInStartScreenSubMode) {
+          setEncoderRange (0, 1, 2, false) ;
+        }else{
+          setEncoderRange (0, gSelectedItemIndexInStartScreenSubMode, 3, true) ;
+        }
+        break ;
+      case 3 : // Start
+        startOvenInAutomaticMode (gDelayedStartInMinutes) ;
+        gDisplayPhase = DisplayPhase::running ;       
+        break ;
+      default :
+        outReturnToMainMenu = true ;
+        break ;
+      }
+      break ;
+    case DisplayPhase::running :
+      stopOven () ;
+      gDisplayPhase = DisplayPhase::startConfiguration ;       
+      break ;
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------

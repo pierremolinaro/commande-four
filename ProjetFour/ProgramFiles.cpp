@@ -197,6 +197,38 @@ String programName (void) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
+uint32_t programDurationInMinutes (void) {
+  uint32_t result = 0 ;
+  if (gProgramDescriptor.mPointCount > 0) {
+    result = gProgramDescriptor.mPoints [gProgramDescriptor.mPointCount - 1].mTime ;
+  }
+  return result ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+double programTemperatureReferenceForRunningTime (const uint32_t inRunningTimeInSeconds) {
+  double result = 0.0 ;
+  if (gProgramDescriptor.mPointCount > 0) {
+    uint32_t idx = 1 ;
+    while ((idx < gProgramDescriptor.mPointCount) && (inRunningTimeInSeconds > (gProgramDescriptor.mPoints [idx].mTime * 60))) {
+      idx += 1 ;
+    }
+    if (idx < gProgramDescriptor.mPointCount) {
+      const double referenceStart = (double) gProgramDescriptor.mPoints [idx - 1].mTemperatureReference ;
+      const uint32_t timeStart = gProgramDescriptor.mPoints [idx - 1].mTime * 60 ;
+      const double referenceEnd = (double) gProgramDescriptor.mPoints [idx].mTemperatureReference ;
+      const uint32_t timeEnd = gProgramDescriptor.mPoints [idx].mTime * 60 ;
+      const double t = (double) (inRunningTimeInSeconds - timeStart) ;
+      const double stepDuration = (double) (timeEnd - timeStart) ;
+      result = referenceStart + (referenceEnd - referenceStart) * t / stepDuration ;
+    }
+  }
+  return result ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
 bool readProgramFile (const String & inFileName) {
   gFileName = inFileName ;
   gProgramDescriptor.mPointCount = 0 ;
@@ -345,10 +377,10 @@ static void setCursorForTable (const uint8_t numTime, const bool TimeOrTemp) { /
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void printTable (void) {
+void printTable (const char * inTitle) {
   setLineForTextSize (0, 2) ; setColumnForTextSize (0, 2) ; tft.setTextSize (2) ;
   setMenuColor (true, false) ;
-  tft.print ("Retour") ;
+  tft.print (inTitle) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
   tft.print (gFileName) ;

@@ -6,17 +6,17 @@
 #include "OvenControl.h"
 #include "RealTimeClock.h"
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 //   STATIC VARIABLES
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 static uint32_t gSelectedItemIndex ;
 static uint32_t gTemperatureReference ;
 static bool gTemperatureReferenceSettingSelected ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 //   ENTER MANUAL MODE
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 void enterManualMode (void) {
   const int32_t v = lround (getSensorTemperature ()) - 10 ;
@@ -30,9 +30,9 @@ void enterManualMode (void) {
   setEncoderRange (0, gSelectedItemIndex, 2, true) ;
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 //   PRINT MANUAL MODE SCREEN
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 void printManualModeScreen (void) {
   tft.setTextSize (3) ;
@@ -55,7 +55,7 @@ void printManualModeScreen (void) {
   tft.print (" ") ;
 
   tft.setTextSize (3) ;
-  setLineForTextSize (0, 3) ; setColumnForTextSize (13) ;
+  setLineForTextSize (0, 3) ; setColumnForTextSize (13, 2) ;
   if (ovenIsRunning ()) {
     const uint32_t runningTime = ovenRunningTime () ;
     const uint32_t seconds = runningTime % 60 ;
@@ -98,11 +98,6 @@ void handleRotaryEncoderInManualMode (void) {
 void clickInManualMode (bool & outReturnToMainMenu) {
   if (gSelectedItemIndex == 0) {
     gTemperatureReferenceSettingSelected ^= true ;
-//    setLineForTextSize (3, 2) ;
-//    setColumnForTextSize (12, 2) ;
-//    tft.setTextSize (3) ;
-//    tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-//    tft.print ("      ") ;
     if (gTemperatureReferenceSettingSelected) {
       setEncoderRange (0, gTemperatureReference, 1100, false) ;
     }else{
@@ -112,7 +107,7 @@ void clickInManualMode (bool & outReturnToMainMenu) {
     if (ovenIsRunning ()) {
       stopOven () ;
     }else{
-      startOvenInManualMode (gTemperatureReference, currentDateTime ()) ;
+      startOvenInManualMode (gTemperatureReference) ;
     }
   }else if (gSelectedItemIndex == 2) {
     stopOven () ;
@@ -120,4 +115,4 @@ void clickInManualMode (bool & outReturnToMainMenu) {
   }
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------

@@ -10,34 +10,30 @@
 
 //----------------------------------------------------------------------------------------------------------------------
 
-#include "Defines.h"
+#include <Arduino.h>
 
 //----------------------------------------------------------------------------------------------------------------------
-//   PROGRAM FILE NAMES MANAGMENT
+//   ENTER AUTOMATIC MODE
 //----------------------------------------------------------------------------------------------------------------------
 
- void resetProgramList (void) ;
-
-void buildProgramFileNameArray (void) ;
-
-uint32_t programFileCount (void) ;
-
-String programFileNameAtIndex (const uint32_t inIndex) ;
+void enterAutomaticMode (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
-//   PROGRAM FILE
+//   PRINT AUTOMATIC MODE SCREEN
 //----------------------------------------------------------------------------------------------------------------------
 
-bool readProgramFile (const String & inFileName) ;
+void printAutomaticModeScreen (void) ;
 
-String programName (void) ;
+//----------------------------------------------------------------------------------------------------------------------
+//   HANDLE ROTARY ENCODER
+//----------------------------------------------------------------------------------------------------------------------
 
-uint32_t programDurationInMinutes (void) ;
+void handleRotaryEncoderInAutomaticMode (void) ;
 
-double programTemperatureReferenceForRunningTime (const uint32_t inRunningTimeInSeconds) ;
+//----------------------------------------------------------------------------------------------------------------------
+//   CLICK IN AUTOMATIC MODE
+//----------------------------------------------------------------------------------------------------------------------
 
-void plotGraph (void) ;
-
-void printTable (const char * inTitle) ;
+void clickInAutomaticMode (bool & outReturnToMainMenu) ;
 
 //----------------------------------------------------------------------------------------------------------------------

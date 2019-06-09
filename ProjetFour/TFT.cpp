@@ -6,15 +6,24 @@
 // ----------Static variables in the file----------
 TFT_eSPI tft = TFT_eSPI () ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
+
+void printWithPadding (const char * inString, const uint32_t inSize) {
+  tft.print (inString) ;
+  for (uint32_t i = strlen (inString) ; i < inSize ; i++) {
+    tft.print (" ") ;
+  }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 //   FORWARD DECLARATION
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 static void drawBmp (const char * inFilePath) ;
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 //   INIT
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 // This function initialized the TFT screen and sets the rotation in landscape, and draws the logo of Centrale Nantes.
 
 void initScreen(void) {
@@ -35,9 +44,9 @@ void initScreen(void) {
   tft.setCursor (0, 0);
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 //   DRAW SPLASH SCREEN
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 static void drawBmp (const char * inFilePath) {
 //--- Open requested file on SD card
@@ -127,12 +136,12 @@ void clearScreen(void) {
  * to write text in the given text size.
  * The default text size is 2.
  */
-void setLineForTextSize (uint8_t lign, uint8_t textSize) {
-    tft.setCursor (1, lign*8*textSize + 1);
-}
-
-void fixerCurseurDemieLignesPourTaille (const uint8_t inNombreDemieLignes, const uint8_t inTextSize) {
-  tft.setCursor (1, inNombreDemieLignes * 4 * inTextSize + 1);
+void setLineForTextSize (const uint8_t inLine, const uint8_t inTextSize, const bool inAddHalfLine) {
+  uint16_t y = inLine * 8 ;
+  if (inAddHalfLine) {
+    y += 4 ;
+  }
+  tft.setCursor (1, y * inTextSize + 1);
 }
 
 /*====================================================================================*
@@ -147,7 +156,7 @@ void setColumnForTextSize (uint8_t column, uint8_t textSize) {
 }
 
 void setMenuColor (const bool inIsSelected, const bool inIsEditing) {
-  if (inIsEditing) {
+  if (inIsEditing && inIsSelected) {
     tft.setTextColor (TFT_BLACK, TFT_YELLOW) ;
   }else if (inIsSelected) {
     tft.setTextColor (TFT_BLACK, TFT_CYAN) ;
@@ -176,7 +185,7 @@ void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, ui
   tft.printf ("%02u:%02u:%02u", hour, minute, second);
 //---- Printing SDCard
   setLineForTextSize (nbLign - 2, 2) ;
-  setColumnForTextSize (nbColumn - 6) ;
+  setColumnForTextSize (nbColumn - 6, 2) ;
   switch (sdCardStatus ()) {
   case SDCardStatus::mounted :
     tft.setTextColor (TFT_GREEN, TFT_BLACK) ;
@@ -194,7 +203,7 @@ void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, ui
 // ----------Printing the temperature----------
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   setLineForTextSize (nbLign - 1, 2) ;
-  setColumnForTextSize (nbColumn - 6) ;
+  setColumnForTextSize (nbColumn - 6, 2) ;
   const uint32_t codeErreur = temperatureSensorErrorFlags () ;
   if (codeErreur == 0) { // Ok
     tft.printf ("%4ld" DEGREE_CHAR "C", lround (getSensorTemperature ())) ;
@@ -241,14 +250,14 @@ void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, ui
     if (isRunning) {
         setLineForTextSize (nbLign*2 - 5, 1); setColumnForTextSize (nbColumn*2 - 12, 1); tft.setTextSize(1);
         tft.print("    restant:");
-        setLineForTextSize (nbLign - 2, 2); setColumnForTextSize (nbColumn - 8); tft.setTextSize(2);
+        setLineForTextSize (nbLign - 2, 2); setColumnForTextSize (nbColumn - 8, 2); tft.setTextSize(2);
         tft.printf("%3uh%02umn", timeLeft/60, timeLeft%60);
     }
     // ----------Printing delay left if a program is delayed----------
     else if (isDelayed) {
         setLineForTextSize (nbLign*2 - 5, 1); setColumnForTextSize (nbColumn*2 - 12, 1); tft.setTextSize(1);
         tft.printf("avant d%cbut:", 130); // (char)130 -> é
-        setLineForTextSize (nbLign - 2, 2); setColumnForTextSize (nbColumn - 8); tft.setTextSize(2);
+        setLineForTextSize (nbLign - 2, 2); setColumnForTextSize (nbColumn - 8, 2); tft.setTextSize(2);
         tft.printf("%3uh%02umn", timeBeforeStart/60, timeBeforeStart%60);
     }
 }
@@ -260,7 +269,7 @@ void printPermanent (uint16_t year, uint8_t month, uint8_t day, uint8_t hour, ui
  * information.
  */
 void clearPrintPermanent (void) {
-  setLineForTextSize (nbLign - 2, 2) ; setColumnForTextSize (nbColumn - 8) ; tft.setTextSize(2) ;
+  setLineForTextSize (nbLign - 2, 2) ; setColumnForTextSize (nbColumn - 8, 2) ; tft.setTextSize(2) ;
   tft.fillRect (tft.getCursorX()-1, tft.getCursorY()-1, 8*2*6, 1*2*8, TFT_BLACK) ;
   setLineForTextSize (nbLign*2 - 5, 1); setColumnForTextSize (nbColumn*2 - 12, 1) ;
   tft.fillRect (tft.getCursorX()-1, tft.getCursorY()-1, 12*1*6, 1*1*8, TFT_BLACK) ;
@@ -278,7 +287,7 @@ void clearPrintPermanent (void) {
  */
 void printMainMenu (uint16_t encoderPos, bool isRunning, bool isDelayed) {
 // ----------Start or Stop or Change Delay----------
-  fixerCurseurDemieLignesPourTaille (0, 3) ;
+  setLineForTextSize (0, 3) ;
   tft.setTextSize (3) ;
   setMenuColor (encoderPos == 0, false) ;
   if (isRunning) {
@@ -290,19 +299,19 @@ void printMainMenu (uint16_t encoderPos, bool isRunning, bool isDelayed) {
   }
 
 // ----------Show Information----------
-  fixerCurseurDemieLignesPourTaille (3, 3) ;
+  setLineForTextSize (1, 3, true) ;
   setMenuColor (encoderPos == 1, false) ;
   tft.print(" Afficher Infos ");
 // ----------Set Time----------
-  fixerCurseurDemieLignesPourTaille (6, 3) ;
+  setLineForTextSize (3, 3) ;
   setMenuColor (encoderPos == 2, false) ;
   tft.print (" R" LOWERCASE_E_ACUTE "gler Heure ");
 // ----------Manage Curves----------
-  fixerCurseurDemieLignesPourTaille (9, 3);
+  setLineForTextSize (4, 3, true);
   setMenuColor (encoderPos == 3, false) ;
   tft.print (" G" LOWERCASE_E_ACUTE "rer Programmes");
 //---------- Mode Manuel
-  fixerCurseurDemieLignesPourTaille (12, 3);
+  setLineForTextSize (6, 3);
   setMenuColor (encoderPos == 4, false) ;
   tft.print (" Mode manuel") ;
  //---
@@ -334,7 +343,7 @@ void printSelectCurveMenu (uint16_t encoderPos, uint8_t nbCurves, String inFileN
   tft.print("Retour");
 // ----------Select the curve----------
   for (uint8_t numeroOfCurve = 0; numeroOfCurve < min(6, nbCurves-6*numPage); numeroOfCurve ++) {
-    setLineForTextSize (3*numeroOfCurve+3, 1); setColumnForTextSize (2) ; tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    setLineForTextSize (3*numeroOfCurve+3, 1); setColumnForTextSize (2, 2) ; tft.setTextColor(TFT_WHITE, TFT_BLACK);
     String displayName = inFileNameArray[numeroOfCurve + 6*numPage];
     if (encoderPos == numeroOfCurve) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
       tft.print(' ' + displayName + ' ');
@@ -342,11 +351,11 @@ void printSelectCurveMenu (uint16_t encoderPos, uint8_t nbCurves, String inFileN
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
 // ----------Next page----------
   if (nbCurves - 6*numPage > 6) {
-    setLineForTextSize (21, 1); setColumnForTextSize (18);
+    setLineForTextSize (21, 1); setColumnForTextSize (18, 2);
     if (encoderPos == 6) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.print(" Suivant");
   }else if (numPage > 0) { // ----------First page----------
-    setLineForTextSize (21, 1); setColumnForTextSize (12);
+    setLineForTextSize (21, 1); setColumnForTextSize (12, 2);
     if (encoderPos == nbCurves - 6*numPage) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.printf(" Premi%cre page", 138); // (char)138 -> è
   }
@@ -419,7 +428,7 @@ void printShowValuesMenu(uint16_t encoderPos) {
     tft.print("Retour");
 
     // ----------Next----------
-    setLineForTextSize (0, 2); setColumnForTextSize (7); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    setLineForTextSize (0, 2); setColumnForTextSize (7, 2); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.print(" Suivant ");
     tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -483,7 +492,7 @@ void printPlotGraphMenu(uint16_t encoderPos) {
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
     // ----------Validate----------
-    setLineForTextSize (0, 2); setColumnForTextSize (7); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    setLineForTextSize (0, 2); setColumnForTextSize (7, 2); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     if (encoderPos == 0) tft.setTextColor(TFT_BLACK, TFT_YELLOW);
     tft.print(" Valider ");
     tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -538,21 +547,21 @@ void printStartOrDelayMenu(uint16_t encoderPos, uint16_t tmax, uint8_t hour, uin
         endJ += 1;
         endH -= 24;
     }
-    setLineForTextSize (19, 1); setColumnForTextSize (0); tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    setLineForTextSize (19, 1); setColumnForTextSize (0, 2); tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.print("Heure de fin:");
-    setLineForTextSize (18, 1); setColumnForTextSize (14);
+    setLineForTextSize (18, 1); setColumnForTextSize (14, 2);
     if (endJ == 1) {
         tft.print("demain      ");
-        setLineForTextSize (20, 1); setColumnForTextSize (14);
+        setLineForTextSize (20, 1); setColumnForTextSize (14, 2);
     }
     else if (endJ >= 2) {
         tft.printf("dans %1u jours", endJ);
-        setLineForTextSize (20, 1); setColumnForTextSize (14);
+        setLineForTextSize (20, 1); setColumnForTextSize (14, 2);
     }
     else { // endJ == 0
         tft.setTextSize(1); tft.print("                        ");
-        setLineForTextSize (21, 1); setColumnForTextSize (14); tft.setTextSize(1); tft.print("                  ");
-        setLineForTextSize (19, 1); setColumnForTextSize (14); tft.setTextSize(2);
+        setLineForTextSize (21, 1); setColumnForTextSize (14, 2); tft.setTextSize(1); tft.print("                  ");
+        setLineForTextSize (19, 1); setColumnForTextSize (14, 2); tft.setTextSize(2);
     }
     tft.printf("%c %02uh%02umn", 133, endH, endM); // (char)133 -> à
 }
@@ -597,21 +606,21 @@ void printDelayMenu(uint16_t launchDelay, uint16_t tmax, uint8_t hour, uint8_t m
         endJ += 1;
         endH -= 24;
     }
-    setLineForTextSize (19, 1); setColumnForTextSize (0); tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    setLineForTextSize (19, 1); setColumnForTextSize (0, 2); tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.print("Heure de fin:");
-    setLineForTextSize (18, 1); setColumnForTextSize (14);
+    setLineForTextSize (18, 1); setColumnForTextSize (14, 2);
     if (endJ == 1) {
         tft.print("demain      ");
-        setLineForTextSize (20, 1); setColumnForTextSize (14);
+        setLineForTextSize (20, 1); setColumnForTextSize (14, 2);
     }
     else if (endJ >= 2) {
         tft.printf("dans %1u jours", endJ);
-        setLineForTextSize (20, 1); setColumnForTextSize (14);
+        setLineForTextSize (20, 1); setColumnForTextSize (14, 2);
     }
     else { // endJ == 0
         tft.setTextSize(1); tft.print("                        ");
-        setLineForTextSize (21, 1); setColumnForTextSize (14); tft.setTextSize(1); tft.print("                  ");
-        setLineForTextSize (19, 1); setColumnForTextSize (14); tft.setTextSize(2);
+        setLineForTextSize (21, 1); setColumnForTextSize (14, 2); tft.setTextSize(1); tft.print("                  ");
+        setLineForTextSize (19, 1); setColumnForTextSize (14, 2); tft.setTextSize(2);
     }
     tft.printf("%c %02uh%02umn", 133, endH, endM); // (char)133 -> à
 }
@@ -668,21 +677,21 @@ void printChangeDelayMenu(uint16_t launchDelay, uint16_t tmax, uint8_t hour, uin
         endJ += 1;
         endH -= 24;
     }
-    setLineForTextSize (16, 1); setColumnForTextSize (0); tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    setLineForTextSize (16, 1); setColumnForTextSize (0, 2); tft.setTextSize(2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.print("Heure de fin:");
-    setLineForTextSize (15, 1); setColumnForTextSize (14);
+    setLineForTextSize (15, 1); setColumnForTextSize (14, 2);
     if (endJ == 1) {
         tft.print("demain      ");
-        setLineForTextSize (17, 1); setColumnForTextSize (14);
+        setLineForTextSize (17, 1); setColumnForTextSize (14, 2);
     }
     else if (endJ >= 2) {
         tft.printf("dans %1u jours", endJ);
-        setLineForTextSize (17, 1); setColumnForTextSize (14);
+        setLineForTextSize (17, 1); setColumnForTextSize (14, 2);
     }
     else { // endJ == 0
         tft.setTextSize(1); tft.print("                        ");
-        setLineForTextSize (18, 1); setColumnForTextSize (14); tft.setTextSize(1); tft.print("                  ");
-        setLineForTextSize (16, 1); setColumnForTextSize (14); tft.setTextSize(2);
+        setLineForTextSize (18, 1); setColumnForTextSize (14, 2); tft.setTextSize(1); tft.print("                  ");
+        setLineForTextSize (16, 1); setColumnForTextSize (14, 2); tft.setTextSize(2);
     }
     tft.printf("%c %02uh%02umn", 133, endH, endM); // (char)133 -> à
 }
@@ -716,33 +725,33 @@ void printInfoMenu (double command, bool isRunning, uint16_t timeLeft, bool incr
   tft.setTextColor(TFT_BLACK, TFT_YELLOW);
   tft.print("Retour");
 // ----------Temperature----------
-  setLineForTextSize (3, 2) ; setColumnForTextSize (1) ;
+  setLineForTextSize (3, 2) ; setColumnForTextSize (1, 2) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK);
   tft.printf ("Temp%crature : %7.2f%cC", 130, getSensorTemperature (), 247); // (char)130 -> é, (char)247 -> °
 //--- Nombre de mesures incorrectes
-  setLineForTextSize (4, 2) ; setColumnForTextSize (1) ;
+  setLineForTextSize (4, 2) ; setColumnForTextSize (1, 2) ;
   afficherCompteurErreurs ("Mesures invalides : ", getFaultlySampleCount ()) ;
 //--- Nombre de mesures rejetées
-  setLineForTextSize (5, 2) ; setColumnForTextSize (1) ;
+  setLineForTextSize (5, 2) ; setColumnForTextSize (1, 2) ;
   afficherCompteurErreurs ("Mesures rejet" "\x82" "es : ", getRejectedInconsistentSampleCount ()) ;
 //--- Nombre de moyennes invalides
-  setLineForTextSize (6, 2) ; setColumnForTextSize (1) ;
+  setLineForTextSize (6, 2) ; setColumnForTextSize (1, 2) ;
   afficherCompteurErreurs ("Moyennes invalides : ", obtenirNombreMesuresMoyennesInvalides ()) ;
 //----- Afficher la RAM libre
   setLineForTextSize (7, 2) ;
-  setColumnForTextSize (1) ;
+  setColumnForTextSize (1, 2) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK);    
   tft.printf ("RAM libre %6u octets", minFreeHeap ()) ;
 //--- Affichage quand un programme est en cours
   if (isRunning) {
   // ----------Time left----------
-    setLineForTextSize (5, 2); setColumnForTextSize (1);
+    setLineForTextSize (5, 2); setColumnForTextSize (1, 2);
     tft.printf("Temps restant : %3uh%02umn", timeLeft/60, timeLeft%60);
   // ----------Command----------
-    setLineForTextSize (7, 2); setColumnForTextSize (1);
+    setLineForTextSize (7, 2); setColumnForTextSize (1, 2);
     tft.printf("Consigne : %6.2f%cC", command, 247); // (char)247 -> °
   // ----------Relay ON/OFF----------
-    setLineForTextSize (9, 2); setColumnForTextSize (1);
+    setLineForTextSize (9, 2); setColumnForTextSize (1, 2);
     tft.print("Relais : ");
     if (increaseTemp) {
       tft.setTextColor(TFT_GREEN, TFT_BLACK); tft.print("ON ");
@@ -910,8 +919,8 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
         // ----------Print the chars----------
         for (uint8_t i = 0; i < 26; i ++) {
             setLineForTextSize (4 + 2*(uint8_t)(i/7), 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
-            if (i<21) setColumnForTextSize (2 + 2*(i%7));
-            else setColumnForTextSize (4 + 2*(i%7));
+            if (i<21) setColumnForTextSize (2 + 2*(i%7), 2);
+            else setColumnForTextSize (4 + 2*(i%7), 2);
             if (displayName.length() == maxlength) {
                 tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
             } else if (encoderPos == i) {
@@ -926,7 +935,7 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
         // ----------Print the next menu of chars----------
         if (MAJminOth == 0) { // MAJ
             // The next menu of chars is min
-            setLineForTextSize (5, 2); setColumnForTextSize (19); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+            setLineForTextSize (5, 2); setColumnForTextSize (19, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
             if (displayName.length() == maxlength) {
                 tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
             } else if (encoderPos == 26) {
@@ -935,7 +944,7 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
             tft.print("min");
         } else { // min
             // The next menu of chars is Others
-            setLineForTextSize (5, 2); setColumnForTextSize (19); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+            setLineForTextSize (5, 2); setColumnForTextSize (19, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
             if (displayName.length() == maxlength) {
                 tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
             } else if (encoderPos == 26) {
@@ -944,7 +953,7 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
             tft.print("Others");
         }
         // ----------Print the delete button----------
-        setLineForTextSize (7, 2); setColumnForTextSize (19); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        setLineForTextSize (7, 2); setColumnForTextSize (19, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
         if (displayName.length() == 0) {
             tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
         } else if (displayName.length() == maxlength && encoderPos == 2) {
@@ -954,7 +963,7 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
         }
         tft.print("Eff.");
         // ----------Print the validate button----------
-        setLineForTextSize (9, 2); setColumnForTextSize (19); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        setLineForTextSize (9, 2); setColumnForTextSize (19, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
         if (displayName.length() == 0) {
             tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
         } else if (displayName.length() == maxlength && encoderPos == 0) {
@@ -964,7 +973,7 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
         }
         tft.print("OK");
         // ----------Print the cancel button----------
-        setLineForTextSize (11, 2); setColumnForTextSize (19); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        setLineForTextSize (11, 2); setColumnForTextSize (19, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
         if (displayName.length() == 0 && encoderPos == 27) {
             tft.setTextColor(TFT_BLACK, TFT_YELLOW);
         } else if (displayName.length() == maxlength && encoderPos == 1) {
@@ -979,8 +988,8 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
         // ----------Print the chars----------
         for (uint8_t i = 0; i < 11; i ++) {
             setLineForTextSize (5 + 2*(uint8_t)(i/7), 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
-            if (i<7) setColumnForTextSize (2 + 2*(i%7));
-            else setColumnForTextSize (5 + 2*(i%7));
+            if (i<7) setColumnForTextSize (2 + 2*(i%7), 2);
+            else setColumnForTextSize (5 + 2*(i%7), 2);
             if (displayName.length() == maxlength) {
                 tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
             } else if (encoderPos == i) {
@@ -993,7 +1002,7 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
             }
         }
         // ----------Print the next menu of chars: MAJ----------
-        setLineForTextSize (5, 2); setColumnForTextSize (19); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        setLineForTextSize (5, 2); setColumnForTextSize (19, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
         if (displayName.length() == maxlength) {
             tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
         } else if (encoderPos == 11) { // we change from MAJ to min, min to Other, Other to MAJ
@@ -1001,7 +1010,7 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
         }
         tft.print("MAJ");
         // ----------Print the delete button----------
-        setLineForTextSize (7, 2); setColumnForTextSize (19); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        setLineForTextSize (7, 2); setColumnForTextSize (19, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
         if (displayName.length() == 0) {
             tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
         } else if (displayName.length() == maxlength && encoderPos == 2) {
@@ -1011,7 +1020,7 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
         }
         tft.print("Eff.");
         // ----------Print the validate button----------
-        setLineForTextSize (9, 2); setColumnForTextSize (19); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        setLineForTextSize (9, 2); setColumnForTextSize (19, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
         if (displayName.length() == 0) {
             tft.setTextColor(TFT_DARKGREY, TFT_BLACK);
         } else if (displayName.length() == maxlength && encoderPos == 0) {
@@ -1021,7 +1030,7 @@ void printChooseNameMenu(uint16_t encoderPos, String displayName, uint8_t MAJmin
         }
         tft.print("OK");
         // ----------Print the cancel button----------
-        setLineForTextSize (11, 2); setColumnForTextSize (19); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+        setLineForTextSize (11, 2); setColumnForTextSize (19, 2); tft.setTextColor(TFT_WHITE, TFT_BLACK);
         if (displayName.length() == 0 && encoderPos == maxlength) {
             tft.setTextColor(TFT_BLACK, TFT_YELLOW);
         } else if (displayName.length() == maxlength && encoderPos == 1) {
@@ -1233,9 +1242,9 @@ void printNameErrorMenu(String nameOfCurve, uint16_t Mode) {
     tft.print(nameOfCurve);
     setLineForTextSize (10, 1);
     tft.print("est en cours d'utilisation.");
-    setLineForTextSize (16, 1); setColumnForTextSize (2); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
+    setLineForTextSize (16, 1); setColumnForTextSize (2, 2); tft.setTextSize(3); tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.print("Vous ne pouvez");
-    setLineForTextSize (20, 1); setColumnForTextSize (1);
+    setLineForTextSize (20, 1); setColumnForTextSize (1, 2);
     if (Mode == 431) tft.print("pas le remplacer.");
     else             tft.print("pas le supprimer.");
 }
@@ -1261,7 +1270,7 @@ void printEndCycleMenu(void) {
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 }
 
-//——————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+//----------------------------------------------------------------------------------------------------------------------
 
 void printColoredStatus (const uint32_t inValue) {
   if (inValue == 0) {

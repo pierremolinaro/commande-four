@@ -76,7 +76,7 @@ void clickInProgramListMode (bool & outReturnToMainMenu) {
         }
       } break ;
     case DisplayPhase::graph :
-      printTable () ;
+      printTable ("Retour") ;
       gDisplayPhase = DisplayPhase::table ;
       break ;
     case DisplayPhase::table :
