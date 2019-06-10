@@ -23,8 +23,13 @@ void printWithPadding (const char * inString, const uint32_t inSize) {
 static void drawSplashScreen (void) {
   int16_t y = SPLASH_SCREEN_HEIGHT - 1 ;
   const uint16_t x = 0 ;
+  uint16_t buffer [SPLASH_SCREEN_WIDTH] ;
   for (uint16_t row = 0 ; row < SPLASH_SCREEN_HEIGHT ; row++) {
-    tft.pushImage (x, y, SPLASH_SCREEN_WIDTH, 1, & splashScreen [SPLASH_SCREEN_WIDTH * row]);
+    for (uint32_t i= 0 ; i<SPLASH_SCREEN_WIDTH ; i++) {
+      const uint16_t color = colorTable [splashScreen [SPLASH_SCREEN_WIDTH * row + i]] ;
+      buffer [i] = color ;
+    }
+    tft.pushImage (x, y, SPLASH_SCREEN_WIDTH, 1, buffer);
     y -= 1 ;
   }
 }

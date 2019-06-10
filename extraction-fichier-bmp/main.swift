@@ -76,16 +76,39 @@ func read32 (_ inData : Data, _ ioIndex : inout Int) -> UInt32 {
     print ("Valeurs réservées incorrectes")
     exit (1)
   }
-//--- Construire le fichier destination
+//--- Construire le dictionaire des couleurs
+  var colorSet = Set <UInt16> ()
+  idx = Int (seekOffset)
+  for _ in 0 ..< height {
+    for _ in 0 ..< width {
+      let red = UInt16 (read8 (data, &idx))
+      let green = UInt16 (read8 (data, &idx))
+      let blue = UInt16 (read8 (data, &idx))
+      let color = ((red & 0xF8) << 8) | ((green & 0xFC) << 3) | (blue >> 3)
+      colorSet.insert (color)
+    }
+  }
+  print ("\(colorSet.count) couleurs")
+//--- Construire les fichiers destination
   var h = "#include <Arduino.h>\n\n"
+  h += "static const uint8_t COLOR_COUNT = \(colorSet.count) ;\n"
+  h += "extern const uint16_t colorTable [COLOR_COUNT] ;\n\n"
   h += "static const uint16_t SPLASH_SCREEN_WIDTH  = \(width) ;\n"
   h += "static const uint16_t SPLASH_SCREEN_HEIGHT = \(height) ;\n\n"
-  h += "extern const uint16_t splashScreen [SPLASH_SCREEN_WIDTH * SPLASH_SCREEN_HEIGHT] ;\n\n"
+  h += "extern const uint8_t splashScreen [SPLASH_SCREEN_WIDTH * SPLASH_SCREEN_HEIGHT] ;\n\n"
   var cpp = "#include \"SplashScreen.h\"\n\n"
-  cpp += "const uint16_t splashScreen [SPLASH_SCREEN_WIDTH * SPLASH_SCREEN_HEIGHT] = {\n"
+  var colorDictionary = [UInt16 : UInt8] ()
+  var colorIndex : UInt8 = 0
+  cpp += "const uint16_t colorTable [COLOR_COUNT] {\n"
+  for color in Array (colorSet).sorted () {
+    cpp += " 0x\(String (color, radix: 16)), // \(colorIndex)\n"
+    colorDictionary [color] = colorIndex
+    colorIndex += 1 ;
+  }
+  cpp += "} ;\n\n"
+  cpp += "const uint8_t splashScreen [SPLASH_SCREEN_WIDTH * SPLASH_SCREEN_HEIGHT] = {\n"
 //--- Lire l'image
   idx = Int (seekOffset)
-  //let padding = (4 - ((width * 3) & 3)) & 3
   for row in 0 ..< height {
     cpp += "// Ligne \(row)\n"
     var column = 0
@@ -93,8 +116,8 @@ func read32 (_ inData : Data, _ ioIndex : inout Int) -> UInt32 {
       let red = UInt16 (read8 (data, &idx))
       let green = UInt16 (read8 (data, &idx))
       let blue = UInt16 (read8 (data, &idx))
-      let color = ((red & 0xF8) << 8) | ((green & 0xFC) << 3) | (blue >> 3);
-      cpp += " 0x\(String (color, radix: 16)),"
+      let color = ((red & 0xF8) << 8) | ((green & 0xFC) << 3) | (blue >> 3)
+      cpp += " \(colorDictionary [color]!),"
       column += 1
       if column == 16 {
         column = 0
