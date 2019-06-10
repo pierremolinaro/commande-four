@@ -36,26 +36,26 @@ void enterManualMode (void) {
 
 void printManualModeScreen (void) {
   tft.setTextSize (3) ;
-  setLineForTextSize (0, 3) ;
+  setLineColumnForTextSize (0, 1, 3) ;
   setMenuColor (gSelectedItemIndex == 2, false) ;
-  tft.print (" Retour") ;
+  tft.print ("Retour") ;
 
-  setLineForTextSize (2, 3) ;
+  setLineColumnForTextSize (2, 1, 3) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-  tft.print (" Consigne ") ;
+  tft.print ("Consigne ") ;
   setMenuColor (gSelectedItemIndex == 0, gTemperatureReferenceSettingSelected) ;
   tft.printf ("%4d" DEGREE_CHAR "C", gTemperatureReference) ;
 
-  setLineForTextSize (4, 3) ;
+  setLineColumnForTextSize (4, 1, 3) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-  tft.print (" Four ") ;
+  tft.print ("Four ") ;
   setMenuColor (gSelectedItemIndex == 1, false) ;
   tft.print (ovenIsRunning () ? ("Arr" LOWERCASE_E_CIRCUM "ter") : ("D" LOWERCASE_E_ACUTE "marrer")) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
 
   tft.setTextSize (3) ;
-  setLineForTextSize (0, 3) ; setColumnForTextSize (13, 2) ;
+  setLineColumnForTextSize (0, 13, 3) ;
   if (ovenIsRunning ()) {
     const uint32_t runningTime = ovenRunningTime () ;
     const uint32_t seconds = runningTime % 60 ;
@@ -64,18 +64,18 @@ void printManualModeScreen (void) {
     tft.printf ("%02u:%02u:%02u", hours, minutes, seconds) ;
   }
 
-  setLineForTextSize (10, 2) ;
+  setLineColumnForTextSize (10, 1, 2) ;
   tft.setTextSize (2) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-  tft.print (" Indicateurs : ") ;
+  tft.print ("Indicateurs : ") ;
   printColoredStatus (getFaultlySampleCount ()) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print (" ") ;
   printColoredStatus (getRejectedInconsistentSampleCount ()) ;
 
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-  setLineForTextSize (11, 2) ;
-  tft.printf (" RAM : %u octets", minFreeHeap ()) ;
+  setLineColumnForTextSize (11, 1, 2) ;
+  tft.printf ("RAM : %u octets", minFreeHeap ()) ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

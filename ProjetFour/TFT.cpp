@@ -124,18 +124,21 @@ void clearScreen(void) {
 }
 
 /*====================================================================================*
- *                                   setLineForTextSize                               *
+ *                                   setLineColumnForTextSize                         *
  *====================================================================================*
  * This function sets the cursor at the given lign and at the first column in order
  * to write text in the given text size.
  * The default text size is 2.
  */
-void setLineForTextSize (const uint8_t inLine, const uint8_t inTextSize, const bool inAddHalfLine) {
+void setLineColumnForTextSize (const uint8_t inLine,
+                               const uint8_t inColumn,
+                               const uint8_t inTextSize,
+                               const bool inAddHalfLine) {
   uint16_t y = inLine * 8 ;
   if (inAddHalfLine) {
     y += 4 ;
   }
-  tft.setCursor (1, y * inTextSize + 1);
+  tft.setCursor (inColumn * 6 * inTextSize + 1, y * inTextSize + 1);
 }
 
 /*====================================================================================*

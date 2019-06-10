@@ -67,25 +67,25 @@ static void displayMainMenu (void) {
     gMainMenuInitialized = true ;
   }
 
-  setLineForTextSize (0, 3) ;
+  setLineColumnForTextSize (0, 0, 3) ;
   tft.setTextSize (3) ;
   setMenuColor (gMainMenuSelectedIndex == 0, false) ;
   tft.print (" D" LOWERCASE_E_ACUTE "marrer Four ") ;
 
 // ----------Show Information----------
-  setLineForTextSize (1, 3, true) ;
+  setLineColumnForTextSize (1, 0, 3, true) ;
   setMenuColor (gMainMenuSelectedIndex == 1, false) ;
   tft.print (" Afficher Infos ");
 // ----------Set Time----------
-  setLineForTextSize (3, 3) ;
+  setLineColumnForTextSize (3, 0, 3) ;
   setMenuColor (gMainMenuSelectedIndex == 2, false) ;
   tft.print (" R" LOWERCASE_E_ACUTE "gler Heure ");
 // ----------Manage Curves----------
-  setLineForTextSize (4, 3, true);
+  setLineColumnForTextSize (4, 0, 3, true);
   setMenuColor (gMainMenuSelectedIndex == 3, false) ;
   tft.print (" G" LOWERCASE_E_ACUTE "rer Programmes");
 //---------- Mode Manuel
-  setLineForTextSize (6, 3);
+  setLineColumnForTextSize (6, 0, 3);
   setMenuColor (gMainMenuSelectedIndex == 4, false) ;
   tft.print (" Mode manuel") ;
 }
@@ -174,15 +174,14 @@ static void printFooter (void) {
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.setTextSize (2) ;
 // ----------Printing the date----------
-  setLineForTextSize (nbLign - 2, 2);
+  setLineColumnForTextSize (nbLign - 2, 0, 2) ;
   const RtcDateTime now = currentDateTime () ;
   tft.printf ("%02u/%02u/%04u", now.Day (), now.Month (), now.Year ());
 // ----------Printing the time----------
-  setLineForTextSize (nbLign - 1, 2);
+  setLineColumnForTextSize (nbLign - 1, 0, 2);
   tft.printf ("%02u:%02u:%02u", now.Hour (), now.Minute (), now.Second ()) ;
 //---- Printing SDCard
-  setLineForTextSize (nbLign - 2, 2) ;
-  setColumnForTextSize (nbColumn - 6, 2) ;
+  setLineColumnForTextSize (nbLign - 2, nbColumn - 6, 2) ;
   switch (sdCardStatus ()) {
   case SDCardStatus::mounted :
     tft.setTextColor (TFT_GREEN, TFT_BLACK) ;
@@ -199,8 +198,7 @@ static void printFooter (void) {
   }
 // ----------Printing the temperature----------
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
-  setLineForTextSize (nbLign - 1, 2) ;
-  setColumnForTextSize (nbColumn - 6, 2) ;
+  setLineColumnForTextSize (nbLign - 1, nbColumn - 6, 2) ;
   const uint32_t codeErreur = temperatureSensorErrorFlags () ;
   if (codeErreur == 0) { // Ok
     tft.printf ("%4ld" DEGREE_CHAR "C", lround (getSensorTemperature ())) ;
@@ -216,7 +214,7 @@ static void printFooter (void) {
     tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   }
 // ----------Printing ON/OFF/Delayed----------
-  setLineForTextSize (nbLign - 2, 2); setColumnForTextSize (nbColumn - 2, 1) ;
+  setLineColumnForTextSize (nbLign - 2, 1, 2); setColumnForTextSize (nbColumn - 2, 1) ;
   tft.setTextSize (4) ;
   if (ovenIsRunning ()) {
     tft.setTextColor (TFT_GREEN, TFT_BLACK);

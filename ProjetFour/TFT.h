@@ -53,13 +53,16 @@ uint32_t read32(fs::File &f);
 void clearScreen(void);
 
 /*====================================================================================*
- *                                   setLineForTextSize                                          *
+ *                                   setLineColumnForTextSize                         *
  *====================================================================================*
  * This function sets the cursor at the given lign and at the first column in order
  * to write text in the given text size.
  * The default text size is 2.
  */
-void setLineForTextSize (const uint8_t inLine, const uint8_t inTextSize, const bool inAddHalfLine = false) ;
+void setLineColumnForTextSize (const uint8_t inLine,
+                               const uint8_t inColumn,
+                               const uint8_t inTextSize,
+                               const bool inAddHalfLine = false) ;
 
 /*====================================================================================*
  *                                  setColumn                                         *

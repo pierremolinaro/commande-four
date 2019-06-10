@@ -31,11 +31,12 @@ void enterTimeSettingMode (void) {
 void printTimeSettingModeScreen (void) {
   const RtcDateTime now = currentDateTime () ;
 // ----------Return----------
-  setLineForTextSize (0, 2); tft.setTextSize(2) ;
+  setLineColumnForTextSize (0, 0, 2); tft.setTextSize(2) ;
   setMenuColor (gSelectedItemIndex == 0, false) ;  
   tft.print ("Retour") ;
 // ----------Date----------
-  setLineForTextSize (2, 3); setColumnForTextSize (1, 3) ; tft.setTextSize(3) ;
+  setLineColumnForTextSize (2, 1, 3) ;
+  tft.setTextSize(3) ;
   setMenuColor (gSelectedItemIndex == 1, gEditingItemIndex == 1) ;  
   tft.printf ("%02u", now.Day ()) ;
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
@@ -47,7 +48,7 @@ void printTimeSettingModeScreen (void) {
   setMenuColor (gSelectedItemIndex == 3, gEditingItemIndex == 3) ;  
   tft.printf ("%04u", now.Year ()) ;
 // ----------Time----------
-  setLineForTextSize (4, 3) ; setColumnForTextSize (1, 3) ;
+  setLineColumnForTextSize (4, 1, 3) ;
   setMenuColor (gSelectedItemIndex == 4, gEditingItemIndex == 4) ;  
   tft.printf ("%02u", now.Hour ()) ;
   tft.setTextColor(TFT_WHITE, TFT_BLACK);

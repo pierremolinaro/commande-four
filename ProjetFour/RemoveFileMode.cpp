@@ -37,20 +37,16 @@ void enterRemoveProgramMode (void) {
 
 static void displayRemoveDialog (void) {
   tft.setTextSize (2) ;
-  setLineForTextSize (1, 3) ;
-  setColumnForTextSize (1, 3) ;
+  setLineColumnForTextSize (1, 1, 3) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   tft.print ("Fichier") ;
-  setLineForTextSize (2, 3) ;
-  setColumnForTextSize (1, 3) ;
+  setLineColumnForTextSize (2, 1, 3) ;
   tft.print (programFileNameAtIndex (gSelectedItemIndex - 1)) ;
 //---
-  setLineForTextSize (4, 3) ;
-  setColumnForTextSize (1, 3) ;
+  setLineColumnForTextSize (4, 1, 3) ;
   setMenuColor (gSelectedDialogItemIndex == 0, false) ;
   tft.print ("Ne pas supprimer") ;
-  setLineForTextSize (6, 3) ;
-  setColumnForTextSize (1, 3) ;
+  setLineColumnForTextSize (6, 1, 3) ;
   setMenuColor (gSelectedDialogItemIndex == 1, false) ;
   tft.print ("Supprimer") ;
 }

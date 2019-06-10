@@ -40,8 +40,7 @@ static String stringWithSpaces (const uint32_t inCount) {
 
 void printProgramList (uint32_t & ioSelectedItemIndex, const char * inTitle) {
   tft.setTextSize (3) ;
-  setLineForTextSize (0, 3) ;
-  setColumnForTextSize (1, 3) ;
+  setLineColumnForTextSize (0, 1, 3) ;
   setMenuColor (ioSelectedItemIndex == 0, false) ;
   tft.print ("Retour") ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
@@ -54,11 +53,11 @@ void printProgramList (uint32_t & ioSelectedItemIndex, const char * inTitle) {
     tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
     const String pad = stringWithSpaces (FILE_BASE_NAME_MAX_LENGTH) ;
     for (uint32_t i = 0 ; i < (NAMES_IN_PAGES + 2) ; i++) {
-      setLineForTextSize (2 + i, 2) ; setColumnForTextSize (1, 2) ;
+      setLineColumnForTextSize (2 + i, 1, 2) ;
       tft.print (pad) ;
     }
   }else if (sdCardIsMounted && !gSDCardIsMounted) {
-    setLineForTextSize (2, 3) ; setColumnForTextSize (1, 3) ;
+    setLineColumnForTextSize (2, 1, 3) ;
     tft.setTextSize (3) ;
     tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
     tft.print (stringWithSpaces (strlen (INSERT_SD_CARD_MESSAGE))) ;
@@ -67,7 +66,7 @@ void printProgramList (uint32_t & ioSelectedItemIndex, const char * inTitle) {
   gSDCardIsMounted = sdCardIsMounted ;
   if (gSDCardIsMounted) {
     buildProgramFileNameArray () ;
-    setLineForTextSize (2, 2) ; setColumnForTextSize (2, 2) ;
+    setLineColumnForTextSize (2, 2, 2) ;
     tft.setTextSize (2) ;
     tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
   //--- Update offset
@@ -82,12 +81,12 @@ void printProgramList (uint32_t & ioSelectedItemIndex, const char * inTitle) {
         gDisplayOffset = ioSelectedItemIndex - 1 - NAMES_IN_PAGES / 2 ;
       }
     }
-    setLineForTextSize (2, 2) ; setColumnForTextSize (1, 2) ;
+    setLineColumnForTextSize (2, 1, 2) ;
     tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
     tft.print ((gDisplayOffset == 0) ? "   " : "...") ;
     const uint32_t displayCount = min (programFileCount (), NAMES_IN_PAGES) ;
     for (uint32_t i = 0 ; i < displayCount ; i++) {
-      setLineForTextSize (3 + i, 2) ; setColumnForTextSize (1, 2) ;
+      setLineColumnForTextSize (3 + i, 1, 2) ;
       setMenuColor (ioSelectedItemIndex == (i + gDisplayOffset + 1), false) ;
       const String fileName = programFileNameAtIndex (i + gDisplayOffset) ;
       tft.print (fileName) ;
@@ -99,14 +98,14 @@ void printProgramList (uint32_t & ioSelectedItemIndex, const char * inTitle) {
       }
     }
     const bool displayFooter = (gDisplayOffset + displayCount) < programFileCount () ;
-    setLineForTextSize (3 + NAMES_IN_PAGES, 2) ; setColumnForTextSize (1, 2) ;
+    setLineColumnForTextSize (3 + NAMES_IN_PAGES, 1, 2) ;
     tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
     tft.print (displayFooter ? "..." : "   ") ;
     if (getEncoderMaxValue () != programFileCount ()) {
       setEncoderRange (0, ioSelectedItemIndex, programFileCount (), true) ;
     }
   }else{
-    setLineForTextSize (2, 3) ; setColumnForTextSize (1, 3) ;
+    setLineColumnForTextSize (2, 1, 3) ;
     tft.setTextSize (3) ;
     tft.setTextColor (TFT_RED, TFT_BLACK) ;
     tft.print (INSERT_SD_CARD_MESSAGE) ;

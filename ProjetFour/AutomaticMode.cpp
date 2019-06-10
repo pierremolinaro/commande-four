@@ -43,7 +43,7 @@ void enterAutomaticMode (void) {
 
 static void displayAutomaticStartScreen (void) {
 // ----------Return----------
-  setLineForTextSize (0, 2) ;
+  setLineColumnForTextSize (0, 0, 2) ;
   tft.setTextSize (2) ;
   setMenuColor (gSelectedItemIndexInStartScreenSubMode == 0, false) ;
   tft.print ("Abandon") ;
@@ -51,11 +51,11 @@ static void displayAutomaticStartScreen (void) {
   tft.setTextColor (TFT_WHITE, TFT_BLACK);
   tft.printf (" %s", programName ().c_str ()) ;
 //--- Durée
-  setLineForTextSize (1, 2, true) ; setColumnForTextSize (1, 2) ;
+  setLineColumnForTextSize (1, 1, 2, true) ;
   const uint32_t programDuration = programDurationInMinutes () ;
   tft.printf ("Dur" LOWERCASE_E_ACUTE "e : %u h %u min", programDuration / 60, programDuration % 60) ;
 //--- Démarrage différé
-  setLineForTextSize (3, 2) ; setColumnForTextSize (1, 2) ;
+  setLineColumnForTextSize (3, 1, 2) ;
   tft.print ("Diff" LOWERCASE_E_ACUTE "r" LOWERCASE_E_ACUTE " de ") ;
   setMenuColor (gSelectedItemIndexInStartScreenSubMode == 1, gEditionInStartScreenSubMode) ;
   tft.printf ("%02u", gDelayedStartInMinutes / 60) ;
@@ -67,9 +67,9 @@ static void displayAutomaticStartScreen (void) {
   tft.print (" min") ;
 //--- Démarrage effectif
   const uint32_t start = gDelayedStartInMinutes + currentHour () * 60 + currentMinute () ;
-  setLineForTextSize (4, 2, true) ; setColumnForTextSize (1, 2) ;
+  setLineColumnForTextSize (4, 1, 2, true) ;
   tft.print ("D" LOWERCASE_E_ACUTE "marrage effectif :") ;
-  setLineForTextSize (5, 2, true) ; setColumnForTextSize (3, 2) ;
+  setLineColumnForTextSize (5, 3, 2, true) ;
   uint32_t spaces = 0 ;
   switch (start / 60 / 24) {
   case 0 :
@@ -90,9 +90,9 @@ static void displayAutomaticStartScreen (void) {
   }
 //--- Fin prévue
   const uint32_t endTime = start + programDurationInMinutes () ;
-  setLineForTextSize (7, 2) ; setColumnForTextSize (1, 2) ;
+  setLineColumnForTextSize (7, 1, 2) ;
   tft.print ("Fin pr" LOWERCASE_E_ACUTE "vue :") ;
-  setLineForTextSize (8, 2) ; setColumnForTextSize (3, 2) ;
+  setLineColumnForTextSize (8, 3, 2) ;
   spaces = 0 ;
   switch (endTime / 60 / 24) {
   case 0 :
@@ -112,9 +112,39 @@ static void displayAutomaticStartScreen (void) {
     tft.print (" ") ;
   }
 //--- Démarrer
-  setLineForTextSize (7, 3) ; setColumnForTextSize (5, 3) ; tft.setTextSize (3) ;
+  setLineColumnForTextSize (7, 5, 3) ;
+  tft.setTextSize (3) ;
   setMenuColor (gSelectedItemIndexInStartScreenSubMode == 3, false) ;
   tft.print ("D" LOWERCASE_E_ACUTE "marrer") ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+static void displayAutomaticEndTime (void) { //--- Fin prévue
+  const uint32_t MESSAGE_SIZE = 26 ;
+  char message [MESSAGE_SIZE] ;
+  const uint32_t runningTime = ovenRunningTime () ;
+  const RtcDateTime now = currentDateTime () ;
+  const uint32_t remaining = now.Hour () * 60 + now.Minute () + programDurationInMinutes () - runningTime / 60 ;
+  setLineColumnForTextSize (7, 1, 2, true) ;
+  tft.print ("Fin pr" LOWERCASE_E_ACUTE "vue :") ;
+  setLineColumnForTextSize (8, 3, 2, true) ;
+  uint32_t spaces = 0 ;
+  switch (remaining / 60 / 24) {
+  case 0 :
+    tft.print ("aujourd'hui") ;
+    spaces = 1 ;
+    break ; 
+  case 1 :
+    tft.print ("demain") ;
+    spaces = 6 ;
+    break ;
+  default :
+    tft.printf ("dans %u jours", remaining / 60 / 24) ;
+    break ;
+  }
+  snprintf (message, MESSAGE_SIZE, " " LOWERCASE_A_ACUTE " %02u:%02u", (remaining / 60) % 24, remaining % 60) ;
+  printWithPadding (message, MESSAGE_SIZE) ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -122,16 +152,18 @@ static void displayAutomaticStartScreen (void) {
 //----------------------------------------------------------------------------------------------------------------------
 
 static void displayAutomaticRunningScreen (void) {
+  const uint32_t programDurationInSecondes = programDurationInMinutes () * 60 ;
+  const uint32_t runningTime = ovenRunningTime () ;
 // ----------Return----------
-  setLineForTextSize (0, 2) ;
+  setLineColumnForTextSize (0, 0, 2) ;
   tft.setTextSize (2) ;
   setMenuColor (true, false) ;
-  tft.print ("Arret") ;
+  tft.print ((runningTime >= programDurationInSecondes) ? "Retour" : "Arret") ;
 //--- Programme
   tft.setTextColor (TFT_WHITE, TFT_BLACK);
   tft.printf (" %s", programName ().c_str ()) ;
 //--- Start delay
-  setLineForTextSize (1, 2, true) ; setColumnForTextSize (1, 2) ;
+  setLineColumnForTextSize (1, 1, 2, true) ;
   const uint32_t startDelayInSeconds = delayForStartingInSeconds () ;
   const uint32_t MESSAGE_SIZE = 26 ;
   char message [MESSAGE_SIZE] ;
@@ -144,20 +176,18 @@ static void displayAutomaticRunningScreen (void) {
       snprintf (message, MESSAGE_SIZE, "D" LOWERCASE_E_ACUTE "marrage dans %u h %u min", startDelayInSeconds / 3600, (startDelayInSeconds / 60) % 60) ;
     }
     printWithPadding (message, MESSAGE_SIZE) ;
+  //--- Fin prévue
+    displayAutomaticEndTime () ;
   }else{ // Running
-  //--- Running time
-    const uint32_t runningTime = ovenRunningTime () ;
-    if (runningTime < 60) {
-      snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u s", runningTime) ;
-    }else if (runningTime < 3600) {
-      snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u min %u s", runningTime / 60, runningTime % 60) ;
-    }else{
-      snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u h %u min %u s", runningTime / 3600, (runningTime / 60) % 60, runningTime % 60) ; 
-    }
-    printWithPadding (message, MESSAGE_SIZE) ;
-  //--- Leaving time
-    const uint32_t programDurationInSecondes = programDurationInMinutes () * 60 ;
-    if (programDurationInSecondes > runningTime) {
+    if (runningTime < programDurationInSecondes) { // Running
+      if (runningTime < 60) {
+        snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u s", runningTime) ;
+      }else if (runningTime < 3600) {
+        snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u min %u s", runningTime / 60, runningTime % 60) ;
+      }else{
+        snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u h %u min %u s", runningTime / 3600, (runningTime / 60) % 60, runningTime % 60) ; 
+      }
+      printWithPadding (message, MESSAGE_SIZE) ;
       const uint32_t t = programDurationInSecondes - runningTime ;
       if (t < 60) {
         snprintf (message, MESSAGE_SIZE, "Reste : %u s", t) ;
@@ -166,40 +196,31 @@ static void displayAutomaticRunningScreen (void) {
       }else{
         snprintf (message, MESSAGE_SIZE, "Reste : %u h %u min %u s", t / 3600, (t / 60) % 60, t % 60) ; 
       }
-      setLineForTextSize (3, 2) ; setColumnForTextSize (1, 2) ;
+      setLineColumnForTextSize (3, 1, 2) ;
       printWithPadding (message, MESSAGE_SIZE) ;
-    }
-  //--- Reference
-    setLineForTextSize (4, 2, true) ; setColumnForTextSize (1, 2) ;
-    snprintf (message, MESSAGE_SIZE, "Consigne : %.2f " DEGREE_CHAR "C", temperatureReference ()) ;
-    printWithPadding (message, MESSAGE_SIZE) ;
-  //--- Temperature
-    setLineForTextSize (6, 2) ; setColumnForTextSize (1, 2) ;
-    snprintf (message, MESSAGE_SIZE, "Temp" LOWERCASE_E_ACUTE "rature : %.1f " DEGREE_CHAR "C", getSensorTemperature ()) ;
-    printWithPadding (message, MESSAGE_SIZE) ;
-  //--- Fin prévue
-    const RtcDateTime t = currentDateTime () ;
-    const uint32_t remaining = t.Hour () * 60 + t.Minute () + programDurationInMinutes () - runningTime / 60 ;
-    setLineForTextSize (7, 2, true) ; setColumnForTextSize (1, 2) ;
-    tft.print ("Fin pr" LOWERCASE_E_ACUTE "vue :") ;
-    setLineForTextSize (8, 2, true) ; setColumnForTextSize (3, 2) ;
-    uint32_t spaces = 0 ;
-    switch (remaining / 60 / 24) {
-    case 0 :
-      tft.print ("aujourd'hui") ;
-      spaces = 1 ;
-      break ; 
-    case 1 :
-      tft.print ("demain") ;
-      spaces = 6 ;
-      break ;
-    default :
-      tft.printf ("dans %u jours", remaining / 60 / 24) ;
-      break ;
-    }
-    tft.printf (" " LOWERCASE_A_ACUTE " %02u:%02u", (remaining / 60) % 24, remaining % 60) ;
-    for (uint32_t i=0 ; i<spaces ; i++) {
-      tft.print (" ") ;
+    //--- Reference
+      setLineColumnForTextSize (4, 1, 2, true) ;
+      snprintf (message, MESSAGE_SIZE, "Consigne : %.2f " DEGREE_CHAR "C", temperatureReference ()) ;
+      printWithPadding (message, MESSAGE_SIZE) ;
+    //--- Temperature
+      setLineColumnForTextSize (6, 1, 2) ;
+      snprintf (message, MESSAGE_SIZE, "Temp" LOWERCASE_E_ACUTE "rature : %.1f " DEGREE_CHAR "C", getSensorTemperature ()) ;
+      printWithPadding (message, MESSAGE_SIZE) ;
+    //--- Fin prévue
+      displayAutomaticEndTime () ;
+ //--- Leaving time
+    }else{ // Completed
+      printWithPadding ("Termin" LOWERCASE_E_ACUTE, MESSAGE_SIZE) ;
+      setLineColumnForTextSize (3, 1, 2) ;
+      printWithPadding ("", MESSAGE_SIZE) ;
+      setLineColumnForTextSize (4, 1, 2, true) ;
+      printWithPadding ("", MESSAGE_SIZE) ;
+      setLineColumnForTextSize (6, 1, 2) ;
+      printWithPadding ("", MESSAGE_SIZE) ;
+      setLineColumnForTextSize (7, 1, 2, true) ;
+      printWithPadding ("", MESSAGE_SIZE) ;
+      setLineColumnForTextSize (8, 1, 2, true) ;
+      printWithPadding ("", MESSAGE_SIZE) ;
     }
   }
 }
@@ -263,6 +284,8 @@ void handleRotaryEncoderInAutomaticMode (void) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void clickInAutomaticMode (bool & outReturnToMainMenu) {
+  const uint32_t programDurationInSecondes = programDurationInMinutes () * 60 ;
+  const uint32_t runningTime = ovenRunningTime () ;
   if (gSelectedItemIndex == 0) {
     outReturnToMainMenu = true ;
   }else{
@@ -308,7 +331,11 @@ void clickInAutomaticMode (bool & outReturnToMainMenu) {
       break ;
     case DisplayPhase::running :
       stopOven () ;
-      gDisplayPhase = DisplayPhase::startConfiguration ;       
+      if (runningTime >= programDurationInSecondes) {
+        outReturnToMainMenu = true ;
+      }else{
+        gDisplayPhase = DisplayPhase::startConfiguration ;
+      }     
       break ;
     }
   }

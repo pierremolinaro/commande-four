@@ -306,7 +306,8 @@ bool readProgramFile (const String & inFileName) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void plotGraph (void) {
-  setLineForTextSize (0, 2) ; setColumnForTextSize (0, 2) ; tft.setTextSize (2) ;
+  setLineColumnForTextSize (0, 0, 2) ;
+  tft.setTextSize (2) ;
   setMenuColor (true, false) ;
   tft.print ("Suivant") ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
@@ -351,19 +352,19 @@ static void drawGrid (void) {
   const uint16_t smallLineColor = TFT_NAVY ;
   const uint16_t largeLineColor = TFT_LIGHTGREY ;
 // ----------Write the name of the table lines----------
-  setLineForTextSize ( 5, 1); setColumnForTextSize ( 1, 1); tft.print ("Temps(min)");
-  setLineForTextSize ( 7, 1); setColumnForTextSize ( 1, 1); tft.print ("Temp" LOWERCASE_E_ACUTE "rature(" DEGREE_CHAR "C)") ;
+  setLineColumnForTextSize ( 5, 1, 1) ; tft.print ("Temps(min)");
+  setLineColumnForTextSize ( 7, 1, 1) ; tft.print ("Temp" LOWERCASE_E_ACUTE "rature(" DEGREE_CHAR "C)") ;
 // ----------Draw the small lines----------
-  setLineForTextSize ( 7, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, smallLineColor);
-  setLineForTextSize (11, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, smallLineColor);
-  setLineForTextSize (23, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  1*2*8, smallLineColor);
-  setLineForTextSize ( 9, 1); setColumnForTextSize (11, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1,  5*2*6,  8*2*8, smallLineColor);
-  setLineForTextSize ( 5, 1); setColumnForTextSize (31, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1,  5*2*6, 10*2*8, smallLineColor);
+  setLineColumnForTextSize ( 7, 1, 1) ; tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, smallLineColor);
+  setLineColumnForTextSize (11, 1, 1) ; tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, smallLineColor);
+  setLineColumnForTextSize (23, 1, 1) ; tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  1*2*8, smallLineColor);
+  setLineColumnForTextSize ( 9, 1, 1) ; tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1,  5*2*6,  8*2*8, smallLineColor);
+  setLineColumnForTextSize ( 5, 1, 1) ; tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1,  5*2*6, 10*2*8, smallLineColor);
 // ----------Draw the large lines of the table----------
-  setLineForTextSize ( 5, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, largeLineColor);
-  setLineForTextSize ( 9, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  6*2*8, largeLineColor);
-  setLineForTextSize (17, 1); setColumnForTextSize ( 1, 1); tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, largeLineColor);
-  setLineForTextSize ( 5, 1); setColumnForTextSize (31, 1); tft.drawFastVLine(tft.getCursorX()-1, tft.getCursorY()-1, 2*2*8, largeLineColor);
+  setLineColumnForTextSize ( 5, 1, 1) ; tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, largeLineColor);
+  setLineColumnForTextSize ( 9, 1, 1) ; tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  6*2*8, largeLineColor);
+  setLineColumnForTextSize (17, 1, 1) ; tft.drawRect(tft.getCursorX()-1, tft.getCursorY()-1, 25*2*6,  4*2*8, largeLineColor);
+  setLineColumnForTextSize ( 5, 1, 1) ; tft.drawFastVLine(tft.getCursorX()-1, tft.getCursorY()-1, 2*2*8, largeLineColor);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -371,14 +372,14 @@ static void drawGrid (void) {
 static void setCursorForTable (const uint8_t numTime, const bool TimeOrTemp) { // TimeOrTemp : 0 -> time, 1 -> temp
   const uint8_t lign   = (numTime+3)/5 ;
   const uint8_t column = (numTime+3)%5 ;
-  setLineForTextSize (5+lign*2*2 + TimeOrTemp*2, 1) ;
-  setColumnForTextSize (2+column*5*2, 1) ;
+  setLineColumnForTextSize (5+lign*2*2 + TimeOrTemp*2, 2+column*5*2, 1) ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 void printTable (const char * inTitle) {
-  setLineForTextSize (0, 2) ; setColumnForTextSize (0, 2) ; tft.setTextSize (2) ;
+  setLineColumnForTextSize (0, 0, 2) ;
+  tft.setTextSize (2) ;
   setMenuColor (true, false) ;
   tft.print (inTitle) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
@@ -387,11 +388,7 @@ void printTable (const char * inTitle) {
 //---
   drawGrid () ;
 //--- Print values
-//  TimeTemp arrayTimeTemp[22];
-//  String pathValues = valuesDir + "/valeurs" + nameOfCurve + ".CSV";
-//  uint8_t len = extractValues(arrayTimeTemp, pathValues);
-//  (arrayTimeTemp, len);
-  tft.setTextSize(2);
+  tft.setTextSize (2) ;
   for (uint32_t i = 0 ; i < min (gProgramDescriptor.mPointCount, 26) ; i++) {
     tft.setTextColor (TFT_YELLOW) ; setCursorForTable (i, false) ; tft.printf("%4u", gProgramDescriptor.mPoints[i].mTime) ;
     tft.setTextColor (TFT_PINK) ; setCursorForTable (i, true) ; tft.printf("%4u", gProgramDescriptor.mPoints[i].mTemperatureReference) ;
