@@ -34,17 +34,6 @@ const uint8_t nbColumn = 26; // with a text size of 2
 void initScreen(void);
 
 /*====================================================================================*
- *                               read16 & read32                                      *
- *====================================================================================*
- * These functions read 16- and 32-bit types from the SD card file,
- * they are used for the drawBMP function.
- * BMP data is stored little-endian, Arduino is little-endian too.
- * May need to reverse subscript order if porting elsewhere.
- */
-uint16_t read16(fs::File &f);
-uint32_t read32(fs::File &f);
-
-/*====================================================================================*
  *                                 clearScreen                                        *
  *====================================================================================*
  * This function clears all the screen except the bottom where are printed the

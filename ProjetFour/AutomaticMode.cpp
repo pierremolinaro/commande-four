@@ -129,15 +129,12 @@ static void displayAutomaticEndTime (void) { //--- Fin prévue
   setLineColumnForTextSize (7, 1, 2, true) ;
   tft.print ("Fin pr" LOWERCASE_E_ACUTE "vue :") ;
   setLineColumnForTextSize (8, 3, 2, true) ;
-  uint32_t spaces = 0 ;
   switch (remaining / 60 / 24) {
   case 0 :
     tft.print ("aujourd'hui") ;
-    spaces = 1 ;
     break ; 
   case 1 :
     tft.print ("demain") ;
-    spaces = 6 ;
     break ;
   default :
     tft.printf ("dans %u jours", remaining / 60 / 24) ;
