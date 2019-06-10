@@ -4,6 +4,7 @@
 #include "RealTimeClock.h"
 #include "Defines.h"
 #include "ProgramFiles.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   FORWARD DECLARATIONS
@@ -32,7 +33,7 @@ void runOvenControlOnce (void) {
 //  OVEN CONTROL TASK
 //----------------------------------------------------------------------------------------------------------------------
 
-static void OvenControlTask (void * pData) {
+static void OvenControlTask (void * /* pData */) {
   while (1) {
     xSemaphoreTake (gSemaphore, portMAX_DELAY) ;
     ovenControlTaskExecutesOneStep () ;
@@ -233,7 +234,7 @@ static void ovenControlTaskExecutesOneStep (void) {
       gAutomaticStartDelayInSecondes -= 1 ;
     }else{ // Running
       if (gRunningTime == 0) {
-        configureOnStart () ;    
+        configureOnStart () ;
       }
     //--- Update reference
       gTemperatureReference = programTemperatureReferenceForRunningTime (gRunningTime) ;
@@ -245,7 +246,7 @@ static void ovenControlTaskExecutesOneStep (void) {
       logData (temperature) ;
     //--- Stop or increment running time ?
       if (gRunningTime < (programDurationInMinutes () * 60)) {
-        gRunningTime += 1 ; 
+        gRunningTime += 1 ;
       }else{
         stopOven () ;
       }

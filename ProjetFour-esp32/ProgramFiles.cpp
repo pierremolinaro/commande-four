@@ -6,6 +6,7 @@
 #include "ProgramFiles.h"
 #include "SDCard.h"
 #include "TFT.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   STATIC VARIABLES
@@ -37,7 +38,7 @@ static void filterFilePath (String & ioFilePath, bool & outRetain) {
 //--- Check file extension is ".csv" et ".CSV"
   if (outRetain) {
     const int idx = ioFilePath.indexOf ('.') ;
-    outRetain = (idx > 0) && (idx == (ioFilePath.length () - 4)) ;
+    outRetain = (idx > 0) && (idx == ((int) ioFilePath.length () - 4)) ;
     if (outRetain) {
       const String extension = ioFilePath.substring (idx + 1) ;
       outRetain = extension.equalsIgnoreCase ("csv") ;
@@ -80,7 +81,7 @@ static void sortProgramFileNameArray (const int32_t inFirst, const int32_t inLas
     swap (gFileNameArray [j], gFileNameArray [inFirst]) ;
     sortProgramFileNameArray (inFirst, j-1) ;
     sortProgramFileNameArray (j+1, inLast) ;
-  }  
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -92,10 +93,10 @@ void buildProgramFileNameArray (void) {
   const bool mounted = sdCardStatus () == SDCardStatus::mounted ;
   if (mounted && !gSDCardMounted) {
     build = true ;
-    gSDCardMounted = true ; 
+    gSDCardMounted = true ;
   }else if (gSDCardMounted  && !mounted) {
     gCurrentFileNameCount = 0 ;
-    gSDCardMounted = false ; 
+    gSDCardMounted = false ;
   }else if (gSDCardMounted && mounted && (gCurrentSDCardMountIndex != mountIndex ())) {
     gCurrentSDCardMountIndex = mountIndex () ;
     build = true ;
@@ -118,7 +119,7 @@ void buildProgramFileNameArray (void) {
     }
     file.close () ;
     root.close () ;
-    sortProgramFileNameArray (0, ((int32_t) gCurrentFileNameCount) - 1) ; 
+    sortProgramFileNameArray (0, ((int32_t) gCurrentFileNameCount) - 1) ;
   }
 }
 
@@ -161,7 +162,7 @@ static uint16_t analyzeUnsignedInteger (File & inFile, char & ioCurrentChar, boo
       ioCurrentChar = inFile.read () ;
       if ((ioCurrentChar >= '0') && (ioCurrentChar <= '9')) {
         result *= 10 ;
-        result += ioCurrentChar - '0' ;
+        result += ((uint16_t) ioCurrentChar) - '0' ;
       }else{
         loop = false ;
       }
@@ -271,7 +272,7 @@ bool readProgramFile (const String & inFileName) {
         }
       }
       if (ok) {
-        ok = currentChar == '\n' ;       
+        ok = currentChar == '\n' ;
       }
     //--- Enter point
       if (ok) {
@@ -333,7 +334,7 @@ void plotGraph (void) {
     for (uint8_t i = 1 ; i < gProgramDescriptor.mPointCount ; i++) {
       const uint16_t x1 = tft.getCursorX () + ((double) gProgramDescriptor.mPoints[i].mTime / tmax) * w ;
       const uint16_t y1 = tft.getCursorY () + h - ((double) gProgramDescriptor.mPoints[i].mTemperatureReference / maxTemperature) * h ;
-      tft.drawLine (x0, y0, x1, y1, TFT_YELLOW) ; 
+      tft.drawLine (x0, y0, x1, y1, TFT_YELLOW) ;
       x0 = x1 ; y0 = y1 ;
     }
     tft.setTextColor (TFT_YELLOW, TFT_BLACK) ; tft.setTextSize (1) ;

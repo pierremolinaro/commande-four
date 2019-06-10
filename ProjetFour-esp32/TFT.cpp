@@ -2,6 +2,7 @@
 #include "TemperatureSensor.h"
 #include "MinFreeHeap.h"
 #include "SplashScreen.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -105,13 +106,13 @@ void setMenuColor (const bool inIsSelected, const bool inIsEditing) {
     tft.setTextColor (TFT_BLACK, TFT_CYAN) ;
   }else{
     tft.setTextColor (TFT_GREEN, TFT_BLACK) ;
-  } 
+  }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 void afficherCompteurErreurs (const char * inMessage, const uint32_t inNombreErreurs) {
-  tft.setTextColor (TFT_WHITE, TFT_BLACK);    
+  tft.setTextColor (TFT_WHITE, TFT_BLACK);
   tft.print (inMessage) ;
   if (inNombreErreurs == 0) {
     tft.setTextColor (TFT_GREEN, TFT_BLACK);
@@ -130,13 +131,13 @@ void afficherCompteurErreurs (const char * inMessage, const uint32_t inNombreErr
 void printColoredStatus (const uint32_t inValue) {
   if (inValue == 0) {
     tft.setTextColor (TFT_GREEN, TFT_BLACK) ;
-    tft.print ("0") ;    
+    tft.print ("0") ;
   }else if (inValue < 1000) {
     tft.setTextColor (TFT_ORANGE, TFT_BLACK) ;
-    tft.print (inValue) ;    
+    tft.print (inValue) ;
   }else{
     tft.setTextColor (TFT_RED, TFT_BLACK) ;
-    tft.print ("999+") ;    
+    tft.print ("999+") ;
   }
 }
 

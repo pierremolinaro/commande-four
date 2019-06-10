@@ -1,4 +1,5 @@
 #include "SplashScreen.h"
+#include "gcc-diagnostics.h"
 
 const uint16_t colorTable [COLOR_COUNT] {
  0x2d9d, // 0

@@ -7,6 +7,7 @@
 #include "TFT.h"
 #include "SDCard.h"
 #include "RotaryEncoder.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   CONSTANTS

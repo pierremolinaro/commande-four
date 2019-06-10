@@ -1,6 +1,7 @@
 #include "LogData.h"
 #include "Defines.h"
 #include "SDCard.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   STATIC VARIABLE
@@ -68,7 +69,7 @@ void writeLogFile (void) {
         line += "\n" ;
         ok = f.print (line) ;
       }
-      Serial.print ("File appending: ") ; Serial.println (ok ? "yes" : "no") ;          
+      Serial.print ("File appending: ") ; Serial.println (ok ? "yes" : "no") ;
     }
   //--- Close file
     f.close () ;

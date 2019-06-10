@@ -5,6 +5,7 @@
 #include "TemperatureSensor.h"
 #include "OvenControl.h"
 #include "Defines.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //  CONSTANTS

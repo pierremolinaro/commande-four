@@ -1,5 +1,6 @@
 // ----------Include the header----------
 #include "RealTimeClock.h"
+#include "gcc-diagnostics.h"
 
 // ----------Static variables in the file----------
 static RtcDS1307<TwoWire> Rtc(Wire);

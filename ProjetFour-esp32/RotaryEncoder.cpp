@@ -4,6 +4,7 @@
 
 #include "RotaryEncoder.h"
 #include "Backlight.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   STATIC VARIABLES

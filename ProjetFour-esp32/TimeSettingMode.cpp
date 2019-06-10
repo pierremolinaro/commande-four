@@ -6,6 +6,7 @@
 #include "RealTimeClock.h"
 #include "TFT.h"
 #include "RotaryEncoder.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   STATIC VARIABLES
@@ -32,28 +33,28 @@ void printTimeSettingModeScreen (void) {
   const RtcDateTime now = currentDateTime () ;
 // ----------Return----------
   setLineColumnForTextSize (0, 0, 2); tft.setTextSize(2) ;
-  setMenuColor (gSelectedItemIndex == 0, false) ;  
+  setMenuColor (gSelectedItemIndex == 0, false) ;
   tft.print ("Retour") ;
 // ----------Date----------
   setLineColumnForTextSize (2, 1, 3) ;
   tft.setTextSize(3) ;
-  setMenuColor (gSelectedItemIndex == 1, gEditingItemIndex == 1) ;  
+  setMenuColor (gSelectedItemIndex == 1, gEditingItemIndex == 1) ;
   tft.printf ("%02u", now.Day ()) ;
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.print (":") ;
-  setMenuColor (gSelectedItemIndex == 2, gEditingItemIndex == 2) ;  
+  setMenuColor (gSelectedItemIndex == 2, gEditingItemIndex == 2) ;
   tft.printf ("%02u", now.Month ()) ;
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.print (":") ;
-  setMenuColor (gSelectedItemIndex == 3, gEditingItemIndex == 3) ;  
+  setMenuColor (gSelectedItemIndex == 3, gEditingItemIndex == 3) ;
   tft.printf ("%04u", now.Year ()) ;
 // ----------Time----------
   setLineColumnForTextSize (4, 1, 3) ;
-  setMenuColor (gSelectedItemIndex == 4, gEditingItemIndex == 4) ;  
+  setMenuColor (gSelectedItemIndex == 4, gEditingItemIndex == 4) ;
   tft.printf ("%02u", now.Hour ()) ;
   tft.setTextColor(TFT_WHITE, TFT_BLACK);
   tft.print (":") ;
-  setMenuColor (gSelectedItemIndex == 5, gEditingItemIndex == 5) ;  
+  setMenuColor (gSelectedItemIndex == 5, gEditingItemIndex == 5) ;
   tft.printf ("%02u", now.Minute ()) ;
 }
 
@@ -127,7 +128,7 @@ void clickInTimeSettingMode (bool & outReturnToMainMenu) {
     }
   }else{
     setEncoderRange (0, gSelectedItemIndex, 5, true) ;
-    gEditingItemIndex = 0 ; 
+    gEditingItemIndex = 0 ;
   }
 }
 

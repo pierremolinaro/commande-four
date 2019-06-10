@@ -9,6 +9,7 @@
 #include "ManualMode.h"
 #include "TimeSettingMode.h"
 #include "ProgramMode.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   MODE ENUMERATION

@@ -7,6 +7,7 @@
 #include "RemoveFileMode.h"
 #include "RotaryEncoder.h"
 #include "TFT.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //  SUB MODES ENUMERATION

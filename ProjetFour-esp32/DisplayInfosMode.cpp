@@ -2,6 +2,7 @@
 #include "TFT.h"
 #include "TemperatureSensor.h"
 #include "MinFreeHeap.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +27,7 @@ void displayInfos (void) {
   afficherCompteurErreurs ("Moyennes invalides : ", obtenirNombreMesuresMoyennesInvalides ()) ;
 //----- Afficher la RAM libre
   setLineColumnForTextSize (7, 1, 2) ;
-  tft.setTextColor (TFT_WHITE, TFT_BLACK);    
+  tft.setTextColor (TFT_WHITE, TFT_BLACK);
   tft.printf ("RAM libre %6u octets", minFreeHeap ()) ;
 }
 

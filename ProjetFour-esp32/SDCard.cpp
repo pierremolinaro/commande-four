@@ -1,5 +1,6 @@
 #include "SDCard.h"
 #include "Backlight.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   INIT
@@ -82,7 +83,7 @@ bool directoryExists (const String & inPath) {
     result = f.isDirectory () ;
   }
   f.close () ;
-  return result ;  
+  return result ;
 }
 
 //--------------------------------------------------------------------------------------------------------

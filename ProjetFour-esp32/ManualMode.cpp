@@ -5,6 +5,7 @@
 #include "MinFreeHeap.h"
 #include "OvenControl.h"
 #include "RealTimeClock.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   STATIC VARIABLES

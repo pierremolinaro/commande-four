@@ -8,6 +8,7 @@
 #include "RealTimeClock.h"
 #include "OvenControl.h"
 #include "TemperatureSensor.h"
+#include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //   STATIC VARIABLES
@@ -75,7 +76,7 @@ static void displayAutomaticStartScreen (void) {
   case 0 :
     tft.print ("aujourd'hui") ;
     spaces = 1 ;
-    break ; 
+    break ;
   case 1 :
     tft.print ("demain") ;
     spaces = 6 ;
@@ -98,7 +99,7 @@ static void displayAutomaticStartScreen (void) {
   case 0 :
     tft.print ("aujourd'hui") ;
     spaces = 1 ;
-    break ; 
+    break ;
   case 1 :
     tft.print ("demain") ;
     spaces = 6 ;
@@ -132,7 +133,7 @@ static void displayAutomaticEndTime (void) { //--- Fin prévue
   switch (remaining / 60 / 24) {
   case 0 :
     tft.print ("aujourd'hui") ;
-    break ; 
+    break ;
   case 1 :
     tft.print ("demain") ;
     break ;
@@ -182,7 +183,7 @@ static void displayAutomaticRunningScreen (void) {
       }else if (runningTime < 3600) {
         snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u min %u s", runningTime / 60, runningTime % 60) ;
       }else{
-        snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u h %u min %u s", runningTime / 3600, (runningTime / 60) % 60, runningTime % 60) ; 
+        snprintf (message, MESSAGE_SIZE, "Dur" LOWERCASE_E_ACUTE "e : %u h %u min %u s", runningTime / 3600, (runningTime / 60) % 60, runningTime % 60) ;
       }
       printWithPadding (message, MESSAGE_SIZE) ;
       const uint32_t t = programDurationInSecondes - runningTime ;
@@ -191,7 +192,7 @@ static void displayAutomaticRunningScreen (void) {
       }else if (t < 3600) {
         snprintf (message, MESSAGE_SIZE, "Reste : %u min %u s", t / 60, t % 60) ;
       }else{
-        snprintf (message, MESSAGE_SIZE, "Reste : %u h %u min %u s", t / 3600, (t / 60) % 60, t % 60) ; 
+        snprintf (message, MESSAGE_SIZE, "Reste : %u h %u min %u s", t / 3600, (t / 60) % 60, t % 60) ;
       }
       setLineColumnForTextSize (3, 1, 2) ;
       printWithPadding (message, MESSAGE_SIZE) ;
@@ -319,7 +320,7 @@ void clickInAutomaticMode (bool & outReturnToMainMenu) {
         break ;
       case 3 : // Start
         startOvenInAutomaticMode (gDelayedStartInMinutes) ;
-        gDisplayPhase = DisplayPhase::running ;       
+        gDisplayPhase = DisplayPhase::running ;
         break ;
       default :
         outReturnToMainMenu = true ;
@@ -332,7 +333,7 @@ void clickInAutomaticMode (bool & outReturnToMainMenu) {
         outReturnToMainMenu = true ;
       }else{
         gDisplayPhase = DisplayPhase::startConfiguration ;
-      }     
+      }
       break ;
     }
   }
