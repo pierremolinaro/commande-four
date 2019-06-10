@@ -50,23 +50,6 @@ const uint8_t MAX31855_CLK = 16 ;
 const uint8_t SDCARD_CS = 26 ;
 const uint8_t SDCARD_CD = 33 ;
 
-// Reading on the SD card declaration
-//const String curvesDir = "/Courbes";
-const String valuesDir = "/ValeursCourbes";
-
-// The maximal length of the curve name
-const uint8_t maxlength = 18;
-
-// The maximal number of different curves
-const uint8_t maxnbCurves = 18;
-
-// ----------Structures declaration----------
-// Define a structure to stock values of temperature corresponding to a instant of time
-struct TimeTemp {
-    uint16_t Time;
-    float    Temp;
-};
-
 //----------------------------------------------------------------------------------------------------------------------
 //  SD CARD
 //----------------------------------------------------------------------------------------------------------------------
