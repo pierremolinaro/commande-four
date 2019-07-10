@@ -4,52 +4,64 @@
 //  Check board type
 //----------------------------------------------------------------------------------------------------------------------
 
-#ifndef ARDUINO_MH_ET_LIVE_ESP32MINIKIT
-  #error "Select 'MH ET LIVE ESP32MiniKit' board"
-#endif
+#include "check-board.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 
 #include <Arduino.h>
-#include "Defines.h"
 
 //----------------------------------------------------------------------------------------------------------------------
-//   INIT
+//  INIT
 //----------------------------------------------------------------------------------------------------------------------
 
-void initEncoder (void);
+void initTemperatureSensor (void) ;
+
+// ----------Functions declaration----------
+/*====================================================================================*
+ *                                  updateTemp                                        *
+ *====================================================================================*
+ * This function stocks the data read by the thermocouple in a static variable seqBin.
+ */
+void updateTemp(void);
 
 //----------------------------------------------------------------------------------------------------------------------
-//   ENCODER CLICK PRESSED
+//  erreurCapteurTemperature (renvoie 0 si tout est ok)
+// Seuls les trois bits de poids faible sont utilisés :
+//      D2 : 0 --> ok, 1 --> SCV Fault : « the thermocouple is short-circuited to VCC »
+//      D1 : 0 --> ok, 1 --> SCG Fault : « the thermocouple is short-circuited to GND »
+//      D0 : 0 --> ok, 1 -->  OC Fault : « the thermocouple is open (no connections) »
 //----------------------------------------------------------------------------------------------------------------------
 
-bool encoderClickPressed (void) ;
+const uint32_t TEMPERATURE_SENSOR_ERROR_NO_CONNECTION          = 0x01 ;
+const uint32_t TEMPERATURE_SENSOR_ERROR_SHORT_CIRCUITED_TO_GND = 0x02 ;
+const uint32_t TEMPERATURE_SENSOR_ERROR_SHORT_CIRCUITED_TO_VCC = 0x04 ;
+
+uint32_t temperatureSensorErrorFlags (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
-//   SET ENCODER RANGE
+// Obtenir le nombre de mesures brutes incorrectes
 //----------------------------------------------------------------------------------------------------------------------
 
-void setEncoderRange (const uint32_t inMinValue,
-                      const uint32_t inCurrentValue,
-                      const uint32_t inMaxValue,
-                      const bool inRollover) ;
+uint32_t getFaultlySampleCount (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
-//   ENCODER VALUE DID CHANGE
+// Obtenir le nombre de mesures brutes incohérentes rejetées
 //----------------------------------------------------------------------------------------------------------------------
 
-bool encoderValueDidChange (void) ;
+uint32_t getRejectedInconsistentSampleCount (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
-//   GET ENCODER VALUE
+// Obtenir le nombre de mesures moyennes invalides
 //----------------------------------------------------------------------------------------------------------------------
 
-uint32_t getEncoderValue (void) ;
+uint32_t obtenirNombreMesuresMoyennesInvalides (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
-//   GET ENCODER MAX VALUE
+// GET SENSOR TEMPERATURE (Celcius)
 //----------------------------------------------------------------------------------------------------------------------
 
-uint32_t getEncoderMaxValue (void) ;
+double getSensorTemperature (void) ;
 
 //----------------------------------------------------------------------------------------------------------------------
+
+void runTemperatureSensorFromISR (void) ;

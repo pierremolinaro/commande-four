@@ -42,17 +42,17 @@ void printManualModeScreen (void) {
   tft.print ("Retour") ;
 
   setLineColumnForTextSize (2, 1, 3) ;
-  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.setTextColor (ILI9341_WHITE, ILI9341_BLACK) ;
   tft.print ("Consigne ") ;
   setMenuColor (gSelectedItemIndex == 0, gTemperatureReferenceSettingSelected) ;
   tft.printf ("%4d" DEGREE_CHAR "C", gTemperatureReference) ;
 
   setLineColumnForTextSize (4, 1, 3) ;
-  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.setTextColor (ILI9341_WHITE, ILI9341_BLACK) ;
   tft.print ("Four ") ;
   setMenuColor (gSelectedItemIndex == 1, false) ;
   tft.print (ovenIsRunning () ? ("Arr" LOWERCASE_E_CIRCUM "ter") : ("D" LOWERCASE_E_ACUTE "marrer")) ;
-  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.setTextColor (ILI9341_WHITE, ILI9341_BLACK) ;
   tft.print (" ") ;
 
   if (ovenIsRunning ()) {
@@ -67,14 +67,14 @@ void printManualModeScreen (void) {
 
   setLineColumnForTextSize (10, 1, 2) ;
   tft.setTextSize (2) ;
-  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.setTextColor (ILI9341_WHITE, ILI9341_BLACK) ;
   tft.print ("Indicateurs : ") ;
   printColoredStatus (getFaultlySampleCount ()) ;
-  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.setTextColor (ILI9341_WHITE, ILI9341_BLACK) ;
   tft.print (" ") ;
   printColoredStatus (getRejectedInconsistentSampleCount ()) ;
 
-  tft.setTextColor (TFT_WHITE, TFT_BLACK) ;
+  tft.setTextColor (ILI9341_WHITE, ILI9341_BLACK) ;
   setLineColumnForTextSize (11, 1, 2) ;
   tft.printf ("RAM : %u octets", minFreeHeap ()) ;
 }

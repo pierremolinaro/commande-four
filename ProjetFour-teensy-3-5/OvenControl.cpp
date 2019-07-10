@@ -7,47 +7,12 @@
 #include "gcc-diagnostics.h"
 
 //----------------------------------------------------------------------------------------------------------------------
-//   FORWARD DECLARATIONS
-//----------------------------------------------------------------------------------------------------------------------
-
-static void ovenControlTaskExecutesOneStep (void) ;
-
-//----------------------------------------------------------------------------------------------------------------------
-//   SEMAPHORE
-//----------------------------------------------------------------------------------------------------------------------
-
-static SemaphoreHandle_t gSemaphore (xSemaphoreCreateCounting (10, 0)) ;
-
-//----------------------------------------------------------------------------------------------------------------------
-//   RUN OVEN CONTROL
-//----------------------------------------------------------------------------------------------------------------------
-
-void runOvenControlOnce (void) {
-  BaseType_t xHigherPriorityTaskWoken = pdFALSE ;
-  xSemaphoreGiveFromISR (gSemaphore, &xHigherPriorityTaskWoken) ;
-  portYIELD_FROM_ISR () ;
-//  xSemaphoreGive (gSemaphore) ;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-//  OVEN CONTROL TASK
-//----------------------------------------------------------------------------------------------------------------------
-
-static void OvenControlTask (void * /* pData */) {
-  while (1) {
-    xSemaphoreTake (gSemaphore, portMAX_DELAY) ;
-    ovenControlTaskExecutesOneStep () ;
-  }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 //   INIT OVEN CONTROL
 //----------------------------------------------------------------------------------------------------------------------
 
 void initOvenControl (void) {
   pinMode (PIN_OVEN_RELAY, OUTPUT) ;
   pinMode (LED_EN_MARCHE, OUTPUT) ;
-  xTaskCreate (OvenControlTask, "OvenControlTask", 2048, NULL, 256, NULL) ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -206,7 +171,7 @@ static void logData (const uint32_t inTemperature) {
 //  EXECUTE OVEN CONTROL
 //----------------------------------------------------------------------------------------------------------------------
 
-static void ovenControlTaskExecutesOneStep (void) {
+void runOvenControlFromISR (void) {
   switch (gOvenMode) {
   case OvenMode::stopped :
     digitalWrite (PIN_OVEN_RELAY, LOW) ;

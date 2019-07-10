@@ -11,7 +11,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 static int16_t encoderPos = 0; // This variable stores our current value of encoder position.
-static hw_timer_t * gTimer = NULL;
 
 //--- Rotary variables
 static uint32_t gMinEncoderValue ;
@@ -28,7 +27,7 @@ static volatile bool gClickPressed = false ;
 //   ENCODER INTERRUPT SERVICE ROUTINE
 //----------------------------------------------------------------------------------------------------------------------
 
-static void IRAM_ATTR encoderISR (void) {
+void runEncoderFromISR (void) {
   static bool pinALast = HIGH ;
   const bool pinACurrent = digitalRead (PIN_ENCODER_A);
   if ((pinALast == LOW) && (pinACurrent == HIGH)) { //Rising edge
@@ -67,10 +66,6 @@ void initEncoder (void) {
   pinMode (PIN_ENCODER_CLICK, INPUT); // setup the button pin
   pinMode (PIN_ENCODER_A, INPUT) ; // set pinA as an input
   pinMode (PIN_ENCODER_B, INPUT) ; // set pinB as an input
-  gTimer = timerBegin (TIMER_ROTARY_ENCODER, 80, true) ;
-  timerAttachInterrupt(gTimer, encoderISR, true) ;
-  timerAlarmWrite (gTimer, 1000, true) ; // 1000 µs
-  timerAlarmEnable (gTimer) ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -63,7 +63,7 @@ void writeLogFile (void) {
         line += ";" ;
         line += String (record.mConsigne) ;
         line += ";" ;
-        line += record.mOvenIsOn ? "500" : "0" ;
+        line += String (record.mOvenIsOn) ;
         line += ";" ;
         line += String (record.mTemperature) ;
         line += "\n" ;
