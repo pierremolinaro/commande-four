@@ -198,11 +198,15 @@ static void displayAutomaticRunningScreen (void) {
       printWithPadding (message, MESSAGE_SIZE) ;
     //--- Reference
       setLineColumnForTextSize (4, 1, 2, true) ;
-      snprintf (message, MESSAGE_SIZE, "Consigne : %.2f " DEGREE_CHAR "C", temperatureReference ()) ;
+      String message = "Consigne : " ;
+      message += String (temperatureReference ()) ;
+      message += " " DEGREE_CHAR "C" ;
       printWithPadding (message, MESSAGE_SIZE) ;
     //--- Temperature
       setLineColumnForTextSize (6, 1, 2) ;
-      snprintf (message, MESSAGE_SIZE, "Temp" LOWERCASE_E_ACUTE "rature : %.1f " DEGREE_CHAR "C", getSensorTemperature ()) ;
+      message = "Temp" LOWERCASE_E_ACUTE "rature : " ;
+      message += String (getSensorTemperature ()) ;
+      message += " " DEGREE_CHAR "C" ;
       printWithPadding (message, MESSAGE_SIZE) ;
     //--- Fin prévue
       displayAutomaticEndTime () ;

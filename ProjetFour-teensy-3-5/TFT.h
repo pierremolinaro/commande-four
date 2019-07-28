@@ -64,6 +64,8 @@ void setMenuColor (const bool inIsSelected, const bool inIsEditing) ;
 
 void printWithPadding (const char * inString, const uint32_t inSize) ;
 
+void printWithPadding (const String & inString, const uint32_t inSize) ;
+
 void afficherCompteurErreurs (const char * inMessage, const uint32_t inNombreErreurs) ;
 
 //----------------------------------------------------------------------------------------------------------------------

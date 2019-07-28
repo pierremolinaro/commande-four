@@ -39,7 +39,8 @@
 
 void setup (void) {
 // ----------DEBUGGING section of setup----------
- // Serial.begin (9600) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
+  Serial.begin (9600) ;
+  Serial.println ("Hello monitor!") ;
 // ----------LEDs section of setup----------
   pinMode (LED_HOT_OVEN, OUTPUT) ;
   pinMode (LED_BUILTIN, OUTPUT) ;

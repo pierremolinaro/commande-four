@@ -31,7 +31,7 @@ void updateSDCardStatus (void) {
   case SDCardStatus::noCard :
     if (inserted) {
       extendBackLightDuration () ;
-      const bool mounted = SD.cardBegin (SDCARD_CS, SD_SCK_MHZ (25)) ;
+      const bool mounted = SD.begin (SDCARD_CS, SD_SCK_MHZ (25)) ;
       if (mounted) {
         gSDCardStatus = SDCardStatus::mounted ;
         gMountIndex += 1 ;
@@ -44,13 +44,13 @@ void updateSDCardStatus (void) {
   case SDCardStatus::mounted :
     if (!inserted) {
       extendBackLightDuration () ;
-      // SD.end () ; §
+      // SD.end () ;
       gSDCardStatus = SDCardStatus::noCard ;
     }
     break ;
   case SDCardStatus::insertedNotMounted :
     if (inserted) {
-      const bool mounted = SD.cardBegin (SDCARD_CS, SD_SCK_MHZ (25)) ;
+      const bool mounted = SD.begin (SDCARD_CS, SD_SCK_MHZ (25)) ;
       if (mounted) {
         extendBackLightDuration () ;
         gSDCardStatus = SDCardStatus::mounted ;
@@ -94,18 +94,6 @@ bool directoryExists (const String & inPath) {
 
 bool createDirectory (const String & inPath) {
   return SD.mkdir (inPath.c_str ()) ;
-}
-
-//--------------------------------------------------------------------------------------------------------
-
-File openFileForCreation (const String & inFilePath) {
-  return SD.open (inFilePath.c_str (), O_WRITE) ;
-}
-
-//--------------------------------------------------------------------------------------------------------
-
-File openFileForAppending (const String & inFilePath) {
-  return SD.open (inFilePath.c_str (), O_APPEND) ;
 }
 
 //--------------------------------------------------------------------------------------------------------

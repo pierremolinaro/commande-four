@@ -155,7 +155,7 @@ static void ovenControlCore (const int32_t inSensorTemperature) {
 static void logData (const uint32_t inTemperature) {
   Record record ;
   record.mConsigne = lround (gTemperatureReference) ;
-  record.mOvenIsOn = gCurrentOvenCommand ;
+  record.mOvenIsOn = gCurrentOvenCommand ? (record.mConsigne + 10) : 0 ;
   record.mTemperature = inTemperature ;
   gLogData.mLogImage [gLogData.mLogImageSize] = record ;
   gLogData.mLogImageSize += 1 ;

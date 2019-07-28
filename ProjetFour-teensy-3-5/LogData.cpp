@@ -28,17 +28,17 @@ void enterLogData (const LogData & inData) {
 void writeLogFile (void) {
   if (gWriteLogFile && (sdCardStatus () == SDCardStatus::mounted)) {
   //--- Message
-    // Serial.print ("Result file : ") ; Serial.println (gLogData.mFileName) ;
+    Serial.print ("Result file : ") ; Serial.println (gLogData.mFileName) ;
   //--- Check if result directory exists
     const bool resultDirectoryExists = directoryExists (RESULT_DIRECTORY) ;
-    // Serial.print ("Result directory exists: ") ; Serial.println (resultDirectoryExists ? "yes" : "no") ;
+    Serial.print ("Result directory exists: ") ; Serial.println (resultDirectoryExists ? "yes" : "no") ;
     bool ok = resultDirectoryExists ;
   //--- Create result directory
     if (! resultDirectoryExists) {
       ok = createDirectory (RESULT_DIRECTORY) ;
-      // Serial.print ("Result directory creation: ") ; Serial.println (ok ? "yes" : "no") ;
+      Serial.print ("Result directory creation: ") ; Serial.println (ok ? "yes" : "no") ;
     }
-  //--- Append data to file (or create file if does not exist)
+   //--- Append data to file (or create file if does not exist)
     File f ;
     if (ok) {
     //--- Build file path
@@ -46,14 +46,10 @@ void writeLogFile (void) {
       filePath += "/" ;
       filePath += gLogData.mFileName ;
       filePath += ".csv" ;
-      f = openFileForAppending (filePath) ;
+      Serial.print ("file path: ") ; Serial.println (filePath) ;
+      f = SD.open (filePath, O_RDWR | O_CREAT | O_AT_END) ;
       ok = f ;
-      // Serial.print ("Open file for appending: ") ; Serial.println (ok ? "yes" : "no") ;
-      if (!ok) { // Create file
-        f = openFileForCreation (filePath) ;
-        ok = f ;
-        // Serial.print ("Open file for creation: ") ; Serial.println (ok ? "yes" : "no") ;
-      }
+      Serial.print ("Open file for appending: ") ; Serial.println (ok ? "yes" : "no") ;
     }
   //--- Append data to file
     if (ok) {
@@ -69,7 +65,7 @@ void writeLogFile (void) {
         line += "\n" ;
         ok = f.print (line) ;
       }
-      // Serial.print ("File appending: ") ; Serial.println (ok ? "yes" : "no") ;
+      Serial.print ("File appending: ") ; Serial.println (ok ? "yes" : "no") ;
     }
   //--- Close file
     f.close () ;

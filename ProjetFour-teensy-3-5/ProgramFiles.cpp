@@ -29,26 +29,17 @@ void resetProgramList (void) {
 //----------------------------------------------------------------------------------------------------------------------
 
 static void filterFilePath (String & ioFilePath, bool & outRetain) {
-//--- Suppress path
-  const int idx = ioFilePath.lastIndexOf ('/') ;
-  if (idx > 0) {
-    ioFilePath = ioFilePath.substring (idx + 1) ;
-    outRetain = true ;
-  }
-//--- Check file extension is ".csv" et ".CSV"
+  const int idx = ioFilePath.indexOf ('.') ;
+  outRetain = (idx > 0) && (idx == ((int) ioFilePath.length () - 4)) ;
   if (outRetain) {
-    const int idx = ioFilePath.indexOf ('.') ;
-    outRetain = (idx > 0) && (idx == ((int) ioFilePath.length () - 4)) ;
-    if (outRetain) {
-      const String extension = ioFilePath.substring (idx + 1) ;
-      outRetain = extension.equalsIgnoreCase ("csv") ;
-    }
-    if (outRetain) {
-      ioFilePath = ioFilePath.substring (0, idx) ;
-    }
-    if (outRetain) {
-      outRetain = ioFilePath.length () <= FILE_BASE_NAME_MAX_LENGTH ;
-    }
+    const String extension = ioFilePath.substring (idx + 1) ;
+    outRetain = extension.equalsIgnoreCase ("csv") ;
+  }
+  if (outRetain) {
+    ioFilePath = ioFilePath.substring (0, idx) ;
+  }
+  if (outRetain) {
+    outRetain = ioFilePath.length () <= FILE_BASE_NAME_MAX_LENGTH ;
   }
 }
 
@@ -94,6 +85,7 @@ void buildProgramFileNameArray (void) {
   if (mounted && !gSDCardMounted) {
     build = true ;
     gSDCardMounted = true ;
+    gCurrentSDCardMountIndex = mountIndex () ;
   }else if (gSDCardMounted  && !mounted) {
     gCurrentFileNameCount = 0 ;
     gSDCardMounted = false ;
@@ -103,12 +95,17 @@ void buildProgramFileNameArray (void) {
   }
 //--- Build file name list ?
   if (build) {
+    // Serial.println ("build") ;
     gCurrentFileNameCount = 0 ;
-    File root = SD.open (PROFILES_DIRECTORY);
+    File root = SD.open (PROFILES_DIRECTORY, O_READ);
+    // Serial.print ("  root ") ; Serial.println (root.isDir ()) ;
     root.rewindDirectory () ;
     File file = root.openNextFile () ;
     while (file && (gCurrentFileNameCount < FILE_NAME_ARRAY_SIZE)) {
-      String filePath = file.name () ;
+      char s [FILE_BASE_NAME_MAX_LENGTH + 10] ;
+      file.getName (s, FILE_BASE_NAME_MAX_LENGTH + 10) ;
+      String filePath = s ;
+      // Serial.print ("  filePath ") ; Serial.println (filePath) ;
       bool retain = false ;
       filterFilePath (filePath, retain) ;
       if (retain) {

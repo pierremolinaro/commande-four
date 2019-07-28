@@ -9,7 +9,7 @@
 //  SD CARD DIRECTORIES
 //----------------------------------------------------------------------------------------------------------------------
 
-const char * const PROFILES_DIRECTORY = "/profils" ;
-const char * const RESULT_DIRECTORY   = "/resultats" ;
+const char * const PROFILES_DIRECTORY = "profils" ;
+const char * const RESULT_DIRECTORY   = "resultats" ;
 
 //----------------------------------------------------------------------------------------------------------------------

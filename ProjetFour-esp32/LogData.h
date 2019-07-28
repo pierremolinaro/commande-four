@@ -26,8 +26,10 @@ static const uint32_t RECORD_SIZE = 60 ;
 typedef struct {
   int mConsigne ;
   int mTemperature ;
-  bool mOvenIsOn ;
+  int mOvenIsOn ;
 } Record ;
+
+//----------------------------------------------------------------------------------------------------------------------
 
 typedef struct {
   uint32_t mLogStartTime ;
