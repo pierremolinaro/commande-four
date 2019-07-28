@@ -100,7 +100,7 @@ void clickInRemoveProgramMode (bool & outReturnToMainMenu) {
         const String fileName = programFileNameAtIndex (gSelectedItemIndex - 1) ;
         const String filePath = String (PROFILES_DIRECTORY) + '/' + fileName + ".CSV" ;
         const bool ok = SD.remove (filePath.c_str ()) ;
-        Serial.printf ("Remove file '%s': %s\n", filePath.c_str (), ok ? "done" : "error") ;
+        //Serial.printf ("Remove file '%s': %s\n", filePath.c_str (), ok ? "done" : "error") ;
         if (ok) {
           resetProgramList () ;
         }

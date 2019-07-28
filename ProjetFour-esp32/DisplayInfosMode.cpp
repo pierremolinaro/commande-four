@@ -29,6 +29,10 @@ void displayInfos (void) {
   setLineColumnForTextSize (7, 1, 2) ;
   tft.setTextColor (TFT_WHITE, TFT_BLACK);
   tft.printf ("RAM libre %6u octets", minFreeHeap ()) ;
+//--- Jonction
+  setLineColumnForTextSize (8, 1, 2) ;
+  tft.setTextColor (TFT_WHITE, TFT_BLACK);
+  tft.printf ("Junction : %7.2f" DEGREE_CHAR "C", getJunctionTemperature ()) ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

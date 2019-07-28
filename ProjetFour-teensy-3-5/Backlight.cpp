@@ -45,12 +45,11 @@ void updateBacklight (void) {
   }
 //--- Contrôler le retro-éclairage
   if ((gExtinctionDate < millis ()) && (gIntensity > 0)) {
-    gIntensity *= 9 ;
-    gIntensity /= 10 ;
-    gExtinctionDate += 100 ; // Période de diminution de l'intensité
+    gIntensity *= 99 ;
+    gIntensity /= 100 ;
+    gExtinctionDate += 10 ; // Période de diminution de l'intensité
   }
   analogWrite (PIN_BACKLIGHT, PWM_MAX_INTENSITY - gIntensity) ;
- // ledcWrite (PWM_CHANNEL_BACKLIGHT, PWM_MAX_INTENSITY - gIntensity) ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

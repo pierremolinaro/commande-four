@@ -63,9 +63,9 @@ void runEncoderFromISR (void) {
 //----------------------------------------------------------------------------------------------------------------------
 
 void initEncoder (void) {
-  pinMode (PIN_ENCODER_CLICK, INPUT); // setup the button pin
-  pinMode (PIN_ENCODER_A, INPUT) ; // set pinA as an input
-  pinMode (PIN_ENCODER_B, INPUT) ; // set pinB as an input
+  pinMode (PIN_ENCODER_CLICK, INPUT_PULLUP); // setup the button pin
+  pinMode (PIN_ENCODER_A, INPUT_PULLUP) ; // set pinA as an input
+  pinMode (PIN_ENCODER_B, INPUT_PULLUP) ; // set pinB as an input
 }
 
 //----------------------------------------------------------------------------------------------------------------------

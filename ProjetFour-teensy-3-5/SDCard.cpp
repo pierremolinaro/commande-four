@@ -11,7 +11,7 @@ SdFat SD ;
 //----------------------------------------------------------------------------------------------------------------------
 
 void initSDcard (void) {
-  pinMode (SDCARD_CD, INPUT) ;
+  pinMode (SDCARD_CD, INPUT_PULLUP) ;
   SPI.setSCK (SDCARD_SCK) ;
   updateSDCardStatus () ;
 }

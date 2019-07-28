@@ -5,6 +5,7 @@
 #include "TemperatureSensor.h"
 #include "Defines.h"
 #include "gcc-diagnostics.h"
+#include "TemperatureCorrection.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 //  CONSTANTS
@@ -24,12 +25,6 @@ static const uint32_t SAMPLE_ARRAY_SIZE = 8 ;
 //      D1 : 0 --> ok, 1 --> SCG Fault : « the thermocouple is short-circuited to GND »
 //      D0 : 0 --> ok, 1 -->  OC Fault : « the thermocouple is open (no connections) »
 //----------------------------------------------------------------------------------------------------------------------
-//  Interruptions périodiques de l'ESP32 (https://techtutorialsx.com/2017/10/07/esp32-arduino-timer-interrupts/)
-//    - fréquence de base 80 MHz
-//    - prescaler qui divise cette fréquence par 2 à 65536
-//    - Attention, le numéro du timer peut entrer en conflit avec les PWM (?)
-
-//----------------------------------------------------------------------------------------------------------------------
 //  STATIC VARIABLES
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -41,7 +36,9 @@ static volatile uint32_t gFaultlySampleCount ;
 static uint32_t gNombreMesuresMoyennesInvalides ;
 
 static uint32_t gErrorFlags ;
-static double gMesure ;
+static double gRawTemperature ;
+static double gJunctionTemperature ;
+static double gCorrectedTemperature ;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -122,6 +119,7 @@ void updateTemp (void) {
   int32_t nombreMesuresValides = 0 ;
   uint32_t errorFlags = 0 ; // 0 -> No error
   int32_t mesuresCumulees = 0 ;
+  int32_t sumOfJunctionTemperatures = 0 ;
   for (uint32_t i=0 ; i<SAMPLE_ARRAY_SIZE ; i++) {
     const uint32_t mesure = gSampleArray [i] ;
     if (mesure != UINT32_MAX) { // Mesure incohérente rejetée
@@ -131,16 +129,24 @@ void updateTemp (void) {
         int32_t v = (int32_t) mesure ;
         v >>= 18 ;
         mesuresCumulees += v ;
+        v = (int32_t) mesure ;
+        v <<= 16 ;
+        v >>= (16 + 4) ;
+        sumOfJunctionTemperatures += v ;
         nombreMesuresValides += 1 ;
       }
     }
   }
   if (nombreMesuresValides > 0) {
     gErrorFlags = 0 ;
-    gMesure = (mesuresCumulees * 0.25) / nombreMesuresValides ;
+    gRawTemperature = (((double) mesuresCumulees) * 0.25) / (double) nombreMesuresValides ;
+    gJunctionTemperature = (((double) sumOfJunctionTemperatures) / 16.0) / (double) nombreMesuresValides ;
+    gCorrectedTemperature = correctedCelsius (gRawTemperature, gJunctionTemperature) ;
   }else{
     gErrorFlags = errorFlags ;
-    gMesure = 2000.0 ;
+    gRawTemperature = 2000.0 ;
+    gCorrectedTemperature = 2000.0 ;
+    gJunctionTemperature = 128.0 ;
     gNombreMesuresMoyennesInvalides += 1 ;
   }
 }
@@ -160,10 +166,21 @@ uint32_t temperatureSensorErrorFlags (void) {
 //----------------------------------------------------------------------------------------------------------------------
 //    getSensorTemperature
 //----------------------------------------------------------------------------------------------------------------------
-// This function returns the temperature in Celcius
 
 double getSensorTemperature (void) {
-  return gMesure ;
+  return gCorrectedTemperature ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+double getRawTemperature (void) {
+  return gRawTemperature ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+double getJunctionTemperature (void) {
+  return gJunctionTemperature ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

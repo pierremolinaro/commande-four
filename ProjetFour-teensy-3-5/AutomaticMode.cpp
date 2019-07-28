@@ -292,7 +292,7 @@ void clickInAutomaticMode (bool & outReturnToMainMenu) {
     case DisplayPhase::list :
       { const String fileName = programFileNameAtIndex (gSelectedItemIndex - 1) ;
         const bool ok = readProgramFile (fileName) ;
-        Serial.printf ("Read '%s' --> %d\n", fileName.c_str (), ok) ;
+        // Serial.printf ("Read '%s' --> %d\n", fileName.c_str (), ok) ;
         if (ok) {
           gDisplayPhase = DisplayPhase::graph ;
           plotGraph () ;

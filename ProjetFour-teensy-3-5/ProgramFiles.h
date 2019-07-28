@@ -14,7 +14,7 @@
 //   PROGRAM FILE NAMES MANAGMENT
 //----------------------------------------------------------------------------------------------------------------------
 
- void resetProgramList (void) ;
+void resetProgramList (void) ;
 
 void buildProgramFileNameArray (void) ;
 

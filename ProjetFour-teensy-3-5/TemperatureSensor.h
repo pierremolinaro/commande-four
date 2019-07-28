@@ -60,7 +60,13 @@ uint32_t obtenirNombreMesuresMoyennesInvalides (void) ;
 // GET SENSOR TEMPERATURE (Celcius)
 //----------------------------------------------------------------------------------------------------------------------
 
-double getSensorTemperature (void) ;
+double getSensorTemperature (void) ; // Corrected temperature
+
+
+double getRawTemperature (void) ; // Used only for information
+
+
+double getJunctionTemperature (void) ; // Used only for information
 
 //----------------------------------------------------------------------------------------------------------------------
 

@@ -9,7 +9,7 @@
 //#####################################################################################################################
 //
 //----------------------------------------------------------------------------------------------------------------------
-//  Check board type
+//  Check board type (Teensy 3.5)
 //----------------------------------------------------------------------------------------------------------------------
 
 #include "check-board.h"
@@ -39,9 +39,11 @@
 
 void setup (void) {
 // ----------DEBUGGING section of setup----------
-  Serial.begin (115200) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
+ // Serial.begin (9600) ;     // DEBUGGING: opens serial port, sets data rate to 115200 bps
 // ----------LEDs section of setup----------
   pinMode (LED_HOT_OVEN, OUTPUT) ;
+  pinMode (LED_BUILTIN, OUTPUT) ;
+  digitalWrite (LED_BUILTIN, HIGH) ;
 //--- Backlight
   initBacklight () ;
 //--- Initializations
@@ -60,7 +62,13 @@ void setup (void) {
 //                                    LOOP
 //----------------------------------------------------------------------------------------------------------------------
 
+static uint32_t gBlinkDate = 3000 ;
+
 void loop (void) {
+  if (gBlinkDate < millis ()) {
+    digitalWrite (LED_BUILTIN, !digitalRead (LED_BUILTIN)) ;
+    gBlinkDate += 1000 ;
+  }
 //--- Backlight
   updateBacklight () ;
 //----------Updating the time----------

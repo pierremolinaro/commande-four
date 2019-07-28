@@ -5,6 +5,12 @@
 *.pyc
 *.bin
 
+## Xcode files
+**/project.xcworkspace/**
+**/xcuserdata/**
+**/xcshareddata/**
+**/build/**
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof

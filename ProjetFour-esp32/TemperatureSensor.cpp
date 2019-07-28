@@ -44,6 +44,7 @@ static uint32_t gNombreMesuresMoyennesInvalides ;
 
 static uint32_t gErrorFlags ;
 static double gMesure ;
+static double gJunctionTemperature ;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -130,6 +131,7 @@ void updateTemp (void) {
   int32_t nombreMesuresValides = 0 ;
   uint32_t errorFlags = 0 ; // 0 -> No error
   int32_t mesuresCumulees = 0 ;
+  int32_t sumOfJunctionTemperatures = 0 ;
   for (uint32_t i=0 ; i<SAMPLE_ARRAY_SIZE ; i++) {
     const uint32_t mesure = gSampleArray [i] ;
     if (mesure != UINT32_MAX) { // Mesure incohérente rejetée
@@ -139,6 +141,10 @@ void updateTemp (void) {
         int32_t v = (int32_t) mesure ;
         v >>= 18 ;
         mesuresCumulees += v ;
+        v = (int32_t) mesure ;
+        v <<= 16 ;
+        v >>= (16 + 4) ;
+        sumOfJunctionTemperatures += v ;
         nombreMesuresValides += 1 ;
       }
     }
@@ -146,9 +152,11 @@ void updateTemp (void) {
   if (nombreMesuresValides > 0) {
     gErrorFlags = 0 ;
     gMesure = (mesuresCumulees * 0.25) / nombreMesuresValides ;
+    gJunctionTemperature = (((double) sumOfJunctionTemperatures) / 16.0) / (double) nombreMesuresValides ;
   }else{
     gErrorFlags = errorFlags ;
     gMesure = 2000.0 ;
+    gJunctionTemperature = 128.0 ;
     gNombreMesuresMoyennesInvalides += 1 ;
   }
 }
@@ -172,6 +180,12 @@ uint32_t temperatureSensorErrorFlags (void) {
 
 double getSensorTemperature (void) {
   return gMesure ;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+double getJunctionTemperature (void) {
+  return gJunctionTemperature ;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

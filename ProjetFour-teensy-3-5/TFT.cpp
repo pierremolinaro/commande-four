@@ -31,7 +31,6 @@ static void drawSplashScreen (void) {
       buffer [i] = color ;
     }
     tft.writeRect (x, y, SPLASH_SCREEN_WIDTH, 1, buffer);
-    // § tft.pushImage (x, y, SPLASH_SCREEN_WIDTH, 1, buffer);
     y -= 1 ;
   }
 }
@@ -51,7 +50,7 @@ void initScreen(void) {
   tft.begin () ;
   tft.setRotation (1) ;  // 0 & 2 Portrait. 1 & 3 landscape
  //--- Splash screen
-   drawSplashScreen () ;
+  drawSplashScreen () ;
   delay (2000) ;
 //--- Clear screen
   tft.fillScreen (ILI9341_BLACK); // black screen
