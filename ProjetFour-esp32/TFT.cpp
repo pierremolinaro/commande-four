@@ -27,7 +27,7 @@ static void drawSplashScreen (void) {
   uint16_t buffer [SPLASH_SCREEN_WIDTH] ;
   for (uint16_t row = 0 ; row < SPLASH_SCREEN_HEIGHT ; row++) {
     for (uint32_t i= 0 ; i<SPLASH_SCREEN_WIDTH ; i++) {
-      const uint16_t color = colorTable [splashScreen [SPLASH_SCREEN_WIDTH * row + i]] ;
+      const uint16_t color = colorTable [splashScreen [i + SPLASH_SCREEN_WIDTH * row]] ;
       buffer [i] = color ;
     }
     tft.pushImage (x, y, SPLASH_SCREEN_WIDTH, 1, buffer);

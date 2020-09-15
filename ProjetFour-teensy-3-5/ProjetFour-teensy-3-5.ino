@@ -18,6 +18,7 @@
 //  Libraries
 //    - Installer manuellement ILI9341_t3n et SPIN
 //    - Rtc_by_Makuna
+//    - SdFat (Bill Greiman) 
 //----------------------------------------------------------------------------------------------------------------------
 
 #include "Defines.h"

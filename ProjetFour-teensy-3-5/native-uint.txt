@@ -1,0 +1,44 @@
+native $uint <N> where (N >= 1) && (N <= 128) {
+  @llvmType "i" + N
+
+  literalIntConvertibility (?v $literalInt) -> $self {
+    if v < 0 {
+      error v : "operand should be >= 0"
+    }else if v >= (1 << N) {
+      error v : "operand should be <= 1 << " + N
+    }else{
+      return v
+    }
+  }
+
+  safe func & (?left $self ?right $self) -> $self {
+    result = "and i" + N + ", " + left + ", " + right
+    return result
+  }
+
+  func + (?left $self ?right $self) -> $self {
+    result = "add i" + N + ", " + left + ", " + right
+  }panic{
+    declare "{i" + N + ", i1} @llvm.uadd.with.overflow.i" + N + "(i" + N + " %a, i" + N + " %b)"
+    result, ovf = "call {i" + N + ", i1} @llvm.uadd.with.overflow.i" + N + " (i" + N + " " + left + ", i" + N + " " + right + ")"
+    if ovf {
+      panic 5
+    }
+    return result
+  }
+
+  safe func ~ (?value $self) -> $self {
+    result = "xor i" + N + ", " + value + ", " + ((1 << N) - 1)
+    return result
+  }
+
+  safe func extend <$uint <P> > (?value $self) -> $uint <P> {
+    if P <= N {
+      error
+    }else{
+      r = "zext i" + N + " " + value + " to i" + P
+      return r
+    }
+  }
+
+}
